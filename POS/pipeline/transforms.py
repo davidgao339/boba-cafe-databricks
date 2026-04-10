@@ -6,7 +6,7 @@ import pandas as pd
 from pyspark.sql import SparkSession, functions as F
 from pyspark.sql.types import (
     StructType, StructField, StringType, DoubleType, BooleanType,
-    TimestampType, DateType,
+    IntegerType, TimestampType, DateType,
 )
 from delta.tables import DeltaTable
 
@@ -20,7 +20,7 @@ def _get_spark():
 TRANSACTIONS_SCHEMA = StructType([
     StructField("datetime", TimestampType()),
     StructField("date", DateType()),
-    StructField("order_number", DoubleType()),
+    StructField("order_number", IntegerType()),
     StructField("store_name", StringType()),
     StructField("rnm", StringType()),
     StructField("transaction_type", StringType()),
