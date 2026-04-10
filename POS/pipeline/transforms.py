@@ -59,7 +59,7 @@ def build_transactions(raw_data):
 
     df = pd.DataFrame(raw_data)
 
-    df["datetime"] = pd.to_datetime(df["datetime"], format="mixed")
+    df["datetime"] = pd.to_datetime(df["datetime"], infer_datetime_format=True)
     df["date"] = df["datetime"].dt.strftime("%Y-%m-%d")
 
     sign = df["is_return"].apply(lambda x: -1 if x else 1)
