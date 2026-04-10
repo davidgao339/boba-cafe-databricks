@@ -1,25 +1,15 @@
 """
 Shared configuration for the SBIS pipeline.
-Credentials loaded from Databricks secrets, with env var fallback for local dev.
+Credentials imported from secrets.py (gitignored).
 """
-import os
 
-# --- API Endpoints ---
+# --- SBIS API Endpoints ---
 AUTH_URL = "https://api.sbis.ru/oauth/service/"
 POINTS_URL = "https://api.sbis.ru/retail/point/list"
 ORDERS_URL = "https://api.sbis.ru/retail/order/list"
 
-# --- Credentials ---
-try:
-    # Databricks environment
-    APP_CLIENT_ID = dbutils.secrets.get("boba-cafe", "SBIS_APP_CLIENT_ID")  # noqa: F821
-    LOGIN = dbutils.secrets.get("boba-cafe", "SBIS_LOGIN")  # noqa: F821
-    PASSWORD = dbutils.secrets.get("boba-cafe", "SBIS_PASSWORD")  # noqa: F821
-except Exception:
-    # Local fallback
-    APP_CLIENT_ID = os.getenv("SBIS_APP_CLIENT_ID", "")
-    LOGIN = os.getenv("SBIS_LOGIN", "")
-    PASSWORD = os.getenv("SBIS_PASSWORD", "")
+# --- SBIS Credentials (from secrets.py) ---
+from pipeline.secrets import APP_CLIENT_ID, LOGIN, PASSWORD
 
 # --- POS Terminal → Store Name Mapping ---
 POS_TO_STORE = {

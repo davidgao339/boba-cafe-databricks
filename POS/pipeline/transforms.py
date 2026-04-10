@@ -6,7 +6,7 @@ import pandas as pd
 from pyspark.sql import SparkSession, functions as F
 from pyspark.sql.types import (
     StructType, StructField, StringType, DoubleType, BooleanType,
-    IntegerType, TimestampType, DateType,
+    TimestampType, DateType,
 )
 from delta.tables import DeltaTable
 
