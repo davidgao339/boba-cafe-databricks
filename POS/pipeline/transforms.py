@@ -110,6 +110,20 @@ def build_daily_sales(transactions_df):
         .sum()
         .rename(columns={"store_name": "store"})
     )
+
+    # Ensure every store × payment_type combo exists (fill missing with 0)
+    dates = result["date"].unique()
+    stores = result["store"].unique()
+    payment_types = ["card", "cash", "online"]
+    full_index = pd.MultiIndex.from_product(
+        [dates, stores, payment_types], names=["date", "store", "payment_type"]
+    )
+    result = (
+        result.set_index(["date", "store", "payment_type"])
+        .reindex(full_index, fill_value=0)
+        .reset_index()
+    )
+
     result["date"] = pd.to_datetime(result["date"]).dt.date
     result["revenue"] = result["revenue"].round().astype(int)
     return result.sort_values(["date", "store", "payment_type"]).reset_index(drop=True)
