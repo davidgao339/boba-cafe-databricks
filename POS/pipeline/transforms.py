@@ -72,6 +72,7 @@ def build_transactions(raw_data):
         axis=1,
     )
 
+    df["order_number"] = df["order_number"].astype(str)
     df["customer_name"] = df["customer_name"].fillna("")
     df["online"] = df["online"].astype(bool)
     df["is_topping"] = df["is_topping"].astype(bool)
