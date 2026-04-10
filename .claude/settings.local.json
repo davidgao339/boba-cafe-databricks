@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(python -c \":*)",
-      "Bash(ls -la \"D:/Github/boba-cafe/\"*.png)"
+      "Bash(ls -la \"D:/Github/boba-cafe/\"*.png)",
+      "Bash(python -c ':*)",
+      "Bash(iconv -f utf-8 -t utf-8)"
     ]
   }
 }
