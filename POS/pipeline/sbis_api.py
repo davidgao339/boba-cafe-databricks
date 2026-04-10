@@ -108,12 +108,10 @@ def fetch_orders(sid, points, start_dt, end_dt):
                 else:
                     pos_rnm = "Non-Fiscal"
 
-                if pos_rnm != "Non-Fiscal" and pos_rnm not in POS_TO_STORE:
-                    raise ValueError(
-                        f"Unknown RNM '{pos_rnm}' at point {point_id} ({default_name}), "
-                        f"order #{order_number}. Add it to POS_TO_STORE in config.py."
-                    )
-                store_name = POS_TO_STORE.get(pos_rnm, o.get("CompanyName") or default_name)
+                if pos_rnm in POS_TO_STORE:
+                    store_name = POS_TO_STORE[pos_rnm]
+                else:
+                    store_name = f"UNKNOWN_{pos_rnm[-4:]}"
 
                 # Determine transaction type
                 txn_type = "Unknown"
