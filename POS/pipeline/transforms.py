@@ -20,7 +20,7 @@ def _get_spark():
 TRANSACTIONS_SCHEMA = StructType([
     StructField("datetime", TimestampType()),
     StructField("date", DateType()),
-    StructField("order_number", StringType()),
+    StructField("order_number", DoubleType()),
     StructField("store_name", StringType()),
     StructField("rnm", StringType()),
     StructField("transaction_type", StringType()),
@@ -72,7 +72,6 @@ def build_transactions(raw_data):
         axis=1,
     )
 
-    df["order_number"] = df["order_number"].astype(str)
     df["customer_name"] = df["customer_name"].fillna("")
     df["online"] = df["online"].astype(bool)
     df["is_topping"] = df["is_topping"].astype(bool)
