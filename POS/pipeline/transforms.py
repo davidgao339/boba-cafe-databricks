@@ -60,7 +60,7 @@ def build_transactions(raw_data):
     df = pd.DataFrame(raw_data)
 
     df["datetime"] = pd.to_datetime(df["datetime"], infer_datetime_format=True)
-    df["date"] = df["datetime"].dt.strftime("%Y-%m-%d")
+    df["date"] = df["datetime"].dt.date
 
     sign = df["is_return"].apply(lambda x: -1 if x else 1)
     df["qty"] = df["qty_raw"] * sign
@@ -110,6 +110,7 @@ def build_daily_sales(transactions_df):
         .sum()
         .rename(columns={"store_name": "store"})
     )
+    result["date"] = pd.to_datetime(result["date"]).dt.date
     result["revenue"] = result["revenue"].round().astype(int)
     return result.sort_values(["date", "store", "payment_type"]).reset_index(drop=True)
 
@@ -127,6 +128,7 @@ def build_product_sales(transactions_df):
         .agg({"qty": "sum", "revenue": "sum"})
         .rename(columns={"store_name": "store"})
     )
+    result["date"] = pd.to_datetime(result["date"]).dt.date
     result["revenue"] = result["revenue"].astype(int)
     return result.sort_values(["date", "store", "revenue"], ascending=[True, True, False]).reset_index(drop=True)
 
