@@ -26,5 +26,5 @@ POS_TO_STORE = {
 
 # --- Delta Table Names ---
 TRANSACTIONS_TABLE = "workspace.default.transactions"
-DAILY_SALES_TABLE = "workspace.default.daily_sales"
-PRODUCT_SALES_TABLE = "workspace.default.product_sales"
+DAILY_SALES_TABLE = "workspace.default.daily_sales_v2"
+PRODUCT_SALES_TABLE = "workspace.default.product_sales_v2"
