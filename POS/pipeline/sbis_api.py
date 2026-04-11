@@ -160,9 +160,9 @@ def fetch_orders(sid, points, start_dt, end_dt):
                     }
                     all_items.append(base)
 
-                    # Toppings (modifiers with price > 0)
+                    # Toppings (all modifiers, including free ones)
                     for pos in item.get("Positions") or []:
-                        if _nz(pos.get("CatalogPrice")) > 0 and pos.get("IsModifier"):
+                        if pos.get("IsModifier"):
                             t_qty = _nz(pos.get("Quantity"))
                             t_disc = _nz(pos.get("CheckDiscount")) or _nz(pos.get("TotalDiscount"))
                             t_net = (_nz(pos.get("CatalogPrice")) * t_qty) - t_disc
