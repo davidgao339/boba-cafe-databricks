@@ -100,8 +100,10 @@ def build_daily_sales(transactions_df):
             return "online"
         elif row["transaction_type"] == "Cash":
             return "cash"
-        else:
+        elif row["transaction_type"] == "Card":
             return "card"
+        else:
+            return "other"  # Mixed, Non-Fiscal, Unknown, etc.
 
     df["payment_type"] = df.apply(classify, axis=1)
 
@@ -114,7 +116,7 @@ def build_daily_sales(transactions_df):
     # Ensure every store × payment_type combo exists (fill missing with 0)
     dates = result["date"].unique()
     stores = result["store"].unique()
-    payment_types = ["card", "cash", "online"]
+    payment_types = ["card", "cash", "online", "other"]
     full_index = pd.MultiIndex.from_product(
         [dates, stores, payment_types], names=["date", "store", "payment_type"]
     )
