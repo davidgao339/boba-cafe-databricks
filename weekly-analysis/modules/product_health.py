@@ -1,28 +1,75 @@
 """
 Section 3: Product Health — category distribution, per-product sales, WoW.
-Uses product_hierarchy.csv if available, falls back to raw product names.
+Uses products_mapped.csv for hierarchy. Strips variant suffixes before joining.
 """
+import re
 import pandas as pd
 from modules.utils import fmt_rub, fmt_pct, wow_arrow, md_table, section
 
+# Suffixes that mark a variant of the base product (strip before lookup)
+_VARIANT_SUFFIXES = re.compile(
+    r"\s*\(шарики не включены\)"
+    r"|\s*\(без шариков\)"
+    r"|\s*\(no balls\)",
+    flags=re.IGNORECASE,
+)
+
+# Products to exclude from health reporting entirely
+_EXCLUDE_PREFIXES = ("списание", "у меня нет тапиоки")
+_ZERO_REV_MODIFIERS = {
+    "без соуса", "без топпинга", "без шариков", "кетчуп 30гр",
+    "менее сладкий", "со льдом", "соус кетчуп", "соус сырный",
+    "соус сырный 30гр", "стандартный", "теплый", "холодный меньше льда",
+}
+
+
+def _clean_product_name(name):
+    """Strip variant suffixes to get the canonical lookup name."""
+    if not isinstance(name, str):
+        return name
+    return _VARIANT_SUFFIXES.sub("", name).strip()
+
+
+def _should_exclude(name):
+    """Return True for write-offs and zero-revenue modifiers."""
+    if not isinstance(name, str):
+        return False
+    low = name.lower().strip()
+    if any(low.startswith(p) for p in _EXCLUDE_PREFIXES):
+        return True
+    if low in _ZERO_REV_MODIFIERS:
+        return True
+    return False
+
 
 def _enrich(txn, hierarchy):
-    """Join transactions with product hierarchy."""
+    """Join transactions with product hierarchy, stripping variant suffixes."""
     df = txn.copy()
+    df = df[~df["product"].apply(_should_exclude)]
+
+    # Create a lookup key by stripping suffixes
+    df["product_lookup"] = df["product"].apply(_clean_product_name)
+
     if hierarchy.empty:
-        df["category"]   = "Uncategorised"
+        df["category"]    = "Uncategorised"
         df["subcategory"] = "Uncategorised"
-        df["product_en"] = df["product"]
-        df["variant"]    = ""
+        df["product_en"]  = df["product_lookup"]
+        df["variant"]     = ""
     else:
         df = df.merge(
             hierarchy[["product", "category", "subcategory", "product_en", "variant"]],
-            on="product", how="left"
+            left_on="product_lookup", right_on="product",
+            how="left", suffixes=("", "_hier")
         )
         df["category"]    = df["category"].fillna("Uncategorised")
         df["subcategory"] = df["subcategory"].fillna("Uncategorised")
-        df["product_en"]  = df["product_en"].fillna(df["product"])  # fallback to Russian name
+        df["product_en"]  = df["product_en"].fillna(df["product_lookup"])
         df["variant"]     = df["variant"].fillna("")
+
+        # Mark variant rows (original name ≠ lookup name)
+        is_variant = df["product"] != df["product_lookup"]
+        df.loc[is_variant & (df["variant"] == ""), "variant"] = "no balls"
+
     return df
 
 

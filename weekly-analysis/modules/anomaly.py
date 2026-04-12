@@ -54,7 +54,7 @@ def build(current_txn, spark, transactions_table, week_start, week_end, cfg):
         parts.append(md_table(
             low_sales[["date", "store_name", "revenue", "rolling_avg", "vs_avg"]].rename(
                 columns={"store_name": "store"}
-            ).sort_values("revenue"),
+            ).sort_values(["store", "date"]),
             formatters={"revenue": fmt_rub, "rolling_avg": fmt_rub}
         ))
 
@@ -106,7 +106,7 @@ def build(current_txn, spark, transactions_table, week_start, week_end, cfg):
         parts.append(md_table(
             low_cash[["date", "store_name", "cash", "total", "cash_ratio_fmt", "baseline_ratio_fmt"]]
             .rename(columns={"store_name": "store", "cash_ratio_fmt": "cash_%", "baseline_ratio_fmt": "baseline_%"})
-            .sort_values("date"),
+            .sort_values(["store", "date"]),
             formatters={"cash": fmt_rub, "total": fmt_rub}
         ))
 
@@ -134,8 +134,9 @@ def build(current_txn, spark, transactions_table, week_start, week_end, cfg):
     if not gap_rows:
         parts.append("_No long sales gaps detected._\n")
     else:
-        gap_df = pd.DataFrame(gap_rows).sort_values("gap_min", ascending=False)
+        gap_df = pd.DataFrame(gap_rows)
         gap_df["date"] = pd.to_datetime(gap_df["date"]).dt.strftime("%Y-%m-%d")
+        gap_df = gap_df.sort_values(["store", "date", "gap_start"])
         parts.append(md_table(gap_df))
 
     # ── 4.4 Tapioca Gaps ─────────────────────────────────────────
@@ -173,8 +174,9 @@ def build(current_txn, spark, transactions_table, week_start, week_end, cfg):
     if not tap_gaps:
         parts.append("_No tapioca gaps detected._\n")
     else:
-        tap_df = pd.DataFrame(tap_gaps).sort_values("gap_min", ascending=False)
+        tap_df = pd.DataFrame(tap_gaps)
         tap_df["date"] = pd.to_datetime(tap_df["date"]).dt.strftime("%Y-%m-%d")
+        tap_df = tap_df.sort_values(["store", "date", "gap_start"])
         parts.append(md_table(
             tap_df,
             formatters={"rev_in_gap": fmt_rub}
