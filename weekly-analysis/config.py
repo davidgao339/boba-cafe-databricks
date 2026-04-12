@@ -31,7 +31,7 @@ DAILY_SALES_TABLE   = "workspace.default.daily_sales_v2"
 
 # ── Product Hierarchy ────────────────────────────────────────────
 HERE = os.path.dirname(os.path.abspath(__file__))
-HIERARCHY_CSV = os.path.join(HERE, "data", "products_to_map.csv")
+HIERARCHY_CSV = os.path.join(HERE, "data", "products_mapped.csv")
 
 # ── Anomaly Thresholds ───────────────────────────────────────────
 LOW_SALES_PCT          = 0.50   # flag if daily revenue < 50% of 4-week rolling avg

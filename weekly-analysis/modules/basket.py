@@ -5,10 +5,22 @@ import pandas as pd
 from modules.utils import fmt_rub, wow_arrow, md_table, section
 
 
+EXCLUDED_PAYMENT_TYPES = {"Non-Fiscal"}
+
+
+def _filter(txn):
+    """Exclude returns, Non-Fiscal, and online orders from basket calculation."""
+    return txn[
+        ~txn["is_return"]
+        & ~txn["online"]
+        & ~txn["transaction_type"].isin(EXCLUDED_PAYMENT_TYPES)
+    ]
+
+
 def _basket_stats(txn):
     """Compute avg basket size per store from transaction rows."""
     return (
-        txn[~txn["is_return"]]
+        _filter(txn)
         .groupby(["store_name", "order_number"])["revenue"]
         .sum()
         .reset_index()
@@ -21,6 +33,7 @@ def _basket_stats(txn):
 
 def build(current_txn, prior_txn):
     parts = [section("2. Basket Size", 2)]
+    parts.append("_Excludes returns, Non-Fiscal, and online orders._\n")
 
     cur = _basket_stats(current_txn)
     pri = _basket_stats(prior_txn).rename(columns={"avg_basket": "prior_basket", "orders": "prior_orders"})
@@ -30,8 +43,8 @@ def build(current_txn, prior_txn):
     merged = merged.sort_values("avg_basket", ascending=False)
 
     # Overall
-    cur_overall  = current_txn[~current_txn["is_return"]].groupby("order_number")["revenue"].sum().mean()
-    pri_overall  = prior_txn[~prior_txn["is_return"]].groupby("order_number")["revenue"].sum().mean()
+    cur_overall = _filter(current_txn).groupby("order_number")["revenue"].sum().mean()
+    pri_overall = _filter(prior_txn).groupby("order_number")["revenue"].sum().mean()
     parts.append(
         f"**Avg basket (all stores):** {fmt_rub(cur_overall)}  "
         f"**WoW:** {wow_arrow(cur_overall, pri_overall)}\n"
