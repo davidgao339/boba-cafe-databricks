@@ -15,8 +15,12 @@ def wow_arrow(current, prior):
     if prior == 0:
         return "–"
     pct = (current - prior) / prior * 100
-    arrow = "↑" if pct > 0 else "↓" if pct < 0 else "→"
-    return f"{arrow} {abs(pct):.1f}%"
+    if pct > 0:
+        return f'<span style="color:green">↑ {abs(pct):.1f}%</span>'
+    elif pct < 0:
+        return f'<span style="color:red">↓ {abs(pct):.1f}%</span>'
+    else:
+        return "→ 0.0%"
 
 
 def md_table(df, formatters=None):

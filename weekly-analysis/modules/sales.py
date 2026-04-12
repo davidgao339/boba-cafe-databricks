@@ -72,7 +72,8 @@ def build(current_sales, prior_sales):
 
     all_types = sorted(current_sales["payment_type"].unique())
 
-    for store_name in store["store"].tolist():
+    known_stores = [s for s in store["store"].tolist() if not str(s).startswith("UNKNOWN_")]
+    for store_name in known_stores:
         cur_s = current_sales[current_sales["store"] == store_name]
         pri_s = prior_sales[prior_sales["store"] == store_name]
         store_total = cur_s["revenue"].sum()
