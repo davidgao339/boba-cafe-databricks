@@ -10,17 +10,19 @@ def _enrich(txn, hierarchy):
     """Join transactions with product hierarchy."""
     df = txn.copy()
     if hierarchy.empty:
-        df["category"]    = "Uncategorised"
+        df["category"]   = "Uncategorised"
         df["subcategory"] = "Uncategorised"
-        df["product_mapped"] = df["product"]
+        df["product_en"] = df["product"]
+        df["variant"]    = ""
     else:
         df = df.merge(
-            hierarchy[["product", "category", "subcategory", "product_mapped"]],
+            hierarchy[["product", "category", "subcategory", "product_en", "variant"]],
             on="product", how="left"
         )
         df["category"]    = df["category"].fillna("Uncategorised")
         df["subcategory"] = df["subcategory"].fillna("Uncategorised")
-        df["product_mapped"] = df["product_mapped"].fillna(df["product"])
+        df["product_en"]  = df["product_en"].fillna(df["product"])  # fallback to Russian name
+        df["variant"]     = df["variant"].fillna("")
     return df
 
 
@@ -49,20 +51,20 @@ def build(current_txn, prior_txn, hierarchy):
     parts.append(section("Product Sales", 3))
 
     cur_prod = (
-        cur.groupby(["category", "subcategory", "product_mapped"])
+        cur.groupby(["category", "subcategory", "product_en"])
         .agg(revenue=("revenue", "sum"), qty=("qty", "sum"))
         .reset_index()
     )
     pri_prod = (
-        pri.groupby("product_mapped")["revenue"].sum()
+        pri.groupby("product_en")["revenue"].sum()
         .reset_index().rename(columns={"revenue": "prior_revenue"})
     )
-    prod = cur_prod.merge(pri_prod, on="product_mapped", how="outer").fillna(0)
+    prod = cur_prod.merge(pri_prod, on="product_en", how="outer").fillna(0)
     prod["wow"] = prod.apply(lambda r: wow_arrow(r["revenue"], r["prior_revenue"]), axis=1)
     prod = prod.sort_values(["category", "subcategory", "revenue"], ascending=[True, True, False])
 
     parts.append(md_table(
-        prod[["category", "subcategory", "product_mapped", "qty", "revenue", "wow"]],
+        prod[["category", "subcategory", "product_en", "qty", "revenue", "wow"]],
         formatters={
             "revenue": fmt_rub,
             "qty":     lambda x: f"{int(x):,}",
