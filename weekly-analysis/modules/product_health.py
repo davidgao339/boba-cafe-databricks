@@ -108,12 +108,15 @@ def build(current_txn, prior_txn, hierarchy):
     )
     prod = cur_prod.merge(pri_prod, on="product_en", how="outer").fillna(0)
     prod["wow"] = prod.apply(lambda r: wow_arrow(r["revenue"], r["prior_revenue"]), axis=1)
-    prod = prod.sort_values(["category", "subcategory", "revenue"], ascending=[True, True, False])
+    total_revenue = prod["revenue"].sum()
+    prod["share"] = prod["revenue"] / total_revenue * 100 if total_revenue > 0 else 0
+    prod = prod.sort_values(["category", "share"], ascending=[True, False])
 
     parts.append(md_table(
-        prod[["category", "subcategory", "product_en", "qty", "revenue", "wow"]],
+        prod[["category", "subcategory", "product_en", "qty", "revenue", "share", "wow"]],
         formatters={
             "revenue": fmt_rub,
+            "share":   fmt_pct,
             "qty":     lambda x: f"{int(x):,}",
         }
     ))
