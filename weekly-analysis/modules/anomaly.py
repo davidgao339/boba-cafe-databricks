@@ -171,6 +171,8 @@ def build(current_txn, spark, transactions_table, week_start, week_end, cfg):
                     "rev_in_gap": int(round(between_rev)),
                 })
 
+    tap_gaps = [g for g in tap_gaps if g["rev_in_gap"] >= 1000]
+
     if not tap_gaps:
         parts.append("_No tapioca gaps detected._\n")
     else:

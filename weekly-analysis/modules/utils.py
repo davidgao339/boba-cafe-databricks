@@ -16,9 +16,9 @@ def wow_arrow(current, prior):
         return "–"
     pct = (current - prior) / prior * 100
     if pct > 0:
-        return f'<span style="color:green">↑ {abs(pct):.1f}%</span>'
+        return f"🟢 ↑ {abs(pct):.1f}%"
     elif pct < 0:
-        return f'<span style="color:red">↓ {abs(pct):.1f}%</span>'
+        return f"🔴 ↓ {abs(pct):.1f}%"
     else:
         return "→ 0.0%"
 
