@@ -144,6 +144,7 @@ def build(current_txn, spark, transactions_table, week_start, week_end, cfg):
 
     tap_mask = (
         current_txn["product"].str.contains(cfg["TAPIOCA_KEYWORD"], case=False, na=False)
+        & ~current_txn["product"].str.contains("не тапиок", case=False, na=False)  # exclude "not tapioca" products
         & (~current_txn["is_return"])
         & (
             (current_txn["qty"] > 0)                               # real sale
