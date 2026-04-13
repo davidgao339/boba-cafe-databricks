@@ -144,8 +144,11 @@ def build(current_txn, spark, transactions_table, week_start, week_end, cfg):
 
     tap_mask = (
         current_txn["product"].str.contains(cfg["TAPIOCA_KEYWORD"], case=False, na=False)
-        & (current_txn["qty"] > 0)
         & (~current_txn["is_return"])
+        & (
+            (current_txn["qty"] > 0)                               # real sale
+            | (current_txn["transaction_type"] == "Non-Fiscal")    # write-off (qty may be 0 or negative)
+        )
     )
     tap_txn = current_txn[tap_mask].sort_values("datetime")
 
