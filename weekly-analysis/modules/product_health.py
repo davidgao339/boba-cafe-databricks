@@ -94,6 +94,21 @@ def build(current_txn, prior_txn, hierarchy):
         formatters={"revenue": fmt_rub, "share": fmt_pct, "qty": lambda x: f"{int(x):,}"}
     ))
 
+    # ── Subcategory Distribution ──────────────────────────────────
+    parts.append(section("Subcategory Distribution", 3))
+
+    cur_sub = cur.groupby(["category", "subcategory"]).agg(revenue=("revenue", "sum"), qty=("qty", "sum")).reset_index()
+    pri_sub = pri.groupby(["category", "subcategory"])["revenue"].sum().reset_index().rename(columns={"revenue": "prior_revenue"})
+    sub = cur_sub.merge(pri_sub, on=["category", "subcategory"], how="outer").fillna(0)
+    sub["share"] = sub["revenue"] / sub["revenue"].sum() * 100
+    sub["wow"]   = sub.apply(lambda r: wow_arrow(r["revenue"], r["prior_revenue"]), axis=1)
+    sub = sub.sort_values(["category", "revenue"], ascending=[True, False])
+
+    parts.append(md_table(
+        sub[["category", "subcategory", "revenue", "share", "qty", "wow"]],
+        formatters={"revenue": fmt_rub, "share": fmt_pct, "qty": lambda x: f"{int(x):,}"}
+    ))
+
     # ── Per-Product Sales ─────────────────────────────────────────
     parts.append(section("Product Sales", 3))
 

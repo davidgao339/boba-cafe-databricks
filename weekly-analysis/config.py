@@ -42,4 +42,5 @@ TAPIOCA_KEYWORD        = "тапиок"
 MIN_TRADING_REVENUE    = 500    # ignore days with < 500 revenue (closed/near-closed)
 
 # ── Output ────────────────────────────────────────────────────────
-ANALYSIS_DIR = os.path.join(HERE, "analysis")
+ANALYSIS_DIR      = os.path.join(HERE, "analysis")
+ANALYSIS_HTML_DIR = os.path.join(HERE, "analysis-html")
