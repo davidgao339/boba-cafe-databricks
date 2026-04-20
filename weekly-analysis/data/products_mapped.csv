@@ -34,7 +34,7 @@
 Бабл-чай Мятное яблоко,Drink,Bubble tea,Bubble Tea Mint Apple,,,0
 Айс Латте Шоколадное печенье,Drink,Coffee,Ice Latte Chocolate Cookie,,,0
 Бабл айс-ти Малина (чай),Drink,Tea,Bubble Ice Tea Raspberry,,350,0
-Бабл-ти Лаймовый (чай),Drink,Bubble tea,Bubble Tea Lime,,,0
+Бабл-ти Лаймовый (чай),Drink,Tea,Bubble Tea Lime,,350,0
 Айс Латте Малина,Drink,Coffee,Ice Latte Raspberry,,350,1
 Пина Колада Лимонад,Drink,Lemonade,Pina Colada Lemonade,,,0
 Малиновый закат лимонад,Drink,Lemonade,Raspberry Sunset Lemonade,,,0
@@ -144,3 +144,7 @@
 ТОППИНГ ШОКОЛАД (10 гр.),Drink,Topping,Chocolate Topping,,,0
 Топпинг клубничный 10гр,Drink,Topping,Strawberry Topping,,,0
 Топпинг шоколадный 10гр,Drink,Topping,Chocolate Topping,,,0
+Флэт Уайт,Drink,Coffee,Flat White,,250,0
+Мята в облаках Лимонад с мороженым,Drink,Lemonade,Lemonade with Ice Cream,,450,0
+Матча латте,Drink,Tea,Macha Latte,,350,0
+Сироп кокос (10 мл),Drink,Syrup,Coconut Syrup,,50,0
