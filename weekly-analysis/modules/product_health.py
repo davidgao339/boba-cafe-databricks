@@ -92,17 +92,20 @@ def build(current_txn, prior_txn, hierarchy):
 
     # ── Subcategory Distribution ──────────────────────────────────
     parts.append(section("Subcategory Distribution", 3))
+    parts.append("_Featured products (★) shown as a separate group within each subcategory._\n")
 
-    cur_sub = cur.groupby(["category", "subcategory"]).agg(revenue=("revenue", "sum"), qty=("qty", "sum")).reset_index()
-    pri_sub = pri.groupby(["category", "subcategory"])["revenue"].sum().reset_index().rename(columns={"revenue": "prior_revenue"})
-    sub = cur_sub.merge(pri_sub, on=["category", "subcategory"], how="outer").fillna(0)
+    cur_sub = cur.groupby(["category", "subcategory", "featured"]).agg(revenue=("revenue", "sum"), qty=("qty", "sum")).reset_index()
+    pri_sub = pri.groupby(["category", "subcategory", "featured"])["revenue"].sum().reset_index().rename(columns={"revenue": "prior_revenue"})
+    sub = cur_sub.merge(pri_sub, on=["category", "subcategory", "featured"], how="outer").fillna(0)
+    sub["featured"] = sub["featured"].astype(int)
     sub = sub[(sub["revenue"] > 0) | (sub["prior_revenue"] > 0)]
     sub["share"] = sub["revenue"] / sub["revenue"].sum() * 100
     sub["wow"]   = sub.apply(lambda r: wow_arrow(r["revenue"], r["prior_revenue"]), axis=1)
-    sub = sub.sort_values(["category", "revenue"], ascending=[True, False])
+    sub = sub.sort_values(["category", "subcategory", "featured", "revenue"], ascending=[True, True, False, False])
+    sub["group"] = sub.apply(lambda r: f"{r['subcategory']} ★" if r["featured"] else r["subcategory"], axis=1)
 
     parts.append(md_table(
-        sub[["category", "subcategory", "revenue", "share", "qty", "wow"]],
+        sub[["category", "group", "revenue", "share", "qty", "wow"]],
         formatters={"revenue": fmt_rub, "share": fmt_pct, "qty": lambda x: f"{int(x):,}"}
     ))
 
@@ -157,7 +160,7 @@ def build(current_txn, prior_txn, hierarchy):
     ))
 
     # ── Extra Rate ────────────────────────────────────────────────
-    parts.append(section("Extra Rate", 3))
+    parts.append(section("Add-on Rate", 3))
     parts.append("_Share of in-store orders containing both a drink and a food/dessert item. Excludes online and Non-Fiscal._\n")
 
     def _compute_extra_rate(txn):
@@ -165,11 +168,12 @@ def build(current_txn, prior_txn, hierarchy):
         df = df[~df["online"] & ~df["transaction_type"].isin(_EXCLUDED_PAYMENT_TYPES)]
         order_cats = (
             df.groupby(["store_name", "order_number"])["category"]
-            .apply(set)
+            .agg(set)
             .reset_index()
+            .rename(columns={"category": "categories"})
         )
-        order_cats["has_drink"] = order_cats["category"].apply(lambda s: "Drink" in s)
-        order_cats["has_extra"] = order_cats["category"].apply(lambda s: bool(s & {"Food", "Dessert"}))
+        order_cats["has_drink"] = order_cats["categories"].apply(lambda s: "Drink" in s)
+        order_cats["has_extra"] = order_cats["categories"].apply(lambda s: bool(s & {"Food", "Dessert"}))
         order_cats["is_combo"]  = order_cats["has_drink"] & order_cats["has_extra"]
         return (
             order_cats.groupby("store_name")
