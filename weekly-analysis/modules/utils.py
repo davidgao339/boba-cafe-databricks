@@ -11,16 +11,26 @@ def fmt_pct(value):
     return f"{value:.1f}%"
 
 
+def _fmt_diff(diff):
+    sign = "+" if diff >= 0 else ""
+    # Integer if within float precision, otherwise 1 decimal place
+    if abs(diff - round(diff)) < 1e-9:
+        return f"{sign}{int(round(diff)):,}"
+    return f"{sign}{diff:,.1f}"
+
+
 def wow_arrow(current, prior):
     if prior == 0:
         return "–"
-    pct = (current - prior) / prior * 100
+    diff = current - prior
+    pct = diff / prior * 100
+    d = _fmt_diff(diff)
     if pct > 0:
-        return f"🟢 ↑ {abs(pct):.1f}%"
+        return f"🟢 ↑ {abs(pct):.1f}% ({d})"
     elif pct < 0:
-        return f"🔴 ↓ {abs(pct):.1f}%"
+        return f"🔴 ↓ {abs(pct):.1f}% ({d})"
     else:
-        return "→ 0.0%"
+        return f"→ 0.0% (0)"
 
 
 def md_table(df, formatters=None):

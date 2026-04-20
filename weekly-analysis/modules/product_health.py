@@ -19,9 +19,6 @@ _ZERO_REV_MODIFIERS = {
     "менее сладкий", "со льдом", "соус кетчуп", "соус сырный",
     "соус сырный 30гр", "стандартный", "теплый", "холодный меньше льда",
 }
-_EXCLUDED_PAYMENT_TYPES = {"Non-Fiscal"}
-
-
 def _clean_product_name(name):
     if not isinstance(name, str):
         return name
@@ -156,49 +153,6 @@ def build(current_txn, prior_txn, hierarchy):
             "revenue":   fmt_rub,
             "% of cat":  fmt_pct,
             "qty":       lambda x: f"{int(x):,}",
-        }
-    ))
-
-    # ── Extra Rate ────────────────────────────────────────────────
-    parts.append(section("Add-on Rate", 3))
-    parts.append("_Share of in-store orders containing both a drink and a food/dessert item. Excludes online and Non-Fiscal._\n")
-
-    def _compute_extra_rate(txn):
-        df = _enrich(txn[~txn["is_return"]], hierarchy)
-        df = df[~df["online"] & ~df["transaction_type"].isin(_EXCLUDED_PAYMENT_TYPES)]
-        order_cats = (
-            df.groupby(["store_name", "order_number"])["category"]
-            .agg(set)
-            .reset_index()
-            .rename(columns={"category": "categories"})
-        )
-        order_cats["has_drink"] = order_cats["categories"].apply(lambda s: "Drink" in s)
-        order_cats["has_extra"] = order_cats["categories"].apply(lambda s: bool(s & {"Food", "Dessert"}))
-        order_cats["is_combo"]  = order_cats["has_drink"] & order_cats["has_extra"]
-        return (
-            order_cats.groupby("store_name")
-            .agg(orders=("order_number", "count"), combo_orders=("is_combo", "sum"))
-            .reset_index()
-            .assign(extra_rate=lambda d: d["combo_orders"] / d["orders"] * 100)
-            .rename(columns={"store_name": "store"})
-        )
-
-    cur_er = _compute_extra_rate(current_txn)
-    pri_er = _compute_extra_rate(prior_txn).rename(columns={
-        "extra_rate": "prior_rate", "orders": "prior_orders", "combo_orders": "prior_combo"
-    })
-    er = cur_er.merge(pri_er[["store", "prior_rate", "prior_orders"]], on="store", how="outer").fillna(0)
-    # Show only stores with orders in at least one week
-    er = er[(er["orders"] > 0) | (er["prior_orders"] > 0)]
-    er["wow"] = er.apply(lambda r: wow_arrow(r["extra_rate"], r["prior_rate"]), axis=1)
-    er = er.sort_values("extra_rate", ascending=False)
-
-    parts.append(md_table(
-        er[["store", "orders", "combo_orders", "extra_rate", "wow"]],
-        formatters={
-            "extra_rate":   fmt_pct,
-            "orders":       lambda x: f"{int(x):,}",
-            "combo_orders": lambda x: f"{int(x):,}",
         }
     ))
 
