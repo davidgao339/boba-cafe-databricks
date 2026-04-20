@@ -31,18 +31,18 @@
 Манго Танго Лимонад,Drink,Lemonade,Mango Tango Lemonade,,450,1
 Латте,Drink,Coffee,Latte,,250,0
 Единорожек Коктейль,Drink,Cocktail,Unicorn Cocktail,,,0
-Бабл-чай Мятное яблоко,Drink,Bubble tea,Bubble Tea Mint Apple,,,0
+Бабл-чай Мятное яблоко,Drink,Tea,Bubble Tea Mint Apple,,,0
 Айс Латте Шоколадное печенье,Drink,Coffee,Ice Latte Chocolate Cookie,,,0
 Бабл айс-ти Малина (чай),Drink,Tea,Bubble Ice Tea Raspberry,,350,0
 Бабл-ти Лаймовый (чай),Drink,Tea,Bubble Tea Lime,,350,0
 Айс Латте Малина,Drink,Coffee,Ice Latte Raspberry,,350,1
 Пина Колада Лимонад,Drink,Lemonade,Pina Colada Lemonade,,,0
-Малиновый закат лимонад,Drink,Lemonade,Raspberry Sunset Lemonade,,,0
+Малиновый закат лимонад,Drink,Lemonade,Raspberry Sunset Lemonade,,,1
 Айс Латте Банан,Drink,Coffee,Ice Latte Banana,,,0
 Красный дракон лимонад,Drink,Lemonade,Red Dragon Lemonade,,350,1
 Вишня мята Коктейль,Drink,Cocktail,Cherry Mint Cocktail,,,0
 Моти Манго,Dessert,Mochi,Mochi Mango,,250,0
-Бабл чай Остров манго,Drink,Bubble tea,Bubble Tea Mango Island,,,0
+Бабл чай Остров манго,Drink,Tea,Bubble Tea Mango Island,,,0
 АБОНЕМЕНТ ВИП НА МЕСЯЦ,,,VIP Monthly Pass,,,0
 Соник лимонад,Drink,Lemonade,Sonic Lemonade,,400,1
 Моти Вишня,Dessert,Mochi,Mochi Cherry,,,0
@@ -56,13 +56,13 @@
 Айс Латте лаванда,Drink,Coffee,Ice Latte Lavender,,350,1
 Моти Клубника,Dessert,Mochi,Mochi Strawberry,,,0
 Печенье с предсказаниями,Dessert,Cookie,Fortune Cookie,,50,0
-Лини вишневый чай,Drink,Bubble tea,Lini Cherry Tea,,,0
+Лини вишневый чай,Drink,Tea,Lini Cherry Tea,,,0
 Принцесса Персиков Коктейль,Drink,Cocktail,Peach Princess Cocktail,,,0
 Манго-кокос,Drink,Cocktail,Mango Coconut,,,0
 Раф кокос,Drink,Coffee,Raf Coconut,,350,0
 Мини гам Коктейль,Drink,Cocktail,Mini Gum Cocktail,,,0
-Бабл-ти Смородина мята (чай),Drink,Bubble tea,Bubble Tea Currant Mint,,,0
-Бабл-ти Сочная маракуйя (чай),Drink,Bubble tea,Bubble Tea Juicy Passion Fruit,,,0
+Бабл-ти Смородина мята (чай),Drink,Tea,Bubble Tea Currant Mint,,,0
+Бабл-ти Сочная маракуйя (чай),Drink,Tea,Bubble Tea Juicy Passion Fruit,,,0
 Моти Кокос,Dessert,Mochi,Mochi Coconut,,,0
 Раф имбирный пряник,Drink,Coffee,Raf Gingerbread,,,0
 Грейпфрут кокос,Drink,Cocktail,Grapefruit Coconut,,,0
