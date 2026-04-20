@@ -46,6 +46,9 @@ def load_product_hierarchy(path):
     if "status" in h.columns:
         h = h[h["status"] == "mapped"]
 
-    h = h[["product_ru", "category", "subcategory", "product", "variant"]].copy()
-    h.columns = ["product", "category", "subcategory", "product_en", "variant"]
+    if "featured" not in h.columns:
+        h["featured"] = 0
+    h = h[["product_ru", "category", "subcategory", "product", "variant", "featured"]].copy()
+    h.columns = ["product", "category", "subcategory", "product_en", "variant", "featured"]
+    h["featured"] = h["featured"].fillna(0).astype(int)
     return h.reset_index(drop=True)
