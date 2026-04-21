@@ -62,6 +62,14 @@ def _enrich(txn, hierarchy):
         is_variant = df["product"] != df["product_lookup"]
         df.loc[is_variant & (df["variant"] == ""), "variant"] = "no balls"
 
+    # Combined display name: "Русское название / English Name"
+    # Falls back to just the lookup name when RU == EN (uncategorised items)
+    df["product_display"] = df.apply(
+        lambda r: f"{r['product_lookup']} / {r['product_en']}"
+        if r["product_en"] != r["product_lookup"] else r["product_lookup"],
+        axis=1,
+    )
+
     return df
 
 
@@ -111,7 +119,7 @@ def build(current_txn, prior_txn, hierarchy):
     parts.append("_Grouped by subcategory; featured products (★) listed first within each group._\n")
 
     cur_prod = (
-        cur.groupby(["category", "subcategory", "featured", "product_en"])
+        cur.groupby(["category", "subcategory", "featured", "product_en", "product_display"])
         .agg(revenue=("revenue", "sum"), qty=("qty", "sum"))
         .reset_index()
     )
@@ -120,12 +128,13 @@ def build(current_txn, prior_txn, hierarchy):
         .reset_index().rename(columns={"revenue": "prior_revenue"})
     )
     prod = cur_prod.merge(pri_prod, on="product_en", how="outer")
-    prod["prior_revenue"] = prod["prior_revenue"].fillna(0)
-    prod["revenue"]       = prod["revenue"].fillna(0)
-    prod["qty"]           = prod["qty"].fillna(0)
-    prod["category"]      = prod["category"].fillna("Uncategorised")
-    prod["subcategory"]   = prod["subcategory"].fillna("Uncategorised")
-    prod["featured"]      = prod["featured"].fillna(0).astype(int)
+    prod["prior_revenue"]    = prod["prior_revenue"].fillna(0)
+    prod["revenue"]          = prod["revenue"].fillna(0)
+    prod["qty"]              = prod["qty"].fillna(0)
+    prod["category"]         = prod["category"].fillna("Uncategorised")
+    prod["subcategory"]      = prod["subcategory"].fillna("Uncategorised")
+    prod["featured"]         = prod["featured"].fillna(0).astype(int)
+    prod["product_display"]  = prod["product_display"].fillna(prod["product_en"])
 
     # Drop products with no sales in either week
     prod = prod[(prod["revenue"] > 0) | (prod["prior_revenue"] > 0)]
@@ -148,7 +157,7 @@ def build(current_txn, prior_txn, hierarchy):
     )
 
     parts.append(md_table(
-        prod[["category", "group", "product_en", "qty", "revenue", "% of cat", "wow"]],
+        prod[["category", "group", "product_display", "qty", "revenue", "% of cat", "wow"]],
         formatters={
             "revenue":   fmt_rub,
             "% of cat":  fmt_pct,

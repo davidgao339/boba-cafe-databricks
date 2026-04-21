@@ -79,6 +79,13 @@ def _enrich(txn, hierarchy):
         is_variant = df["product"] != df["product_lookup"]
         df.loc[is_variant & (df["variant"] == ""), "variant"] = "no balls"
 
+    # Combined display name: "Русское название / English Name"
+    df["product_display"] = df.apply(
+        lambda r: f"{r['product_lookup']} / {r['product_en']}"
+        if r["product_en"] != r["product_lookup"] else r["product_lookup"],
+        axis=1,
+    )
+
     return df
 
 
@@ -186,7 +193,7 @@ def build(cur_txn, pri_txn, hierarchy, month_label, prior_label, cfg=None):
     parts.append("_Featured-first within each subcategory. Weekly avg = monthly revenue ÷ weeks in period._\n")
 
     cur_prod = (
-        cur.groupby(["category", "subcategory", "featured", "product_en"])
+        cur.groupby(["category", "subcategory", "featured", "product_en", "product_display"])
         .agg(revenue=("revenue", "sum"), qty=("qty", "sum"))
         .reset_index()
     )
@@ -195,12 +202,13 @@ def build(cur_txn, pri_txn, hierarchy, month_label, prior_label, cfg=None):
         .reset_index().rename(columns={"revenue": "prior_revenue"})
     )
     prod = cur_prod.merge(pri_prod, on="product_en", how="outer")
-    prod["prior_revenue"] = prod["prior_revenue"].fillna(0)
-    prod["revenue"]       = prod["revenue"].fillna(0)
-    prod["qty"]           = prod["qty"].fillna(0)
-    prod["category"]      = prod["category"].fillna("Uncategorised")
-    prod["subcategory"]   = prod["subcategory"].fillna("Uncategorised")
-    prod["featured"]      = prod["featured"].fillna(0).astype(int)
+    prod["prior_revenue"]   = prod["prior_revenue"].fillna(0)
+    prod["revenue"]         = prod["revenue"].fillna(0)
+    prod["qty"]             = prod["qty"].fillna(0)
+    prod["category"]        = prod["category"].fillna("Uncategorised")
+    prod["subcategory"]     = prod["subcategory"].fillna("Uncategorised")
+    prod["featured"]        = prod["featured"].fillna(0).astype(int)
+    prod["product_display"] = prod["product_display"].fillna(prod["product_en"])
 
     # Drop products with no sales in either month
     prod = prod[(prod["revenue"] > 0) | (prod["prior_revenue"] > 0)]
@@ -221,7 +229,7 @@ def build(cur_txn, pri_txn, hierarchy, month_label, prior_label, cfg=None):
     )
 
     parts.append(md_table(
-        prod[["category", "group", "product_en", "qty", "revenue", "weekly_avg", "% of subcat", "mom"]],
+        prod[["category", "group", "product_display", "qty", "revenue", "weekly_avg", "% of subcat", "mom"]],
         formatters={
             "revenue":     fmt_rub,
             "weekly_avg":  fmt_rub,
@@ -252,7 +260,7 @@ def build(cur_txn, pri_txn, hierarchy, month_label, prior_label, cfg=None):
     prod2 = prod2.join(subcat_all_avg, on=["category", "subcategory"])
     prod2["mom_pct"] = prod2.apply(_mom_pct, axis=1)
 
-    _signal_cols = ["category", "subcategory", "product_en", "revenue", "weekly_avg", "% of subcat", "mom"]
+    _signal_cols = ["category", "subcategory", "product_display", "revenue", "weekly_avg", "% of subcat", "mom"]
     _signal_fmt  = {"revenue": fmt_rub, "weekly_avg": fmt_rub, "% of subcat": fmt_pct}
 
     # ── Promote ──────────────────────────────────────────────────────────────
@@ -306,7 +314,7 @@ def build(cur_txn, pri_txn, hierarchy, month_label, prior_label, cfg=None):
         parts.append("_No cut candidates this month._\n")
     else:
         parts.append(md_table(
-            cut[["category", "subcategory", "product_en", "revenue", "weekly_avg", "mom"]],
+            cut[["category", "subcategory", "product_display", "revenue", "weekly_avg", "mom"]],
             formatters={"revenue": fmt_rub, "weekly_avg": fmt_rub},
         ))
 
