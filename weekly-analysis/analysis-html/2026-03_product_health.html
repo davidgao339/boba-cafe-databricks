@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Health: March 2026</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #24292e;
+      background: #f6f8fa;
+      margin: 0;
+      padding: 24px;
+    }
+    #content {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid #d0d7de;
+      border-radius: 8px;
+      padding: 40px 48px;
+    }
+    h1 { font-size: 1.9em; border-bottom: 2px solid #d0d7de; padding-bottom: 10px; }
+    h2 { font-size: 1.4em; border-bottom: 1px solid #eaecef; padding-bottom: 6px; margin-top: 2em; }
+    h3 { font-size: 1.1em; color: #444; margin-top: 1.6em; }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1em 0;
+      font-size: 0.9em;
+    }
+    th {
+      background: #f6f8fa;
+      border: 1px solid #d0d7de;
+      padding: 7px 12px;
+      text-align: left;
+      white-space: nowrap;
+    }
+    td {
+      border: 1px solid #d0d7de;
+      padding: 6px 12px;
+    }
+    tr:nth-child(even) td { background: #f9fafb; }
+    tr:hover td { background: #eef2ff; }
+    hr { border: none; border-top: 1px solid #d0d7de; margin: 2em 0; }
+    code { background: #f3f4f6; padding: 2px 5px; border-radius: 4px; font-size: 0.88em; }
+    em { color: #666; }
+  </style>
+</head>
+<body>
+  <div id="content"></div>
+  <script>
+    const md = `# Monthly Product Health: March 2026
+
+_Generated: 2026-04-21 00:28_
+
+---
+
+
+## 1. Month Summary
+
+| Metric | March 2026 | February 2026 | MoM |
+| --- | --- | --- | --- |
+| Revenue | ₽2,383,238 | ₽2,025,090 | 🟢 ↑ 17.7% (+358,148) |
+| Items sold | 12,751 | 10,683 | 🟢 ↑ 19.4% (+2,068) |
+| Active products | 85 | – | – |
+| Weeks in period | 6 | – | – |
+
+
+## 2. Category Overview
+
+| category | revenue | share | qty | mom |
+| --- | --- | --- | --- | --- |
+| Drink | ₽1,919,567 | 80.5% | 10,481 | 🟢 ↑ 17.9% (+290,787.6) |
+| Food | ₽237,648 | 10.0% | 911 | 🟢 ↑ 9.9% (+21,500.4) |
+| Dessert | ₽190,294 | 8.0% | 1,220 | 🟢 ↑ 22.1% (+34,455.9) |
+| Uncategorised | ₽35,729 | 1.5% | 139 | 🟢 ↑ 46.9% (+11,404.2) |
+
+## 3. Subcategory Overview
+
+_Featured (★) shown as a separate row within each subcategory._
+
+| category | group | revenue | share | qty | mom |
+| --- | --- | --- | --- | --- | --- |
+| Dessert | Cake | ₽6,987 | 0.3% | 24 | 🟢 ↑ 470.4% (+5,762.0) |
+| Dessert | Cookie | ₽14,486 | 0.6% | 406 | 🟢 ↑ 34.4% (+3,710.7) |
+| Dessert | Mochi | ₽168,821 | 7.1% | 790 | 🟢 ↑ 17.4% (+24,983.1) |
+| Drink | Add-in | ₽2,600 | 0.1% | 27 | 🟢 ↑ 8.8% (+209.8) |
+| Drink | Cocktail | ₽80,665 | 3.4% | 225 | 🟢 ↑ 31.9% (+19,523.5) |
+| Drink | Coffee ★ | ₽390,627 | 16.4% | 1,146 | 🟢 ↑ 24.7% (+77,310.3) |
+| Drink | Coffee | ₽188,452 | 7.9% | 689 | 🔴 ↓ 16.3% (-36,655.0) |
+| Drink | Lemonade ★ | ₽397,252 | 16.7% | 1,083 | 🟢 ↑ 17.9% (+60,201.3) |
+| Drink | Lemonade | ₽35,912 | 1.5% | 93 | 🟢 ↑ 20.4% (+6,080.4) |
+| Drink | Milk ★ | ₽598,515 | 25.1% | 1,531 | 🟢 ↑ 28.9% (+134,358.1) |
+| Drink | Syrup | ₽1,640 | 0.1% | 33 | 🔴 ↓ 8.9% (-160) |
+| Drink | Tea ★ | ₽42,825 | 1.8% | 125 | 🟢 ↑ 24.9% (+8,525) |
+| Drink | Tea | ₽168,073 | 7.1% | 491 | 🟢 ↑ 9.7% (+14,915.0) |
+| Drink | Topping | ₽12,006 | 0.5% | 5,018 | 🟢 ↑ 104.3% (+6,129.1) |
+| Drink | Water | ₽1,000 | 0.0% | 20 | 🟢 ↑ 53.8% (+350) |
+| Food | Corn dog | ₽179,426 | 7.5% | 627 | 🟢 ↑ 16.7% (+25,634.6) |
+| Food | Pancakes | ₽58,222 | 2.4% | 284 | 🔴 ↓ 6.6% (-4,134.3) |
+| Uncategorised | Uncategorised | ₽35,729 | 1.5% | 139 | 🟢 ↑ 46.9% (+11,404.2) |
+
+## 4. Product Performance
+
+_Featured-first within each subcategory. Weekly avg = monthly revenue ÷ weeks in period._
+
+| category | group | product_en | qty | revenue | weekly_avg | % of subcat | mom |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Dessert | Cake | Cheesecake | 24 | ₽6,987 | ₽1,165 | 100.0% | 🟢 ↑ 470.4% (+5,762.0) |
+| Dessert | Cookie | Fortune Cookie | 406 | ₽14,486 | ₽2,414 | 100.0% | 🟢 ↑ 34.4% (+3,710.7) |
+| Dessert | Mochi | Mochi Oreo | 214 | ₽46,450 | ₽7,742 | 27.5% | 🟢 ↑ 23.2% (+8,750) |
+| Dessert | Mochi | Mochi Nutella | 193 | ₽42,882 | ₽7,147 | 25.4% | 🟢 ↑ 3.3% (+1,382.1) |
+| Dessert | Mochi | Mochi Mango | 109 | ₽22,914 | ₽3,819 | 13.6% | 🟢 ↑ 6.8% (+1,461.7) |
+| Dessert | Mochi | Mochi Wild Berries | 96 | ₽19,875 | ₽3,312 | 11.8% | 🔴 ↓ 1.9% (-375) |
+| Dessert | Mochi | Mochi Raffaello | 71 | ₽13,625 | ₽2,271 | 8.1% | – |
+| Dessert | Mochi | Mochi Cherry | 57 | ₽13,125 | ₽2,188 | 7.8% | 🔴 ↓ 33.7% (-6,685.7) |
+| Dessert | Mochi | Mochi Cream | 50 | ₽9,950 | ₽1,658 | 5.9% | 🟢 ↑ 218.4% (+6,825) |
+| Drink | Add-in | Lactose-free Milk | 27 | ₽2,600 | ₽433 | 100.0% | 🟢 ↑ 8.8% (+209.8) |
+| Drink | Cocktail | Beach Storm Cocktail | 86 | ₽32,750 | ₽5,458 | 40.6% | 🟢 ↑ 37.6% (+8,950) |
+| Drink | Cocktail | Peach Princess Cocktail | 79 | ₽26,315 | ₽4,386 | 32.6% | 🟢 ↑ 39.7% (+7,473.5) |
+| Drink | Cocktail | Unicorn Cocktail | 50 | ₽19,100 | ₽3,183 | 23.7% | 🟢 ↑ 19.4% (+3,100) |
+| Drink | Cocktail | Mini Gum Cocktail | 10 | ₽2,500 | ₽417 | 3.1% | → 0.0% (0) |
+| Drink | Coffee ★ | Ice Latte Salted Caramel | 419 | ₽139,022 | ₽23,170 | 24.0% | 🟢 ↑ 37.8% (+38,142.3) |
+| Drink | Coffee ★ | Tiramisu Coffee | 190 | ₽60,850 | ₽10,142 | 10.5% | 🟢 ↑ 20.8% (+10,492) |
+| Drink | Coffee ★ | Snickers Coffee | 134 | ₽58,410 | ₽9,735 | 10.1% | 🟢 ↑ 20.9% (+10,085) |
+| Drink | Coffee ★ | Mocha Frappuccino | 148 | ₽48,383 | ₽8,064 | 8.4% | 🟢 ↑ 9.7% (+4,283.3) |
+| Drink | Coffee ★ | Ice Latte Raspberry | 141 | ₽46,431 | ₽7,738 | 8.0% | 🟢 ↑ 22.0% (+8,377.7) |
+| Drink | Coffee ★ | Ice Latte Lavender | 114 | ₽37,530 | ₽6,255 | 6.5% | 🟢 ↑ 18.8% (+5,930) |
+| Drink | Coffee | Cappuccino | 225 | ₽54,025 | ₽9,004 | 9.3% | 🔴 ↓ 16.2% (-10,475) |
+| Drink | Coffee | Korean Coffee | 96 | ₽34,950 | ₽5,825 | 6.0% | 🟢 ↑ 18.2% (+5,376.7) |
+| Drink | Coffee | Latte | 111 | ₽25,000 | ₽4,167 | 4.3% | 🔴 ↓ 31.5% (-11,475) |
+| Drink | Coffee | Bumble | 61 | ₽23,625 | ₽3,938 | 4.1% | 🟢 ↑ 21.8% (+4,225) |
+| Drink | Coffee | Americano | 103 | ₽15,045 | ₽2,508 | 2.6% | 🔴 ↓ 25.4% (-5,130) |
+| Drink | Coffee | Coffee Brûlée | 35 | ₽13,800 | ₽2,300 | 2.4% | 🔴 ↓ 29.4% (-5,750) |
+| Drink | Coffee | Mango Coffee | 27 | ₽11,592 | ₽1,932 | 2.0% | 🔴 ↓ 40.0% (-7,741.7) |
+| Drink | Coffee | Raf Coconut | 19 | ₽6,560 | ₽1,093 | 1.1% | 🔴 ↓ 46.4% (-5,690) |
+| Drink | Coffee | Raf Gingerbread | 11 | ₽3,505 | ₽584 | 0.6% | 🟢 ↑ 0.1% (+5) |
+| Drink | Coffee | Ice Latte Chocolate Cookie | 1 | ₽350 | ₽58 | 0.1% | – |
+| Drink | Lemonade ★ | Lime Apple Lemonade | 206 | ₽69,355 | ₽11,559 | 16.0% | 🟢 ↑ 24.1% (+13,471.7) |
+| Drink | Lemonade ★ | Gummy Bear Lemonade | 156 | ₽61,300 | ₽10,217 | 14.2% | 🟢 ↑ 11.6% (+6,347.4) |
+| Drink | Lemonade ★ | Azure Bay Lemonade | 154 | ₽59,093 | ₽9,849 | 13.6% | 🟢 ↑ 56.3% (+21,292.8) |
+| Drink | Lemonade ★ | Sonic Lemonade | 105 | ₽40,328 | ₽6,721 | 9.3% | 🟢 ↑ 15.5% (+5,407.8) |
+| Drink | Lemonade ★ | Cherry Sour Lemonade | 96 | ₽37,550 | ₽6,258 | 8.7% | 🟢 ↑ 41.2% (+10,950) |
+| Drink | Lemonade ★ | Rising Sun Lemonade | 110 | ₽36,865 | ₽6,144 | 8.5% | 🔴 ↓ 6.7% (-2,650) |
+| Drink | Lemonade ★ | Raspberry Sunset Lemonade | 97 | ₽32,260 | ₽5,377 | 7.4% | 🟢 ↑ 18.9% (+5,135) |
+| Drink | Lemonade ★ | Red Dragon Lemonade | 88 | ₽30,340 | ₽5,057 | 7.0% | 🔴 ↓ 0.7% (-215) |
+| Drink | Lemonade ★ | Mango Tango Lemonade | 71 | ₽30,162 | ₽5,027 | 7.0% | 🟢 ↑ 1.6% (+461.7) |
+| Drink | Lemonade | Invigorating Orange Lemonade | 40 | ₽15,752 | ₽2,625 | 3.6% | 🟢 ↑ 55.6% (+5,627) |
+| Drink | Lemonade | Pina Colada Lemonade | 33 | ₽11,210 | ₽1,868 | 2.6% | 🔴 ↓ 7.0% (-846.6) |
+| Drink | Lemonade | Mint in the Clouds Lemonade | 20 | ₽8,950 | ₽1,492 | 2.1% | 🟢 ↑ 17.0% (+1,300) |
+| Drink | Milk ★ | Tiger Caramel | 358 | ₽120,938 | ₽20,156 | 20.2% | 🟢 ↑ 45.9% (+38,038.3) |
+| Drink | Milk ★ | Raspberry-Banana | 291 | ₽97,470 | ₽16,245 | 16.3% | 🟢 ↑ 23.4% (+18,451.9) |
+| Drink | Milk ★ | Blue Bubblegum | 211 | ₽91,675 | ₽15,279 | 15.3% | 🟢 ↑ 20.7% (+15,704.5) |
+| Drink | Milk ★ | Banana Matcha | 171 | ₽70,361 | ₽11,727 | 11.8% | 🟢 ↑ 41.8% (+20,753.1) |
+| Drink | Milk ★ | Choco-Banana | 126 | ₽55,600 | ₽9,267 | 9.3% | 🟢 ↑ 13.5% (+6,621.1) |
+| Drink | Milk ★ | Zhong Li Chocolate | 119 | ₽49,371 | ₽8,228 | 8.2% | 🟢 ↑ 22.6% (+9,113.0) |
+| Drink | Milk ★ | Hello Kitty | 112 | ₽47,950 | ₽7,992 | 8.0% | 🟢 ↑ 37.2% (+13,008.6) |
+| Drink | Milk ★ | Crème Brûlée | 82 | ₽35,275 | ₽5,879 | 5.9% | 🟢 ↑ 52.5% (+12,150) |
+| Drink | Milk ★ | Kuromi | 61 | ₽29,875 | ₽4,979 | 5.0% | 🟢 ↑ 1.8% (+517.6) |
+| Drink | Syrup | Chocolate Syrup | 21 | ₽1,040 | ₽173 | 63.4% | 🟢 ↑ 30.0% (+240) |
+| Drink | Syrup | Coconut Syrup | 7 | ₽350 | ₽58 | 21.3% | 🔴 ↓ 12.5% (-50) |
+| Drink | Syrup | Gingerbread Syrup | 3 | ₽150 | ₽25 | 9.1% | 🔴 ↓ 57.1% (-200) |
+| Drink | Syrup | Chocolate Cookie Syrup | 2 | ₽100 | ₽17 | 6.1% | 🔴 ↓ 60.0% (-150) |
+| Drink | Tea ★ | Bubble Tea Wild Berries | 125 | ₽42,825 | ₽7,138 | 20.3% | 🟢 ↑ 24.9% (+8,525) |
+| Drink | Tea | Bubble Tea Lavender | 94 | ₽31,585 | ₽5,264 | 15.0% | 🟢 ↑ 22.1% (+5,708.3) |
+| Drink | Tea | Bubble Tea Salted Caramel | 78 | ₽29,645 | ₽4,941 | 14.1% | 🔴 ↓ 17.4% (-6,260.2) |
+| Drink | Tea | Bubble Tea Mint Apple | 79 | ₽26,600 | ₽4,433 | 12.6% | 🟢 ↑ 37.8% (+7,295) |
+| Drink | Tea | Bubble Tea Currant Mint | 63 | ₽24,650 | ₽4,108 | 11.7% | 🟢 ↑ 17.4% (+3,650) |
+| Drink | Tea | Bubble Ice Tea Raspberry | 79 | ₽21,600 | ₽3,600 | 10.2% | 🔴 ↓ 2.1% (-471.4) |
+| Drink | Tea | Bubble Tea Juicy Passion Fruit | 50 | ₽19,723 | ₽3,287 | 9.4% | 🟢 ↑ 14.7% (+2,523.3) |
+| Drink | Tea | Bubble Tea Mango Island | 48 | ₽14,270 | ₽2,378 | 6.8% | 🟢 ↑ 20.9% (+2,470) |
+| Drink | Topping | Tapioca Portion | 2,884 | ₽6,914 | ₽1,152 | 57.6% | 🟢 ↑ 223.6% (+4,777.3) |
+| Drink | Topping | Juice Balls Portion | 1,727 | ₽3,242 | ₽540 | 27.0% | 🟢 ↑ 88.5% (+1,521.8) |
+| Drink | Topping | Rainbow Jelly | 49 | ₽1,200 | ₽200 | 10.0% | 🟢 ↑ 2.6% (+30) |
+| Drink | Topping | Coconut Pieces Portion | 226 | ₽650 | ₽108 | 5.4% | 🔴 ↓ 23.5% (-200) |
+| Drink | Water | Iced Water | 20 | ₽1,000 | ₽167 | 100.0% | 🟢 ↑ 53.8% (+350) |
+| Food | Corn dog | Corn Dog 50/50 | 244 | ₽80,006 | ₽13,334 | 44.6% | 🟢 ↑ 5.8% (+4,405.9) |
+| Food | Corn dog | Corn Dog Cheese | 235 | ₽58,794 | ₽9,799 | 32.8% | 🟢 ↑ 32.3% (+14,360.2) |
+| Food | Corn dog | Corn Dog Sausage | 127 | ₽35,977 | ₽5,996 | 20.1% | 🟢 ↑ 10.0% (+3,268.5) |
+| Food | Corn dog | Corn Dog Potato Sausage | 18 | ₽4,650 | ₽775 | 2.6% | 🟢 ↑ 564.3% (+3,950) |
+| Food | Corn dog | Corn Dog Potato Cheese | 3 | ₽0 | ₽0 | 0.0% | 🔴 ↓ 100.0% (-350) |
+| Food | Pancakes | Pancakes Nutella (×2) | 87 | ₽18,454 | ₽3,076 | 31.7% | 🟢 ↑ 11.7% (+1,929.4) |
+| Food | Pancakes | Pancakes Oreo (×2) | 44 | ₽9,075 | ₽1,512 | 15.6% | 🔴 ↓ 31.3% (-4,140.4) |
+| Food | Pancakes | Pancakes Meat (×2) | 34 | ₽7,700 | ₽1,283 | 13.2% | 🔴 ↓ 16.8% (-1,550) |
+| Food | Pancakes | Pancakes Condensed Milk (×2) | 41 | ₽7,375 | ₽1,229 | 12.7% | 🔴 ↓ 15.7% (-1,375) |
+| Food | Pancakes | Pancakes Raffaello (×2) | 25 | ₽5,125 | ₽854 | 8.8% | 🔴 ↓ 26.7% (-1,865.4) |
+| Food | Pancakes | Pancakes Cream Cheese (×2) | 26 | ₽4,875 | ₽812 | 8.4% | 🟢 ↑ 5.4% (+250) |
+| Food | Pancakes | Pancakes Cherry (×2) | 19 | ₽3,867 | ₽645 | 6.6% | 🟢 ↑ 93.4% (+1,867.1) |
+| Food | Pancakes | Pancakes Cream (×2) | 8 | ₽1,750 | ₽292 | 3.0% | 🟢 ↑ 75.0% (+750) |
+| Uncategorised | Uncategorised | Бабл-ти  Лаймовый (чай) | 117 | ₽33,629 | ₽5,605 | 94.1% | 🟢 ↑ 48.5% (+10,979.2) |
+| Uncategorised | Uncategorised | Для комбо малина айс-ти | 11 | ₽1,400 | ₽233 | 3.9% | – |
+| Uncategorised | Uncategorised | Чайный напиток | 1 | ₽400 | ₽67 | 1.1% | – |
+| Uncategorised | Uncategorised | Блинчики клубника(2шт) | 2 | ₽250 | ₽42 | 0.7% | 🔴 ↓ 77.8% (-875) |
+| Uncategorised | Uncategorised | Сироп лесной орех (10 мл) | 1 | ₽50 | ₽8 | 0.1% | → 0.0% (0) |
+| Uncategorised | Uncategorised | Hot Chocolate | 0 | ₽0 | ₽0 | 0.0% | 🔴 ↓ 100.0% (-350) |
+| Uncategorised | Uncategorised | Pasta with Meat & Cheese | 0 | ₽0 | ₽0 | 0.0% | 🔴 ↓ 100.0% (-500) |
+
+## 5. Decision Signals
+
+_Thresholds — promote: revenue ≥ ₽5,000 and ≥ 50% of subcat featured avg; demote: revenue ≤ 50% of subcat avg or MoM ≤ -25%; cut: revenue ≤ ₽1,500 and MoM ≤ -30% (or no prior month sales)._
+
+
+### ⬆  Promote to Featured
+
+| category | subcategory | product_en | revenue | weekly_avg | % of subcat | mom |
+| --- | --- | --- | --- | --- | --- | --- |
+| Food | Corn dog | Corn Dog 50/50 | ₽80,006 | ₽13,334 | 44.6% | 🟢 ↑ 5.8% (+4,405.9) |
+| Food | Corn dog | Corn Dog Cheese | ₽58,794 | ₽9,799 | 32.8% | 🟢 ↑ 32.3% (+14,360.2) |
+| Drink | Coffee | Cappuccino | ₽54,025 | ₽9,004 | 9.3% | 🔴 ↓ 16.2% (-10,475) |
+| Dessert | Mochi | Mochi Oreo | ₽46,450 | ₽7,742 | 27.5% | 🟢 ↑ 23.2% (+8,750) |
+| Dessert | Mochi | Mochi Nutella | ₽42,882 | ₽7,147 | 25.4% | 🟢 ↑ 3.3% (+1,382.1) |
+| Food | Corn dog | Corn Dog Sausage | ₽35,977 | ₽5,996 | 20.1% | 🟢 ↑ 10.0% (+3,268.5) |
+| Drink | Coffee | Korean Coffee | ₽34,950 | ₽5,825 | 6.0% | 🟢 ↑ 18.2% (+5,376.7) |
+| Uncategorised | Uncategorised | Бабл-ти  Лаймовый (чай) | ₽33,629 | ₽5,605 | 94.1% | 🟢 ↑ 48.5% (+10,979.2) |
+| Drink | Cocktail | Beach Storm Cocktail | ₽32,750 | ₽5,458 | 40.6% | 🟢 ↑ 37.6% (+8,950) |
+| Drink | Tea | Bubble Tea Lavender | ₽31,585 | ₽5,264 | 15.0% | 🟢 ↑ 22.1% (+5,708.3) |
+| Drink | Tea | Bubble Tea Salted Caramel | ₽29,645 | ₽4,941 | 14.1% | 🔴 ↓ 17.4% (-6,260.2) |
+| Drink | Tea | Bubble Tea Mint Apple | ₽26,600 | ₽4,433 | 12.6% | 🟢 ↑ 37.8% (+7,295) |
+| Drink | Cocktail | Peach Princess Cocktail | ₽26,315 | ₽4,386 | 32.6% | 🟢 ↑ 39.7% (+7,473.5) |
+| Drink | Tea | Bubble Tea Currant Mint | ₽24,650 | ₽4,108 | 11.7% | 🟢 ↑ 17.4% (+3,650) |
+| Dessert | Mochi | Mochi Mango | ₽22,914 | ₽3,819 | 13.6% | 🟢 ↑ 6.8% (+1,461.7) |
+| Drink | Tea | Bubble Ice Tea Raspberry | ₽21,600 | ₽3,600 | 10.2% | 🔴 ↓ 2.1% (-471.4) |
+| Dessert | Mochi | Mochi Wild Berries | ₽19,875 | ₽3,312 | 11.8% | 🔴 ↓ 1.9% (-375) |
+| Drink | Cocktail | Unicorn Cocktail | ₽19,100 | ₽3,183 | 23.7% | 🟢 ↑ 19.4% (+3,100) |
+| Food | Pancakes | Pancakes Nutella (×2) | ₽18,454 | ₽3,076 | 31.7% | 🟢 ↑ 11.7% (+1,929.4) |
+| Dessert | Cookie | Fortune Cookie | ₽14,486 | ₽2,414 | 100.0% | 🟢 ↑ 34.4% (+3,710.7) |
+| Dessert | Mochi | Mochi Raffaello | ₽13,625 | ₽2,271 | 8.1% | – |
+| Dessert | Mochi | Mochi Cherry | ₽13,125 | ₽2,188 | 7.8% | 🔴 ↓ 33.7% (-6,685.7) |
+| Dessert | Mochi | Mochi Cream | ₽9,950 | ₽1,658 | 5.9% | 🟢 ↑ 218.4% (+6,825) |
+| Food | Pancakes | Pancakes Oreo (×2) | ₽9,075 | ₽1,512 | 15.6% | 🔴 ↓ 31.3% (-4,140.4) |
+| Food | Pancakes | Pancakes Meat (×2) | ₽7,700 | ₽1,283 | 13.2% | 🔴 ↓ 16.8% (-1,550) |
+| Food | Pancakes | Pancakes Condensed Milk (×2) | ₽7,375 | ₽1,229 | 12.7% | 🔴 ↓ 15.7% (-1,375) |
+| Dessert | Cake | Cheesecake | ₽6,987 | ₽1,165 | 100.0% | 🟢 ↑ 470.4% (+5,762.0) |
+| Drink | Topping | Tapioca Portion | ₽6,914 | ₽1,152 | 57.6% | 🟢 ↑ 223.6% (+4,777.3) |
+| Food | Pancakes | Pancakes Raffaello (×2) | ₽5,125 | ₽854 | 8.8% | 🔴 ↓ 26.7% (-1,865.4) |
+
+### ⬇  Demote from Featured
+
+| category | subcategory | product_en | revenue | weekly_avg | % of subcat | mom | reason |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Drink | Milk | Kuromi | ₽29,875 | ₽4,979 | 5.0% | 🟢 ↑ 1.8% (+517.6) | low revenue |
+
+### ✂  Cut Candidates
+
+| category | subcategory | product_en | revenue | weekly_avg | mom |
+| --- | --- | --- | --- | --- | --- |
+| Food | Corn dog | Corn Dog Potato Cheese | ₽0 | ₽0 | 🔴 ↓ 100.0% (-350) |
+| Uncategorised | Uncategorised | Hot Chocolate | ₽0 | ₽0 | 🔴 ↓ 100.0% (-350) |
+| Uncategorised | Uncategorised | Pasta with Meat & Cheese | ₽0 | ₽0 | 🔴 ↓ 100.0% (-500) |
+| Drink | Syrup | Chocolate Cookie Syrup | ₽100 | ₽17 | 🔴 ↓ 60.0% (-150) |
+| Drink | Syrup | Gingerbread Syrup | ₽150 | ₽25 | 🔴 ↓ 57.1% (-200) |
+| Uncategorised | Uncategorised | Блинчики клубника(2шт) | ₽250 | ₽42 | 🔴 ↓ 77.8% (-875) |
+| Drink | Coffee | Ice Latte Chocolate Cookie | ₽350 | ₽58 | – |
+| Uncategorised | Uncategorised | Чайный напиток | ₽400 | ₽67 | – |
+| Uncategorised | Uncategorised | Для комбо малина айс-ти | ₽1,400 | ₽233 | – |`;
+    document.getElementById("content").innerHTML = marked.parse(md);
+  </script>
+</body>
+</html>
