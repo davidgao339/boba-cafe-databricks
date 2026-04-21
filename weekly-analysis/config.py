@@ -44,3 +44,7 @@ MIN_TRADING_REVENUE    = 500    # ignore days with < 500 revenue (closed/near-cl
 # ── Output ────────────────────────────────────────────────────────
 ANALYSIS_DIR      = os.path.join(HERE, "analysis")
 ANALYSIS_HTML_DIR = os.path.join(HERE, "analysis-html")
+
+# Web export — Databricks workspace path of the bobacafe-web repo.
+# Set to None to skip web export.
+WEB_REPORTS_DIR = "/Workspace/Users/davidgao734@gmail.com/bobacafe-web/main-site/reports"
