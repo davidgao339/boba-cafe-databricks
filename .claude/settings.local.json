@@ -11,7 +11,10 @@
       "Bash(sed \"s/__DATABRICKS_NOTEBOOK_MODEL = '//;s/'$//\")",
       "Read(//c/Users/david/Downloads/**)",
       "Bash(python -c \"import json; nb=json.load\\(open\\('D:/Github/boba-cafe-databricks/weekly-analysis/weekly_report.ipynb'\\)\\); [print\\(i, repr\\(c['source'][:50] if isinstance\\(c['source'],str\\) else repr\\(c['source'][0][:50]\\)\\)\\) for i,c in enumerate\\(nb['cells']\\)]\")",
-      "Bash(python -c ' *)"
+      "Bash(python -c ' *)",
+      "Bash(python3 -c ' *)",
+      "Bash(python __fix_encoding.py)",
+      "Bash(del \"D:\\\\Github\\\\boba-cafe-databricks\\\\weekly-analysis\\\\__enc_check.txt\" \"D:\\\\Github\\\\boba-cafe-databricks\\\\weekly-analysis\\\\__enc_check2.txt\" \"D:\\\\Github\\\\boba-cafe-databricks\\\\weekly-analysis\\\\__fix_encoding.py\")"
     ]
   }
 }
