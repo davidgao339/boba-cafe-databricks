@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boba Cafe — Reports</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #24292e;
+      background: #f6f8fa;
+      margin: 0;
+      padding: 24px;
+    }
+    #content {
+      max-width: 700px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid #d0d7de;
+      border-radius: 8px;
+      padding: 40px 48px;
+    }
+    h1 {
+      font-size: 1.9em;
+      border-bottom: 2px solid #d0d7de;
+      padding-bottom: 10px;
+      margin-top: 0;
+    }
+    h2 {
+      font-size: 1.1em;
+      color: #57606a;
+      font-weight: 500;
+      margin-top: 0;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 2em 0 0;
+    }
+    li {
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      transition: box-shadow 0.15s;
+    }
+    li:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    li a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      text-decoration: none;
+      color: #0969da;
+      font-weight: 500;
+    }
+    li a:hover { text-decoration: underline; }
+    .icon { font-size: 1.2em; flex-shrink: 0; }
+    .label { flex: 1; }
+    .badge {
+      font-size: 0.75em;
+      background: #ddf4ff;
+      color: #0969da;
+      border: 1px solid #b6e3ff;
+      border-radius: 12px;
+      padding: 2px 8px;
+      font-weight: 500;
+    }
+    .badge.product { background: #fff8c5; color: #9a6700; border-color: #e3b341; }
+    footer {
+      margin-top: 2.5em;
+      padding-top: 1.2em;
+      border-top: 1px solid #eaecef;
+      font-size: 0.85em;
+      color: #57606a;
+    }
+  </style>
+</head>
+<body>
+  <div id="content">
+    <h1>Boba Cafe Reports</h1>
+    <h2>Weekly and product health analysis</h2>
+    <ul>
+      <li>
+        <a href="2026-04-20_weekly_report.html">
+          <span class="icon">📊</span>
+          <span class="label">Weekly Report — Apr 20 – Apr 26, 2026</span>
+          <span class="badge">Weekly</span>
+        </a>
+      </li>
+      <li>
+        <a href="2026-04-13_weekly_report.html">
+          <span class="icon">📊</span>
+          <span class="label">Weekly Report — Apr 13 – Apr 19, 2026</span>
+          <span class="badge">Weekly</span>
+        </a>
+      </li>
+      <li>
+        <a href="2026-04-06_weekly_report.html">
+          <span class="icon">📊</span>
+          <span class="label">Weekly Report — Apr 6 – Apr 12, 2026</span>
+          <span class="badge">Weekly</span>
+        </a>
+      </li>
+      <li>
+        <a href="2026-03_product_health.html">
+          <span class="icon">🧋</span>
+          <span class="label">Product Health — March 2026</span>
+          <span class="badge product">Product Health</span>
+        </a>
+      </li>
+    </ul>
+    <footer>Boba Cafe &mdash; internal analytics</footer>
+  </div>
+</body>
+</html>
