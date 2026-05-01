@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Health: April 2026</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #24292e;
+      background: #f6f8fa;
+      margin: 0;
+      padding: 24px;
+    }
+    #content {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid #d0d7de;
+      border-radius: 8px;
+      padding: 40px 48px;
+    }
+    h1 { font-size: 1.9em; border-bottom: 2px solid #d0d7de; padding-bottom: 10px; }
+    h2 { font-size: 1.4em; border-bottom: 1px solid #eaecef; padding-bottom: 6px; margin-top: 2em; }
+    h3 { font-size: 1.1em; color: #444; margin-top: 1.6em; }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1em 0;
+      font-size: 0.9em;
+    }
+    th {
+      background: #f6f8fa;
+      border: 1px solid #d0d7de;
+      padding: 7px 12px;
+      text-align: left;
+      white-space: nowrap;
+    }
+    td {
+      border: 1px solid #d0d7de;
+      padding: 6px 12px;
+    }
+    tr:nth-child(even) td { background: #f9fafb; }
+    tr:hover td { background: #eef2ff; }
+    hr { border: none; border-top: 1px solid #d0d7de; margin: 2em 0; }
+    code { background: #f3f4f6; padding: 2px 5px; border-radius: 4px; font-size: 0.88em; }
+    em { color: #666; }
+  </style>
+</head>
+<body>
+  <div id="content"></div>
+  <script>
+    const md = `# Monthly Product Health: April 2026
+
+_Generated: 2026-05-01 14:55_
+
+---
+
+
+## 1. Month Summary
+
+| Metric | April 2026 | March 2026 | MoM |
+| --- | --- | --- | --- |
+| Revenue | ₽2,070,321 | ₽2,383,238 | 🔴 ↓ 13.1% (-312,917) |
+| Items sold | 10,949 | 12,751 | 🔴 ↓ 14.1% (-1,802) |
+| Active products | 101 | – | – |
+| Weeks in period | 5 | – | – |
+
+
+## 2. Category Overview
+
+| category | revenue | share | qty | mom |
+| --- | --- | --- | --- | --- |
+| Drink | ₽1,686,786 | 81.5% | 8,857 | 🔴 ↓ 12.1% (-232,780.9) |
+| Food | ₽202,916 | 9.8% | 751 | 🔴 ↓ 14.6% (-34,731.3) |
+| Dessert | ₽168,309 | 8.1% | 1,072 | 🔴 ↓ 11.6% (-21,985.7) |
+| Uncategorised | ₽12,310 | 0.6% | 269 | 🔴 ↓ 65.5% (-23,419.2) |
+
+## 3. Subcategory Overview
+
+_Featured (★) shown as a separate row within each subcategory._
+
+| category | group | revenue | share | qty | mom |
+| --- | --- | --- | --- | --- | --- |
+| Dessert | Cake | ₽2,962 | 0.1% | 9 | 🔴 ↓ 57.6% (-4,025) |
+| Dessert | Cookie | ₽10,900 | 0.5% | 288 | 🔴 ↓ 24.8% (-3,585.7) |
+| Dessert | Mochi | ₽154,446 | 7.5% | 775 | 🔴 ↓ 8.5% (-14,374.9) |
+| Drink | Add-in | ₽1,550 | 0.1% | 21 | 🔴 ↓ 40.4% (-1,050) |
+| Drink | Bubble tea | ₽8,160 | 0.4% | 26 | – |
+| Drink | Cocktail | ₽35,920 | 1.7% | 98 | 🔴 ↓ 55.5% (-44,745) |
+| Drink | Coffee ★ | ₽319,120 | 15.4% | 973 | 🔴 ↓ 18.3% (-71,506.6) |
+| Drink | Coffee | ₽150,963 | 7.3% | 556 | 🔴 ↓ 19.9% (-37,488.3) |
+| Drink | Lemonade ★ | ₽389,366 | 18.8% | 1,048 | 🔴 ↓ 2.0% (-7,886.6) |
+| Drink | Lemonade | ₽15,400 | 0.7% | 40 | 🔴 ↓ 57.1% (-20,512) |
+| Drink | Milk ★ | ₽577,438 | 27.9% | 1,448 | 🔴 ↓ 3.5% (-21,077.0) |
+| Drink | Syrup | ₽1,092 | 0.1% | 22 | 🔴 ↓ 33.4% (-548.3) |
+| Drink | Tea ★ | ₽52,580 | 2.5% | 157 | 🟢 ↑ 22.8% (+9,755) |
+| Drink | Tea | ₽80,766 | 3.9% | 250 | 🔴 ↓ 51.9% (-87,306.8) |
+| Drink | Topping | ₽52,455 | 2.5% | 4,139 | 🟢 ↑ 336.9% (+40,448.8) |
+| Drink | Upgrade | ₽1,726 | 0.1% | 74 | – |
+| Drink | Water | ₽250 | 0.0% | 5 | 🔴 ↓ 75.0% (-750) |
+| Food | Corn dog | ₽165,115 | 8.0% | 572 | 🔴 ↓ 8.0% (-14,311.3) |
+| Food | Pancakes | ₽37,801 | 1.8% | 179 | 🔴 ↓ 35.1% (-20,420.0) |
+| Uncategorised | Uncategorised | ₽12,310 | 0.6% | 269 | 🔴 ↓ 65.5% (-23,419.2) |
+
+## 4. Product Performance
+
+_Featured-first within each subcategory. Weekly avg = monthly revenue ÷ weeks in period._
+
+| category | group | product_display | qty | revenue | weekly_avg | % of subcat | mom |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Dessert | Cake | Чизкейк / Cheesecake | 9 | ₽2,962 | ₽592 | 100.0% | 🔴 ↓ 57.6% (-4,025) |
+| Dessert | Cookie | Печенье с предсказаниями / Fortune Cookie | 288 | ₽10,900 | ₽2,180 | 100.0% | 🔴 ↓ 24.8% (-3,585.7) |
+| Dessert | Mochi | Моти Нутелла / Mochi Nutella | 178 | ₽36,575 | ₽7,315 | 23.7% | 🔴 ↓ 14.7% (-6,307.1) |
+| Dessert | Mochi | Моти Орео / Mochi Oreo | 174 | ₽33,450 | ₽6,690 | 21.7% | 🔴 ↓ 28.0% (-13,000) |
+| Dessert | Mochi | Моти Лесные ягоды / Mochi Wild Berries | 102 | ₽21,575 | ₽4,315 | 14.0% | 🟢 ↑ 8.6% (+1,700) |
+| Dessert | Mochi | Моти Манго / Mochi Mango | 100 | ₽20,691 | ₽4,138 | 13.4% | 🔴 ↓ 9.7% (-2,223.5) |
+| Dessert | Mochi | Моти рафаэлло / Mochi Raffaello | 82 | ₽17,450 | ₽3,490 | 11.3% | 🟢 ↑ 28.1% (+3,825) |
+| Dessert | Mochi | Моти Вишня / Mochi Cherry | 62 | ₽12,750 | ₽2,550 | 8.3% | 🔴 ↓ 2.9% (-375) |
+| Dessert | Mochi | Моти сливочный / Mochi Cream | 77 | ₽11,956 | ₽2,391 | 7.7% | 🟢 ↑ 20.2% (+2,005.7) |
+| Drink | Add-in | Безлатнозное коровье молоко (Пармалат) / Lactose-free Milk | 16 | ₽1,250 | ₽250 | 80.6% | 🔴 ↓ 51.9% (-1,350) |
+| Drink | Add-in | Двойной шот / Double shot | 5 | ₽300 | ₽60 | 19.4% | – |
+| Drink | Bubble tea | Соленая карамель чай / Salted caramel tea | 7 | ₽2,450 | ₽490 | 30.0% | – |
+| Drink | Bubble tea | Смородина мята чай / Currant mint tea | 5 | ₽1,470 | ₽294 | 18.0% | – |
+| Drink | Bubble tea | Сочная маракуйя чай / Juicy passion fruit tea | 3 | ₽910 | ₽182 | 11.2% | – |
+| Drink | Bubble tea | Лавандовый чай / Lavender tea | 3 | ₽840 | ₽168 | 10.3% | – |
+| Drink | Bubble tea | Мятное яблоко чай / Mint apple tea | 2 | ₽700 | ₽140 | 8.6% | – |
+| Drink | Bubble tea | Остров манго чай / Island Mango Tea | 2 | ₽650 | ₽130 | 8.0% | – |
+| Drink | Bubble tea | Лаймовый чай / Lime tea | 2 | ₽580 | ₽116 | 7.1% | – |
+| Drink | Bubble tea | Айс-ти Малина (чай) / Raspberry Ice Tea | 2 | ₽560 | ₽112 | 6.9% | – |
+| Drink | Cocktail | Принцесса Персиков Коктейль / Peach Princess Cocktail | 35 | ₽12,170 | ₽2,434 | 33.9% | 🔴 ↓ 53.8% (-14,145) |
+| Drink | Cocktail | Единорожек Коктейль / Unicorn Cocktail | 31 | ₽11,700 | ₽2,340 | 32.6% | 🔴 ↓ 38.7% (-7,400) |
+| Drink | Cocktail | Шторм на пляже Коктейль / Beach Storm Cocktail | 26 | ₽10,550 | ₽2,110 | 29.4% | 🔴 ↓ 67.8% (-22,200) |
+| Drink | Cocktail | Мини гам Коктейль / Mini Gum Cocktail | 6 | ₽1,500 | ₽300 | 4.2% | 🔴 ↓ 40.0% (-1,000) |
+| Drink | Coffee ★ | Айс Латте Соленая Карамель / Ice Latte Salted Caramel | 419 | ₽127,423 | ₽25,485 | 27.1% | 🔴 ↓ 8.3% (-11,599.8) |
+| Drink | Coffee ★ | Сникерс кофе / Snickers Coffee | 124 | ₽54,230 | ₽10,846 | 11.5% | 🔴 ↓ 7.2% (-4,180) |
+| Drink | Coffee ★ | Тирамису кофе / Tiramisu Coffee | 121 | ₽41,359 | ₽8,272 | 8.8% | 🔴 ↓ 32.0% (-19,491.2) |
+| Drink | Coffee ★ | Айс Латте Малина / Ice Latte Raspberry | 125 | ₽36,680 | ₽7,336 | 7.8% | 🔴 ↓ 21.0% (-9,751.0) |
+| Drink | Coffee ★ | Айс Латте лаванда / Ice Latte Lavender | 95 | ₽29,724 | ₽5,945 | 6.3% | 🔴 ↓ 20.8% (-7,806.3) |
+| Drink | Coffee ★ | Мокка фраппучино / Mocha Frappuccino | 89 | ₽29,705 | ₽5,941 | 6.3% | 🔴 ↓ 38.6% (-18,678.3) |
+| Drink | Coffee | Корейский кофе / Korean Coffee | 108 | ₽42,225 | ₽8,445 | 9.0% | 🟢 ↑ 20.8% (+7,275.0) |
+| Drink | Coffee | Капучино / Cappuccino | 155 | ₽36,033 | ₽7,207 | 7.7% | 🔴 ↓ 33.3% (-17,991.7) |
+| Drink | Coffee | Латте / Latte | 73 | ₽16,575 | ₽3,315 | 3.5% | 🔴 ↓ 33.7% (-8,425) |
+| Drink | Coffee | Бамбл / Bumble | 37 | ₽12,775 | ₽2,555 | 2.7% | 🔴 ↓ 45.9% (-10,850) |
+| Drink | Coffee | Американо / Americano | 88 | ₽12,750 | ₽2,550 | 2.7% | 🔴 ↓ 15.3% (-2,295) |
+| Drink | Coffee | Раф кокос / Raf Coconut | 20 | ₽6,685 | ₽1,337 | 1.4% | 🟢 ↑ 1.9% (+125) |
+| Drink | Coffee | Флэт Уайт / Flat White | 27 | ₽6,500 | ₽1,300 | 1.4% | – |
+| Drink | Coffee | Манго кофе / Mango Coffee | 16 | ₽6,350 | ₽1,270 | 1.4% | 🔴 ↓ 45.2% (-5,241.7) |
+| Drink | Coffee | Кофе Брюле / Coffee Brûlée | 12 | ₽4,650 | ₽930 | 1.0% | 🔴 ↓ 66.3% (-9,150) |
+| Drink | Coffee | Раф имбирный пряник / Raf Gingerbread | 10 | ₽3,320 | ₽664 | 0.7% | 🔴 ↓ 5.3% (-185) |
+| Drink | Coffee | Айс Латте Шоколадное печенье / Ice Latte Chocolate Cookie | 8 | ₽2,400 | ₽480 | 0.5% | 🟢 ↑ 585.7% (+2,050) |
+| Drink | Coffee | Горячий шоколад / Hot Chocolate | 1 | ₽350 | ₽70 | 0.1% | – |
+| Drink | Coffee | Раф орех / Raf Hazelnut | 1 | ₽350 | ₽70 | 0.1% | – |
+| Drink | Lemonade ★ | Лаймовое яблоко лимонад / Lime Apple Lemonade | 171 | ₽58,375 | ₽11,675 | 14.4% | 🔴 ↓ 15.8% (-10,980) |
+| Drink | Lemonade ★ | Лазурная бухта лимонад / Azure Bay Lemonade | 131 | ₽50,970 | ₽10,194 | 12.6% | 🔴 ↓ 13.7% (-8,122.8) |
+| Drink | Lemonade ★ | Мармеладный мишка лимонад / Gummy Bear Lemonade | 131 | ₽50,624 | ₽10,125 | 12.5% | 🔴 ↓ 17.4% (-10,675.9) |
+| Drink | Lemonade ★ | Соник лимонад / Sonic Lemonade | 120 | ₽45,770 | ₽9,154 | 11.3% | 🟢 ↑ 13.5% (+5,442.2) |
+| Drink | Lemonade ★ | Вишневая кислинка Лимонад / Cherry Sour Lemonade | 102 | ₽39,300 | ₽7,860 | 9.7% | 🟢 ↑ 4.7% (+1,750) |
+| Drink | Lemonade ★ | Восходящее солнце лимонад / Rising Sun Lemonade | 107 | ₽38,606 | ₽7,721 | 9.5% | 🟢 ↑ 4.7% (+1,740.6) |
+| Drink | Lemonade ★ | Манго Танго Лимонад / Mango Tango Lemonade | 87 | ₽37,575 | ₽7,515 | 9.3% | 🟢 ↑ 24.6% (+7,413.3) |
+| Drink | Lemonade ★ | Малиновый закат лимонад / Raspberry Sunset Lemonade | 101 | ₽34,366 | ₽6,873 | 8.5% | 🟢 ↑ 6.5% (+2,106) |
+| Drink | Lemonade ★ | Красный дракон лимонад / Red Dragon Lemonade | 98 | ₽33,780 | ₽6,756 | 8.3% | 🟢 ↑ 11.3% (+3,440) |
+| Drink | Lemonade | Пина Колада Лимонад / Pina Colada Lemonade | 18 | ₽6,050 | ₽1,210 | 1.5% | 🔴 ↓ 46.0% (-5,160) |
+| Drink | Lemonade | Мята в облаках Лимонад / Mint in the Clouds Lemonade | 12 | ₽5,050 | ₽1,010 | 1.2% | 🔴 ↓ 43.6% (-3,900) |
+| Drink | Lemonade | Бодрящий апельсин Лимонад / Invigorating Orange Lemonade | 7 | ₽2,950 | ₽590 | 0.7% | 🔴 ↓ 81.3% (-12,802) |
+| Drink | Lemonade | Мята в облаках Лимонад с мороженым / Lemonade with Ice Cream | 3 | ₽1,350 | ₽270 | 0.3% | – |
+| Drink | Milk ★ | Голубой Бабл-гам Коктейль / Blue Bubblegum | 271 | ₽115,312 | ₽23,062 | 20.0% | 🟢 ↑ 25.8% (+23,637) |
+| Drink | Milk ★ | Малина-банан Коктейль / Raspberry-Banana | 283 | ₽96,580 | ₽19,316 | 16.7% | 🔴 ↓ 0.9% (-890) |
+| Drink | Milk ★ | Тигр карамельный Коктейль / Tiger Caramel | 271 | ₽93,156 | ₽18,631 | 16.1% | 🔴 ↓ 23.0% (-27,782.3) |
+| Drink | Milk ★ | Банановая матча Коктейль / Banana Matcha | 143 | ₽60,000 | ₽12,000 | 10.4% | 🔴 ↓ 14.7% (-10,360.9) |
+| Drink | Milk ★ | Шоко-банан Коктейль / Choco-Banana | 126 | ₽55,200 | ₽11,040 | 9.6% | 🔴 ↓ 0.7% (-400) |
+| Drink | Milk ★ | Чжун Ли шоколадный Коктейль / Zhong Li Chocolate | 105 | ₽45,485 | ₽9,097 | 7.9% | 🔴 ↓ 7.9% (-3,885.7) |
+| Drink | Milk ★ | Хеллоу Китти Коктейль / Hello Kitty | 96 | ₽41,430 | ₽8,286 | 7.2% | 🔴 ↓ 13.6% (-6,520.1) |
+| Drink | Milk ★ | Куроми Коктейль / Kuromi | 84 | ₽39,675 | ₽7,935 | 6.9% | 🟢 ↑ 32.8% (+9,800) |
+| Drink | Milk ★ | Крем Брюле Коктейль / Crème Brûlée | 69 | ₽30,600 | ₽6,120 | 5.3% | 🔴 ↓ 13.3% (-4,675) |
+| Drink | Syrup | Сироп шоколад (10 мл) / Chocolate Syrup | 10 | ₽500 | ₽100 | 45.8% | 🔴 ↓ 51.9% (-540) |
+| Drink | Syrup | Сироп имбирный пряник (10 мл) / Gingerbread Syrup | 6 | ₽292 | ₽58 | 26.7% | 🟢 ↑ 94.4% (+141.7) |
+| Drink | Syrup | Сироп кокос (10 мл) / Coconut Syrup | 4 | ₽200 | ₽40 | 18.3% | 🔴 ↓ 42.9% (-150) |
+| Drink | Syrup | Сироп шок. печенье (10 мл) / Chocolate Cookie Syrup | 2 | ₽100 | ₽20 | 9.2% | → 0.0% (0) |
+| Drink | Tea ★ | Бабл ти Лесные ягоды (чай) / Bubble Tea Wild Berries | 157 | ₽52,580 | ₽10,516 | 39.4% | 🟢 ↑ 22.8% (+9,755) |
+| Drink | Tea | Бабл-ти Смородина мята (чай) / Bubble Tea Currant Mint | 45 | ₽16,500 | ₽3,300 | 12.4% | 🔴 ↓ 33.1% (-8,150) |
+| Drink | Tea | Бабл-чай Соленая карамель / Bubble Tea Salted Caramel | 42 | ₽15,300 | ₽3,060 | 11.5% | 🔴 ↓ 48.4% (-14,345) |
+| Drink | Tea | Бабл-ти Лавандовый (чай) / Bubble Tea Lavender | 40 | ₽12,945 | ₽2,589 | 9.7% | 🔴 ↓ 59.0% (-18,640) |
+| Drink | Tea | Бабл-чай Мятное яблоко / Bubble Tea Mint Apple | 36 | ₽11,310 | ₽2,262 | 8.5% | 🔴 ↓ 57.5% (-15,290) |
+| Drink | Tea | Бабл айс-ти Малина (чай) / Bubble Ice Tea Raspberry | 42 | ₽11,100 | ₽2,220 | 8.3% | 🔴 ↓ 48.6% (-10,500) |
+| Drink | Tea | Бабл чай Остров манго / Bubble Tea Mango Island | 26 | ₽7,250 | ₽1,450 | 5.4% | 🔴 ↓ 49.2% (-7,020) |
+| Drink | Tea | Бабл-ти Сочная маракуйя (чай) / Bubble Tea Juicy Passion Fruit | 17 | ₽5,836 | ₽1,167 | 4.4% | 🔴 ↓ 70.4% (-13,886.8) |
+| Drink | Tea | Матча латте / Macha Latte | 2 | ₽525 | ₽105 | 0.4% | – |
+| Drink | Topping | Порция тапиоки / Tapioca Portion | 2,445 | ₽32,952 | ₽6,590 | 62.8% | 🟢 ↑ 376.6% (+26,038.2) |
+| Drink | Topping | Порция джус боллов (не тапиока) / Juice Balls Portion | 1,486 | ₽16,231 | ₽3,246 | 30.9% | 🟢 ↑ 400.6% (+12,988.6) |
+| Drink | Topping | Желе радуга (1 шт) / Rainbow Jelly | 52 | ₽1,512 | ₽302 | 2.9% | 🟢 ↑ 26.0% (+312) |
+| Drink | Topping | Порция кокосовых кусочков (не тапиока) / Coconut Pieces Portion | 62 | ₽1,330 | ₽266 | 2.5% | 🟢 ↑ 104.6% (+680) |
+| Drink | Topping | Порция кокосовых кусочков / Coconut Pieces Portion | 6 | ₽250 | ₽50 | 0.5% | 🔴 ↓ 61.5% (-400) |
+| Drink | Topping | Сливочная пенка 1 порция / Cream Foam | 9 | ₽180 | ₽36 | 0.3% | – |
+| Drink | Upgrade | БОЛЬШОЙ Пластиковый стакан 500мл / Large Cup | 74 | ₽1,726 | ₽345 | 100.0% | – |
+| Drink | Water | Вода со льдом / Iced Water | 5 | ₽250 | ₽50 | 100.0% | 🔴 ↓ 75.0% (-750) |
+| Food | Corn dog | Корн-дог 50/50 / Corn Dog 50/50 | 201 | ₽64,640 | ₽12,928 | 39.1% | 🔴 ↓ 19.2% (-15,365.9) |
+| Food | Corn dog | Корн-дог с сыром / Corn Dog Cheese | 225 | ₽62,300 | ₽12,460 | 37.7% | 🟢 ↑ 6.0% (+3,506.5) |
+| Food | Corn dog | Корн-дог сосиска / Corn Dog Sausage | 123 | ₽37,225 | ₽7,445 | 22.5% | 🟢 ↑ 3.5% (+1,248.1) |
+| Food | Corn dog | Корн-дог картошка сосиска / Corn Dog Potato Sausage | 20 | ₽950 | ₽190 | 0.6% | 🔴 ↓ 79.6% (-3,700) |
+| Food | Pancakes | Блинчики с нутеллой (2шт) / Pancakes Nutella (×2) | 60 | ₽12,731 | ₽2,546 | 33.7% | 🔴 ↓ 31.0% (-5,722.9) |
+| Food | Pancakes | Блинчики с орео (2шт) / Pancakes Oreo (×2) | 29 | ₽6,375 | ₽1,275 | 16.9% | 🔴 ↓ 29.8% (-2,700) |
+| Food | Pancakes | Блинчики с крем-сыром (2шт) / Pancakes Cream Cheese (×2) | 19 | ₽4,000 | ₽800 | 10.6% | 🔴 ↓ 17.9% (-875) |
+| Food | Pancakes | Блинчики с мясом (2шт) / Pancakes Meat (×2) | 18 | ₽4,000 | ₽800 | 10.6% | 🔴 ↓ 48.1% (-3,700) |
+| Food | Pancakes | Блинчики рафаэлло (2шт) / Pancakes Raffaello (×2) | 20 | ₽3,750 | ₽750 | 9.9% | 🔴 ↓ 26.8% (-1,375) |
+| Food | Pancakes | Блинчики с вареной сгущенкой (2шт) / Pancakes Condensed Milk (×2) | 16 | ₽3,250 | ₽650 | 8.6% | 🔴 ↓ 55.9% (-4,125) |
+| Food | Pancakes | Блинчики сливочные (2шт) / Pancakes Cream (×2) | 12 | ₽2,445 | ₽489 | 6.5% | 🟢 ↑ 39.7% (+695) |
+| Food | Pancakes | Блинчики вишня (2шт) / Pancakes Cherry (×2) | 5 | ₽1,250 | ₽250 | 3.3% | 🔴 ↓ 67.7% (-2,617.1) |
+| Uncategorised | Uncategorised | Бабл-ти  Лаймовый (чай) | 51 | ₽11,210 | ₽2,242 | 91.1% | 🔴 ↓ 66.7% (-22,419.2) |
+| Uncategorised | Uncategorised | Гляссе | 2 | ₽350 | ₽70 | 2.8% | – |
+| Uncategorised | Uncategorised | Для комбо малина айс-ти | 3 | ₽300 | ₽60 | 2.4% | 🔴 ↓ 78.6% (-1,100) |
+| Uncategorised | Uncategorised | Блинчики клубника(2шт) | 2 | ₽250 | ₽50 | 2.0% | → 0.0% (0) |
+| Uncategorised | Uncategorised | Вода со льдом в стакане | 4 | ₽200 | ₽40 | 1.6% | – |
+| Uncategorised | Uncategorised | Сироп лесной орех (10 мл) | 0 | ₽0 | ₽0 | 0.0% | 🔴 ↓ 100.0% (-50) |
+| Uncategorised | Uncategorised | Чайный напиток | 0 | ₽0 | ₽0 | 0.0% | 🔴 ↓ 100.0% (-400) |
+
+## 5. Decision Signals
+
+_Thresholds — promote: revenue ≥ ₽5,000 and ≥ 50% of subcat featured avg; demote: revenue ≤ 50% of subcat avg or MoM ≤ -25%; cut: revenue ≤ ₽1,500 and MoM ≤ -30% (or no prior month sales)._
+
+
+### ⬆  Promote to Featured
+
+| category | subcategory | product_display | revenue | weekly_avg | % of subcat | mom |
+| --- | --- | --- | --- | --- | --- | --- |
+| Food | Corn dog | Корн-дог 50/50 / Corn Dog 50/50 | ₽64,640 | ₽12,928 | 39.1% | 🔴 ↓ 19.2% (-15,365.9) |
+| Food | Corn dog | Корн-дог с сыром / Corn Dog Cheese | ₽62,300 | ₽12,460 | 37.7% | 🟢 ↑ 6.0% (+3,506.5) |
+| Drink | Coffee | Корейский кофе / Korean Coffee | ₽42,225 | ₽8,445 | 9.0% | 🟢 ↑ 20.8% (+7,275.0) |
+| Food | Corn dog | Корн-дог сосиска / Corn Dog Sausage | ₽37,225 | ₽7,445 | 22.5% | 🟢 ↑ 3.5% (+1,248.1) |
+| Dessert | Mochi | Моти Нутелла / Mochi Nutella | ₽36,575 | ₽7,315 | 23.7% | 🔴 ↓ 14.7% (-6,307.1) |
+| Drink | Coffee | Капучино / Cappuccino | ₽36,033 | ₽7,207 | 7.7% | 🔴 ↓ 33.3% (-17,991.7) |
+| Dessert | Mochi | Моти Орео / Mochi Oreo | ₽33,450 | ₽6,690 | 21.7% | 🔴 ↓ 28.0% (-13,000) |
+| Drink | Topping | Порция тапиоки / Tapioca Portion | ₽32,952 | ₽6,590 | 62.8% | 🟢 ↑ 376.6% (+26,038.2) |
+| Dessert | Mochi | Моти Лесные ягоды / Mochi Wild Berries | ₽21,575 | ₽4,315 | 14.0% | 🟢 ↑ 8.6% (+1,700) |
+| Dessert | Mochi | Моти Манго / Mochi Mango | ₽20,691 | ₽4,138 | 13.4% | 🔴 ↓ 9.7% (-2,223.5) |
+| Dessert | Mochi | Моти рафаэлло / Mochi Raffaello | ₽17,450 | ₽3,490 | 11.3% | 🟢 ↑ 28.1% (+3,825) |
+| Drink | Topping | Порция джус боллов (не тапиока) / Juice Balls Portion | ₽16,231 | ₽3,246 | 30.9% | 🟢 ↑ 400.6% (+12,988.6) |
+| Dessert | Mochi | Моти Вишня / Mochi Cherry | ₽12,750 | ₽2,550 | 8.3% | 🔴 ↓ 2.9% (-375) |
+| Food | Pancakes | Блинчики с нутеллой (2шт) / Pancakes Nutella (×2) | ₽12,731 | ₽2,546 | 33.7% | 🔴 ↓ 31.0% (-5,722.9) |
+| Drink | Cocktail | Принцесса Персиков Коктейль / Peach Princess Cocktail | ₽12,170 | ₽2,434 | 33.9% | 🔴 ↓ 53.8% (-14,145) |
+| Dessert | Mochi | Моти сливочный / Mochi Cream | ₽11,956 | ₽2,391 | 7.7% | 🟢 ↑ 20.2% (+2,005.7) |
+| Drink | Cocktail | Единорожек Коктейль / Unicorn Cocktail | ₽11,700 | ₽2,340 | 32.6% | 🔴 ↓ 38.7% (-7,400) |
+| Uncategorised | Uncategorised | Бабл-ти  Лаймовый (чай) | ₽11,210 | ₽2,242 | 91.1% | 🔴 ↓ 66.7% (-22,419.2) |
+| Dessert | Cookie | Печенье с предсказаниями / Fortune Cookie | ₽10,900 | ₽2,180 | 100.0% | 🔴 ↓ 24.8% (-3,585.7) |
+| Drink | Cocktail | Шторм на пляже Коктейль / Beach Storm Cocktail | ₽10,550 | ₽2,110 | 29.4% | 🔴 ↓ 67.8% (-22,200) |
+| Food | Pancakes | Блинчики с орео (2шт) / Pancakes Oreo (×2) | ₽6,375 | ₽1,275 | 16.9% | 🔴 ↓ 29.8% (-2,700) |
+
+### ⬇  Demote from Featured
+
+| category | subcategory | product_display | revenue | weekly_avg | % of subcat | mom | reason |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Drink | Coffee | Мокка фраппучино / Mocha Frappuccino | ₽29,705 | ₽5,941 | 6.3% | 🔴 ↓ 38.6% (-18,678.3) | MoM -38.6% |
+| Drink | Milk | Крем Брюле Коктейль / Crème Brûlée | ₽30,600 | ₽6,120 | 5.3% | 🔴 ↓ 13.3% (-4,675) | low revenue |
+| Drink | Coffee | Тирамису кофе / Tiramisu Coffee | ₽41,359 | ₽8,272 | 8.8% | 🔴 ↓ 32.0% (-19,491.2) | MoM -32.0% |
+
+### ✂  Cut Candidates
+
+| category | subcategory | product_display | revenue | weekly_avg | mom |
+| --- | --- | --- | --- | --- | --- |
+| Uncategorised | Uncategorised | Чайный напиток | ₽0 | ₽0 | 🔴 ↓ 100.0% (-400) |
+| Uncategorised | Uncategorised | Сироп лесной орех (10 мл) | ₽0 | ₽0 | 🔴 ↓ 100.0% (-50) |
+| Drink | Topping | Сливочная пенка 1 порция / Cream Foam | ₽180 | ₽36 | – |
+| Uncategorised | Uncategorised | Вода со льдом в стакане | ₽200 | ₽40 | – |
+| Drink | Syrup | Сироп кокос (10 мл) / Coconut Syrup | ₽200 | ₽40 | 🔴 ↓ 42.9% (-150) |
+| Drink | Water | Вода со льдом / Iced Water | ₽250 | ₽50 | 🔴 ↓ 75.0% (-750) |
+| Drink | Topping | Порция кокосовых кусочков / Coconut Pieces Portion | ₽250 | ₽50 | 🔴 ↓ 61.5% (-400) |
+| Drink | Add-in | Двойной шот / Double shot | ₽300 | ₽60 | – |
+| Uncategorised | Uncategorised | Для комбо малина айс-ти | ₽300 | ₽60 | 🔴 ↓ 78.6% (-1,100) |
+| Drink | Coffee | Раф орех / Raf Hazelnut | ₽350 | ₽70 | – |
+| Drink | Coffee | Горячий шоколад / Hot Chocolate | ₽350 | ₽70 | – |
+| Uncategorised | Uncategorised | Гляссе | ₽350 | ₽70 | – |
+| Drink | Syrup | Сироп шоколад (10 мл) / Chocolate Syrup | ₽500 | ₽100 | 🔴 ↓ 51.9% (-540) |
+| Drink | Tea | Матча латте / Macha Latte | ₽525 | ₽105 | – |
+| Drink | Bubble tea | Айс-ти Малина (чай) / Raspberry Ice Tea | ₽560 | ₽112 | – |
+| Drink | Bubble tea | Лаймовый чай / Lime tea | ₽580 | ₽116 | – |
+| Drink | Bubble tea | Остров манго чай / Island Mango Tea | ₽650 | ₽130 | – |
+| Drink | Bubble tea | Мятное яблоко чай / Mint apple tea | ₽700 | ₽140 | – |
+| Drink | Bubble tea | Лавандовый чай / Lavender tea | ₽840 | ₽168 | – |
+| Drink | Bubble tea | Сочная маракуйя чай / Juicy passion fruit tea | ₽910 | ₽182 | – |
+| Food | Corn dog | Корн-дог картошка сосиска / Corn Dog Potato Sausage | ₽950 | ₽190 | 🔴 ↓ 79.6% (-3,700) |
+| Drink | Add-in | Безлатнозное коровье молоко (Пармалат) / Lactose-free Milk | ₽1,250 | ₽250 | 🔴 ↓ 51.9% (-1,350) |
+| Food | Pancakes | Блинчики вишня (2шт) / Pancakes Cherry (×2) | ₽1,250 | ₽250 | 🔴 ↓ 67.7% (-2,617.1) |
+| Drink | Lemonade | Мята в облаках Лимонад с мороженым / Lemonade with Ice Cream | ₽1,350 | ₽270 | – |
+| Drink | Bubble tea | Смородина мята чай / Currant mint tea | ₽1,470 | ₽294 | – |
+| Drink | Cocktail | Мини гам Коктейль / Mini Gum Cocktail | ₽1,500 | ₽300 | 🔴 ↓ 40.0% (-1,000) |`;
+    document.getElementById("content").innerHTML = marked.parse(md);
+  </script>
+</body>
+</html>
