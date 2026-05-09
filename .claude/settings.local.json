@@ -14,7 +14,12 @@
       "Bash(python -c ' *)",
       "Bash(python3 -c ' *)",
       "Bash(python __fix_encoding.py)",
-      "Bash(del \"D:\\\\Github\\\\boba-cafe-databricks\\\\weekly-analysis\\\\__enc_check.txt\" \"D:\\\\Github\\\\boba-cafe-databricks\\\\weekly-analysis\\\\__enc_check2.txt\" \"D:\\\\Github\\\\boba-cafe-databricks\\\\weekly-analysis\\\\__fix_encoding.py\")"
+      "Bash(del \"D:\\\\Github\\\\boba-cafe-databricks\\\\weekly-analysis\\\\__enc_check.txt\" \"D:\\\\Github\\\\boba-cafe-databricks\\\\weekly-analysis\\\\__enc_check2.txt\" \"D:\\\\Github\\\\boba-cafe-databricks\\\\weekly-analysis\\\\__fix_encoding.py\")",
+      "Bash(Get-ChildItem -Path \"d:\\\\Github\\\\boba-cafe-databricks\\\\POS\" -Recurse)",
+      "Bash(Select-Object FullName, PSIsContainer)",
+      "Bash(Sort-Object FullName)",
+      "Bash(Format-Table -AutoSize)",
+      "Bash(grep -E '\\\\.\\(txt|md|yml|yaml\\)$')"
     ]
   }
 }
