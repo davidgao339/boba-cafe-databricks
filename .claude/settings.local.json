@@ -19,7 +19,8 @@
       "Bash(Select-Object FullName, PSIsContainer)",
       "Bash(Sort-Object FullName)",
       "Bash(Format-Table -AutoSize)",
-      "Bash(grep -E '\\\\.\\(txt|md|yml|yaml\\)$')"
+      "Bash(grep -E '\\\\.\\(txt|md|yml|yaml\\)$')",
+      "Bash(python -X utf8 -)"
     ]
   }
 }
