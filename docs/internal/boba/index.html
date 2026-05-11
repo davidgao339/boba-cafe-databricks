@@ -1,7 +1,1369 @@
 <!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><title>Tapioca Cooking Plan</title></head>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tapioca Cooking Plan</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          background: #f5f5f5; color: #222; padding: 32px 24px; }
+  h1  { font-size: 1.6rem; margin-bottom: 4px; }
+  h3  { font-size: 1.05rem; font-weight: 700; margin: 36px 0 14px; color: #333; }
+  .subtitle { color: #666; font-size: 0.9rem; margin-bottom: 20px; }
+  .lang-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 22px; }
+  .lang-bar span { font-size: 0.8rem; color: #999; }
+  .lang-seg { display: flex; border: 1px solid #ccc; border-radius: 6px; overflow: hidden; }
+  .lang-seg button { padding: 4px 12px; border: none; background: #fff; cursor: pointer;
+                      font-size: 0.82rem; font-weight: 600; color: #555;
+                      border-right: 1px solid #ccc; transition: background .15s; }
+  .lang-seg button:last-child { border-right: none; }
+  .lang-seg button.active { background: #3b5bdb; color: #fff; }
+  .lang-ru { display: none; }
+  .guide { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.08);
+            margin-bottom: 28px; overflow: hidden; }
+  .guide-header { display: flex; justify-content: space-between; align-items: center;
+                   padding: 14px 20px; cursor: pointer; user-select: none;
+                   border-bottom: 1px solid transparent; transition: border-color .2s; }
+  .guide-header:hover { background: #fafafa; }
+  .guide-header.open { border-bottom-color: #eee; }
+  .guide-title { font-weight: 700; font-size: 0.95rem; color: #333; }
+  .guide-chevron { font-size: 0.75rem; color: #999; transition: transform .2s; }
+  .guide-chevron.open { transform: rotate(180deg); }
+  .guide-body { display: none; padding: 20px; }
+  .guide-body.open { display: block; }
+  .guide-body p  { font-size: 0.88rem; line-height: 1.65; color: #444; margin-bottom: 14px; }
+  .guide-body p:last-child { margin-bottom: 0; }
+  .guide-body strong { color: #222; }
+  .guide-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px; }
+  @media (max-width: 640px) { .guide-grid { grid-template-columns: 1fr; } }
+  .guide-box { background: #f7f7f7; border-radius: 8px; padding: 12px 14px; }
+  .guide-box h4 { font-size: 0.82rem; font-weight: 700; color: #555;
+                   text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+  .guide-box ul { padding-left: 16px; font-size: 0.85rem; line-height: 1.7; color: #444; }
+  .slot-chip { display: inline-block; background: #e8f5e9; color: #2d6a4f;
+                border-radius: 4px; padding: 1px 7px; font-weight: 700;
+                font-size: 0.8rem; margin-right: 4px; }
+  .badge { display: inline-block; border-radius: 4px; padding: 1px 7px;
+             font-size: 0.78rem; font-weight: 700; }
+  .badge-red    { background: #fff5f5; color: #c0392b; }
+  .badge-yellow { background: #fffdf0; color: #d68910; }
+  .badge-teal   { background: #f5fffe; color: #1a7a6e; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 20px; align-items: center;
+              background: #fff; border-radius: 10px; padding: 16px 22px;
+              box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 28px; }
+  .toolbar label { font-weight: 600; white-space: nowrap; font-size: 0.9rem; }
+  .toolbar input  { width: 80px; padding: 5px 9px; border: 1px solid #ccc;
+                     border-radius: 6px; font-size: 0.95rem; }
+  .seg { display: flex; border: 1px solid #ccc; border-radius: 7px; overflow: hidden; }
+  .seg button { padding: 6px 14px; border: none; background: #fff; cursor: pointer;
+                 font-size: 0.88rem; font-weight: 600; color: #555;
+                 border-right: 1px solid #ccc; transition: background .15s; }
+  .seg button:last-child { border-right: none; }
+  .seg button.active { background: #2d6a4f; color: #fff; }
+  .seg button:hover:not(.active) { background: #f0f0f0; }
+  .grid      { display: grid; grid-template-columns: repeat(auto-fill, minmax(500px, 1fr)); gap: 18px; }
+  .grid.wide { grid-template-columns: repeat(auto-fill, minmax(680px, 1fr)); }
+  .store-card { background: #fff; border-radius: 10px; padding: 18px 22px;
+                 box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .store-card h2 { font-size: 0.95rem; font-weight: 700; margin-bottom: 10px;
+                    color: #444; letter-spacing: .04em; }
+  table  { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+  thead tr { background: #f0f0f0; }
+  th { padding: 7px 11px; text-align: center; font-weight: 600;
+        border-bottom: 2px solid #ddd; line-height: 1.3; }
+  th:first-child { text-align: left; }
+  td { padding: 7px 11px; border-bottom: 1px solid #eee; }
+  td.slot  { font-weight: 600; color: #555; white-space: nowrap; }
+  td.num   { text-align: center; }
+  td.grams { color: #c84b31; font-weight: 600; }
+  td.bold  { font-weight: 700; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafafa; }
+  .legend { display: flex; gap: 18px; margin-bottom: 14px; font-size: 0.81rem; color: #555; }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; }
+  .dot-high { background: #f8d7da; border: 1px solid #f5c2c7; }
+  .dot-med  { background: #fff3cd; border: 1px solid #ffecb5; }
+  .dot-low  { background: #d1ecf1; border: 1px solid #bee5eb; }
+  .sev-high { background: #fff5f5; }
+  .sev-med  { background: #fffdf0; }
+  .sev-low  { background: #f5fffe; }
+  .pct-high { color: #c0392b; font-weight: 700; }
+  .pct-med  { color: #d68910; font-weight: 700; }
+  .pct-low  { color: #1a7a6e; font-weight: 600; }
+  .updated  { font-size: 0.78rem; color: #aaa; margin-top: 40px; text-align: right; }
+</style>
+</head>
 <body>
-<p>Report not yet generated. Run the <code>tapioca_report_job</code> Databricks job to populate this page.</p>
+
+<h1>
+  <span class="lang-en">Tapioca Cooking Plan</span>
+  <span class="lang-ru">План варки тапиоки</span>
+</h1>
+<p class="subtitle">
+  <span class="lang-en">Rolling 90 days: 10 Feb 2026 – 11 May 2026 &nbsp;·&nbsp; 10 stores &nbsp;·&nbsp; Weekday vs Weekend</span>
+  <span class="lang-ru">Скользящие 90 дней: 10 Feb 2026 – 11 May 2026 &nbsp;·&nbsp; 10 магазинов &nbsp;·&nbsp; Будни vs Выходные</span>
+</p>
+
+<div class="lang-bar">
+  <span>🌐</span>
+  <div class="lang-seg">
+    <button id="lang-en" class="active" onclick="setLang('en')">EN</button>
+    <button id="lang-ru" onclick="setLang('ru')">RU</button>
+  </div>
+</div>
+
+<div class="guide">
+  <div class="guide-header" onclick="toggleGuide()">
+    <span class="guide-title">
+      <span class="lang-en">📖 How to use this report</span>
+      <span class="lang-ru">📖 Как пользоваться отчётом</span>
+    </span>
+    <span class="guide-chevron" id="guide-chevron">▼</span>
+  </div>
+  <div class="guide-body" id="guide-body">
+    <div class="lang-en">
+      <p>This report shows <strong>how many portions of tapioca to cook</strong> for each time slot per store, based on the last 90 days of sales. It updates automatically every day.</p>
+      <div class="guide-grid">
+        <div class="guide-box">
+          <h4>Cooking slots</h4>
+          <ul>
+            <li><span class="slot-chip">9:30 AM</span> Covers sales until <strong>4:00 PM</strong></li>
+            <li><span class="slot-chip">2:00 PM</span> Ready at 4 PM, covers until <strong>8:00 PM</strong></li>
+            <li><span class="slot-chip">6:00 PM</span> Ready at 8 PM, covers until <strong>close</strong></li>
+          </ul>
+        </div>
+        <div class="guide-box">
+          <h4>Percentile toggle</h4>
+          <ul>
+            <li><strong>Avg</strong> — runs short ~50% of days</li>
+            <li><strong>p75</strong> — short 1 in 4 days</li>
+            <li><strong>p90</strong> — short ~2–3 days/month <em>(recommended)</em></li>
+            <li><strong>p95</strong> — short ~1–2 days/month</li>
+            <li><strong>Max</strong> — never short, but wastes the most</li>
+          </ul>
+        </div>
+        <div class="guide-box">
+          <h4>Grams per portion</h4>
+          <ul>
+            <li>Set this to the weight of <strong>dry tapioca pearls</strong> per drink.</li>
+            <li>The grams column updates automatically.</li>
+            <li>Default is 50 g — adjust to your recipe.</li>
+          </ul>
+        </div>
+        <div class="guide-box">
+          <h4>Backtest colour codes</h4>
+          <ul>
+            <li><span class="badge badge-red">≥ 30%</span> Short more than 1 in 3 days</li>
+            <li><span class="badge badge-yellow">15–29%</span> Borderline</li>
+            <li><span class="badge badge-teal">&lt; 15%</span> Acceptable</li>
+          </ul>
+        </div>
+      </div>
+      <p><strong>Shortfall</strong> shows average and maximum extra portions needed on days the recommendation fell short.</p>
+    </div>
+    <div class="lang-ru">
+      <p>Этот отчёт показывает <strong>сколько порций тапиоки варить</strong> для каждого временного слота в каждом магазине, на основе продаж за последние 90 дней. Обновляется автоматически каждый день.</p>
+      <div class="guide-grid">
+        <div class="guide-box">
+          <h4>Временные слоты</h4>
+          <ul>
+            <li><span class="slot-chip">9:30</span> Покрывает продажи до <strong>16:00</strong></li>
+            <li><span class="slot-chip">14:00</span> Готова в 16:00, покрывает до <strong>20:00</strong></li>
+            <li><span class="slot-chip">18:00</span> Готова в 20:00, покрывает до <strong>закрытия</strong></li>
+          </ul>
+        </div>
+        <div class="guide-box">
+          <h4>Переключатель перцентиля</h4>
+          <ul>
+            <li><strong>Avg</strong> — не хватает ~в 50% дней</li>
+            <li><strong>p75</strong> — не хватает 1 день из 4</li>
+            <li><strong>p90</strong> — не хватает ~2–3 дня/мес <em>(рекомендуется)</em></li>
+            <li><strong>p95</strong> — не хватает ~1–2 дня/мес</li>
+            <li><strong>Max</strong> — никогда не заканчивается, но больше отходов</li>
+          </ul>
+        </div>
+        <div class="guide-box">
+          <h4>Граммов на порцию</h4>
+          <ul>
+            <li>Укажите вес <strong>сухих шариков тапиоки</strong> на один напиток.</li>
+            <li>Столбец граммов пересчитается автоматически.</li>
+            <li>По умолчанию 50 г — измените под ваш рецепт.</li>
+          </ul>
+        </div>
+        <div class="guide-box">
+          <h4>Цвета в бэктесте</h4>
+          <ul>
+            <li><span class="badge badge-red">≥ 30%</span> Не хватает чаще 1 раза из 3</li>
+            <li><span class="badge badge-yellow">15–29%</span> Погранично</li>
+            <li><span class="badge badge-teal">&lt; 15%</span> Приемлемо</li>
+          </ul>
+        </div>
+      </div>
+      <p><strong>Нехватка</strong> — среднее и максимальное количество лишних порций, которых не хватило бы в плохие дни.</p>
+    </div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div>
+    <label><span class="lang-en">Percentile standard:</span><span class="lang-ru">Уровень перцентиля:</span></label><br>
+    <div class="seg" style="margin-top:6px">
+      <button onclick="setMode('avg')" id="btn-avg">Avg</button>
+      <button onclick="setMode('p75')" id="btn-p75">p75</button>
+      <button onclick="setMode('p90')" id="btn-p90" class="active">p90</button>
+      <button onclick="setMode('p95')" id="btn-p95">p95</button>
+      <button onclick="setMode('max')" id="btn-max">Max</button>
+    </div>
+  </div>
+  <div>
+    <label for="gpWeight"><span class="lang-en">Grams per portion:</span><span class="lang-ru">Граммов на порцию:</span></label><br>
+    <input type="number" id="gpWeight" value="50" min="1" step="1" style="margin-top:6px">
+  </div>
+</div>
+
+<h3><span class="lang-en">Cooking Plan</span><span class="lang-ru">План варки</span></h3>
+<div class="grid">
+  <div class="store-card">
+    <h2>АНАПА</h2>
+    <table>
+      <thead><tr>
+        <th class="th-slot">Slot</th>
+        <th class="th-weekday-p">Weekday<br><small>portions</small></th>
+        <th class="th-weekday-g">Weekday<br><small>grams</small></th>
+        <th class="th-weekend-p">Weekend<br><small>portions</small></th>
+        <th class="th-weekend-g">Weekend<br><small>grams</small></th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td class="slot">9:30 AM</td>
+          <td class="num pval" data-store="АНАПА" data-slot="9:30 AM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="АНАПА" data-slot="9:30 AM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="АНАПА" data-slot="9:30 AM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="АНАПА" data-slot="9:30 AM" data-day="Weekend">—</td>
+        </tr>
+        <tr>
+          <td class="slot">2:00 PM</td>
+          <td class="num pval" data-store="АНАПА" data-slot="2:00 PM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="АНАПА" data-slot="2:00 PM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="АНАПА" data-slot="2:00 PM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="АНАПА" data-slot="2:00 PM" data-day="Weekend">—</td>
+        </tr>
+        <tr>
+          <td class="slot">6:00 PM</td>
+          <td class="num pval" data-store="АНАПА" data-slot="6:00 PM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="АНАПА" data-slot="6:00 PM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="АНАПА" data-slot="6:00 PM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="АНАПА" data-slot="6:00 PM" data-day="Weekend">—</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+  <div class="store-card">
+    <h2>БОН ПАССАЖ</h2>
+    <table>
+      <thead><tr>
+        <th class="th-slot">Slot</th>
+        <th class="th-weekday-p">Weekday<br><small>portions</small></th>
+        <th class="th-weekday-g">Weekday<br><small>grams</small></th>
+        <th class="th-weekend-p">Weekend<br><small>portions</small></th>
+        <th class="th-weekend-g">Weekend<br><small>grams</small></th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td class="slot">9:30 AM</td>
+          <td class="num pval" data-store="БОН ПАССАЖ" data-slot="9:30 AM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="БОН ПАССАЖ" data-slot="9:30 AM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="БОН ПАССАЖ" data-slot="9:30 AM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="БОН ПАССАЖ" data-slot="9:30 AM" data-day="Weekend">—</td>
+        </tr>
+        <tr>
+          <td class="slot">2:00 PM</td>
+          <td class="num pval" data-store="БОН ПАССАЖ" data-slot="2:00 PM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="БОН ПАССАЖ" data-slot="2:00 PM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="БОН ПАССАЖ" data-slot="2:00 PM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="БОН ПАССАЖ" data-slot="2:00 PM" data-day="Weekend">—</td>
+        </tr>
+        <tr>
+          <td class="slot">6:00 PM</td>
+          <td class="num pval" data-store="БОН ПАССАЖ" data-slot="6:00 PM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="БОН ПАССАЖ" data-slot="6:00 PM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="БОН ПАССАЖ" data-slot="6:00 PM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="БОН ПАССАЖ" data-slot="6:00 PM" data-day="Weekend">—</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+  <div class="store-card">
+    <h2>ГАЛЕРЕЯ</h2>
+    <table>
+      <thead><tr>
+        <th class="th-slot">Slot</th>
+        <th class="th-weekday-p">Weekday<br><small>portions</small></th>
+        <th class="th-weekday-g">Weekday<br><small>grams</small></th>
+        <th class="th-weekend-p">Weekend<br><small>portions</small></th>
+        <th class="th-weekend-g">Weekend<br><small>grams</small></th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td class="slot">9:30 AM</td>
+          <td class="num pval" data-store="ГАЛЕРЕЯ" data-slot="9:30 AM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="ГАЛЕРЕЯ" data-slot="9:30 AM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="ГАЛЕРЕЯ" data-slot="9:30 AM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="ГАЛЕРЕЯ" data-slot="9:30 AM" data-day="Weekend">—</td>
+        </tr>
+        <tr>
+          <td class="slot">2:00 PM</td>
+          <td class="num pval" data-store="ГАЛЕРЕЯ" data-slot="2:00 PM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="ГАЛЕРЕЯ" data-slot="2:00 PM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="ГАЛЕРЕЯ" data-slot="2:00 PM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="ГАЛЕРЕЯ" data-slot="2:00 PM" data-day="Weekend">—</td>
+        </tr>
+        <tr>
+          <td class="slot">6:00 PM</td>
+          <td class="num pval" data-store="ГАЛЕРЕЯ" data-slot="6:00 PM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="ГАЛЕРЕЯ" data-slot="6:00 PM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="ГАЛЕРЕЯ" data-slot="6:00 PM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="ГАЛЕРЕЯ" data-slot="6:00 PM" data-day="Weekend">—</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+  <div class="store-card">
+    <h2>ГРИН ПАРК</h2>
+    <table>
+      <thead><tr>
+        <th class="th-slot">Slot</th>
+        <th class="th-weekday-p">Weekday<br><small>portions</small></th>
+        <th class="th-weekday-g">Weekday<br><small>grams</small></th>
+        <th class="th-weekend-p">Weekend<br><small>portions</small></th>
+        <th class="th-weekend-g">Weekend<br><small>grams</small></th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td class="slot">9:30 AM</td>
+          <td class="num pval" data-store="ГРИН ПАРК" data-slot="9:30 AM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="ГРИН ПАРК" data-slot="9:30 AM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="ГРИН ПАРК" data-slot="9:30 AM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="ГРИН ПАРК" data-slot="9:30 AM" data-day="Weekend">—</td>
+        </tr>
+        <tr>
+          <td class="slot">2:00 PM</td>
+          <td class="num pval" data-store="ГРИН ПАРК" data-slot="2:00 PM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="ГРИН ПАРК" data-slot="2:00 PM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="ГРИН ПАРК" data-slot="2:00 PM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="ГРИН ПАРК" data-slot="2:00 PM" data-day="Weekend">—</td>
+        </tr>
+        <tr>
+          <td class="slot">6:00 PM</td>
+          <td class="num pval" data-store="ГРИН ПАРК" data-slot="6:00 PM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="ГРИН ПАРК" data-slot="6:00 PM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="ГРИН ПАРК" data-slot="6:00 PM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="ГРИН ПАРК" data-slot="6:00 PM" data-day="Weekend">—</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+  <div class="store-card">
+    <h2>КИОСК</h2>
+    <table>
+      <thead><tr>
+        <th class="th-slot">Slot</th>
+        <th class="th-weekday-p">Weekday<br><small>portions</small></th>
+        <th class="th-weekday-g">Weekday<br><small>grams</small></th>
+        <th class="th-weekend-p">Weekend<br><small>portions</small></th>
+        <th class="th-weekend-g">Weekend<br><small>grams</small></th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td class="slot">9:30 AM</td>
+          <td class="num pval" data-store="КИОСК" data-slot="9:30 AM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="КИОСК" data-slot="9:30 AM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="КИОСК" data-slot="9:30 AM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="КИОСК" data-slot="9:30 AM" data-day="Weekend">—</td>
+        </tr>
+        <tr>
+          <td class="slot">2:00 PM</td>
+          <td class="num pval" data-store="КИОСК" data-slot="2:00 PM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="КИОСК" data-slot="2:00 PM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="КИОСК" data-slot="2:00 PM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="КИОСК" data-slot="2:00 PM" data-day="Weekend">—</td>
+        </tr>
+        <tr>
+          <td class="slot">6:00 PM</td>
+          <td class="num pval" data-store="КИОСК" data-slot="6:00 PM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="КИОСК" data-slot="6:00 PM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="КИОСК" data-slot="6:00 PM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="КИОСК" data-slot="6:00 PM" data-day="Weekend">—</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+  <div class="store-card">
+    <h2>КПК</h2>
+    <table>
+      <thead><tr>
+        <th class="th-slot">Slot</th>
+        <th class="th-weekday-p">Weekday<br><small>portions</small></th>
+        <th class="th-weekday-g">Weekday<br><small>grams</small></th>
+        <th class="th-weekend-p">Weekend<br><small>portions</small></th>
+        <th class="th-weekend-g">Weekend<br><small>grams</small></th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td class="slot">9:30 AM</td>
+          <td class="num pval" data-store="КПК" data-slot="9:30 AM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="КПК" data-slot="9:30 AM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="КПК" data-slot="9:30 AM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="КПК" data-slot="9:30 AM" data-day="Weekend">—</td>
+        </tr>
+        <tr>
+          <td class="slot">2:00 PM</td>
+          <td class="num pval" data-store="КПК" data-slot="2:00 PM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="КПК" data-slot="2:00 PM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="КПК" data-slot="2:00 PM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="КПК" data-slot="2:00 PM" data-day="Weekend">—</td>
+        </tr>
+        <tr>
+          <td class="slot">6:00 PM</td>
+          <td class="num pval" data-store="КПК" data-slot="6:00 PM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="КПК" data-slot="6:00 PM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="КПК" data-slot="6:00 PM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="КПК" data-slot="6:00 PM" data-day="Weekend">—</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+  <div class="store-card">
+    <h2>НОВО КП</h2>
+    <table>
+      <thead><tr>
+        <th class="th-slot">Slot</th>
+        <th class="th-weekday-p">Weekday<br><small>portions</small></th>
+        <th class="th-weekday-g">Weekday<br><small>grams</small></th>
+        <th class="th-weekend-p">Weekend<br><small>portions</small></th>
+        <th class="th-weekend-g">Weekend<br><small>grams</small></th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td class="slot">9:30 AM</td>
+          <td class="num pval" data-store="НОВО КП" data-slot="9:30 AM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="НОВО КП" data-slot="9:30 AM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="НОВО КП" data-slot="9:30 AM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="НОВО КП" data-slot="9:30 AM" data-day="Weekend">—</td>
+        </tr>
+        <tr>
+          <td class="slot">2:00 PM</td>
+          <td class="num pval" data-store="НОВО КП" data-slot="2:00 PM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="НОВО КП" data-slot="2:00 PM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="НОВО КП" data-slot="2:00 PM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="НОВО КП" data-slot="2:00 PM" data-day="Weekend">—</td>
+        </tr>
+        <tr>
+          <td class="slot">6:00 PM</td>
+          <td class="num pval" data-store="НОВО КП" data-slot="6:00 PM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="НОВО КП" data-slot="6:00 PM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="НОВО КП" data-slot="6:00 PM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="НОВО КП" data-slot="6:00 PM" data-day="Weekend">—</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+  <div class="store-card">
+    <h2>ОЗМОЛЛ</h2>
+    <table>
+      <thead><tr>
+        <th class="th-slot">Slot</th>
+        <th class="th-weekday-p">Weekday<br><small>portions</small></th>
+        <th class="th-weekday-g">Weekday<br><small>grams</small></th>
+        <th class="th-weekend-p">Weekend<br><small>portions</small></th>
+        <th class="th-weekend-g">Weekend<br><small>grams</small></th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td class="slot">9:30 AM</td>
+          <td class="num pval" data-store="ОЗМОЛЛ" data-slot="9:30 AM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="ОЗМОЛЛ" data-slot="9:30 AM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="ОЗМОЛЛ" data-slot="9:30 AM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="ОЗМОЛЛ" data-slot="9:30 AM" data-day="Weekend">—</td>
+        </tr>
+        <tr>
+          <td class="slot">2:00 PM</td>
+          <td class="num pval" data-store="ОЗМОЛЛ" data-slot="2:00 PM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="ОЗМОЛЛ" data-slot="2:00 PM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="ОЗМОЛЛ" data-slot="2:00 PM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="ОЗМОЛЛ" data-slot="2:00 PM" data-day="Weekend">—</td>
+        </tr>
+        <tr>
+          <td class="slot">6:00 PM</td>
+          <td class="num pval" data-store="ОЗМОЛЛ" data-slot="6:00 PM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="ОЗМОЛЛ" data-slot="6:00 PM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="ОЗМОЛЛ" data-slot="6:00 PM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="ОЗМОЛЛ" data-slot="6:00 PM" data-day="Weekend">—</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+  <div class="store-card">
+    <h2>СОВЕТОВ</h2>
+    <table>
+      <thead><tr>
+        <th class="th-slot">Slot</th>
+        <th class="th-weekday-p">Weekday<br><small>portions</small></th>
+        <th class="th-weekday-g">Weekday<br><small>grams</small></th>
+        <th class="th-weekend-p">Weekend<br><small>portions</small></th>
+        <th class="th-weekend-g">Weekend<br><small>grams</small></th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td class="slot">9:30 AM</td>
+          <td class="num pval" data-store="СОВЕТОВ" data-slot="9:30 AM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="СОВЕТОВ" data-slot="9:30 AM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="СОВЕТОВ" data-slot="9:30 AM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="СОВЕТОВ" data-slot="9:30 AM" data-day="Weekend">—</td>
+        </tr>
+        <tr>
+          <td class="slot">2:00 PM</td>
+          <td class="num pval" data-store="СОВЕТОВ" data-slot="2:00 PM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="СОВЕТОВ" data-slot="2:00 PM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="СОВЕТОВ" data-slot="2:00 PM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="СОВЕТОВ" data-slot="2:00 PM" data-day="Weekend">—</td>
+        </tr>
+        <tr>
+          <td class="slot">6:00 PM</td>
+          <td class="num pval" data-store="СОВЕТОВ" data-slot="6:00 PM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="СОВЕТОВ" data-slot="6:00 PM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="СОВЕТОВ" data-slot="6:00 PM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="СОВЕТОВ" data-slot="6:00 PM" data-day="Weekend">—</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+  <div class="store-card">
+    <h2>ЧЕРНОМОРСКИЙ</h2>
+    <table>
+      <thead><tr>
+        <th class="th-slot">Slot</th>
+        <th class="th-weekday-p">Weekday<br><small>portions</small></th>
+        <th class="th-weekday-g">Weekday<br><small>grams</small></th>
+        <th class="th-weekend-p">Weekend<br><small>portions</small></th>
+        <th class="th-weekend-g">Weekend<br><small>grams</small></th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td class="slot">9:30 AM</td>
+          <td class="num pval" data-store="ЧЕРНОМОРСКИЙ" data-slot="9:30 AM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="ЧЕРНОМОРСКИЙ" data-slot="9:30 AM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="ЧЕРНОМОРСКИЙ" data-slot="9:30 AM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="ЧЕРНОМОРСКИЙ" data-slot="9:30 AM" data-day="Weekend">—</td>
+        </tr>
+        <tr>
+          <td class="slot">2:00 PM</td>
+          <td class="num pval" data-store="ЧЕРНОМОРСКИЙ" data-slot="2:00 PM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="ЧЕРНОМОРСКИЙ" data-slot="2:00 PM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="ЧЕРНОМОРСКИЙ" data-slot="2:00 PM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="ЧЕРНОМОРСКИЙ" data-slot="2:00 PM" data-day="Weekend">—</td>
+        </tr>
+        <tr>
+          <td class="slot">6:00 PM</td>
+          <td class="num pval" data-store="ЧЕРНОМОРСКИЙ" data-slot="6:00 PM" data-day="Weekday">—</td>
+          <td class="num grams" data-store="ЧЕРНОМОРСКИЙ" data-slot="6:00 PM" data-day="Weekday">—</td>
+          <td class="num pval" data-store="ЧЕРНОМОРСКИЙ" data-slot="6:00 PM" data-day="Weekend">—</td>
+          <td class="num grams" data-store="ЧЕРНОМОРСКИЙ" data-slot="6:00 PM" data-day="Weekend">—</td>
+        </tr></tbody>
+    </table>
+  </div></div>
+
+<h3>
+  <span class="lang-en">Backtest — Days the recommendation falls short</span>
+  <span class="lang-ru">Бэктест — дни, когда рекомендации не хватает</span>
+</h3>
+<div class="legend">
+  <span><span class="dot dot-high"></span><span class="lang-en">&ge;30% of days short</span><span class="lang-ru">&ge;30% дней с нехваткой</span></span>
+  <span><span class="dot dot-med"></span>15–29%</span>
+  <span><span class="dot dot-low"></span>&lt;15%</span>
+</div>
+<div class="grid wide">
+  <div class="store-card wide">
+    <h2>АНАПА</h2>
+    <table>
+      <thead><tr>
+        <th class="th-slot">Slot</th>
+        <th class="th-daytype">Day type</th>
+        <th class="th-rec">Recommended</th>
+        <th class="th-total">Total days</th>
+        <th class="th-under">Days short</th>
+        <th class="th-pct">% short</th>
+        <th class="th-shortfall">Shortfall (avg / max)</th>
+      </tr></thead>
+      <tbody>
+        <tr data-store="АНАПА" data-slot="9:30 AM" data-day="Weekday">
+          <td class="slot">9:30 AM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="АНАПА" data-slot="9:30 AM" data-day="Weekend">
+          <td class="slot">9:30 AM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="АНАПА" data-slot="2:00 PM" data-day="Weekday">
+          <td class="slot">2:00 PM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="АНАПА" data-slot="2:00 PM" data-day="Weekend">
+          <td class="slot">2:00 PM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="АНАПА" data-slot="6:00 PM" data-day="Weekday">
+          <td class="slot">6:00 PM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="АНАПА" data-slot="6:00 PM" data-day="Weekend">
+          <td class="slot">6:00 PM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+  <div class="store-card wide">
+    <h2>БОН ПАССАЖ</h2>
+    <table>
+      <thead><tr>
+        <th class="th-slot">Slot</th>
+        <th class="th-daytype">Day type</th>
+        <th class="th-rec">Recommended</th>
+        <th class="th-total">Total days</th>
+        <th class="th-under">Days short</th>
+        <th class="th-pct">% short</th>
+        <th class="th-shortfall">Shortfall (avg / max)</th>
+      </tr></thead>
+      <tbody>
+        <tr data-store="БОН ПАССАЖ" data-slot="9:30 AM" data-day="Weekday">
+          <td class="slot">9:30 AM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="БОН ПАССАЖ" data-slot="9:30 AM" data-day="Weekend">
+          <td class="slot">9:30 AM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="БОН ПАССАЖ" data-slot="2:00 PM" data-day="Weekday">
+          <td class="slot">2:00 PM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="БОН ПАССАЖ" data-slot="2:00 PM" data-day="Weekend">
+          <td class="slot">2:00 PM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="БОН ПАССАЖ" data-slot="6:00 PM" data-day="Weekday">
+          <td class="slot">6:00 PM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="БОН ПАССАЖ" data-slot="6:00 PM" data-day="Weekend">
+          <td class="slot">6:00 PM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+  <div class="store-card wide">
+    <h2>ГАЛЕРЕЯ</h2>
+    <table>
+      <thead><tr>
+        <th class="th-slot">Slot</th>
+        <th class="th-daytype">Day type</th>
+        <th class="th-rec">Recommended</th>
+        <th class="th-total">Total days</th>
+        <th class="th-under">Days short</th>
+        <th class="th-pct">% short</th>
+        <th class="th-shortfall">Shortfall (avg / max)</th>
+      </tr></thead>
+      <tbody>
+        <tr data-store="ГАЛЕРЕЯ" data-slot="9:30 AM" data-day="Weekday">
+          <td class="slot">9:30 AM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="ГАЛЕРЕЯ" data-slot="9:30 AM" data-day="Weekend">
+          <td class="slot">9:30 AM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="ГАЛЕРЕЯ" data-slot="2:00 PM" data-day="Weekday">
+          <td class="slot">2:00 PM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="ГАЛЕРЕЯ" data-slot="2:00 PM" data-day="Weekend">
+          <td class="slot">2:00 PM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="ГАЛЕРЕЯ" data-slot="6:00 PM" data-day="Weekday">
+          <td class="slot">6:00 PM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="ГАЛЕРЕЯ" data-slot="6:00 PM" data-day="Weekend">
+          <td class="slot">6:00 PM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+  <div class="store-card wide">
+    <h2>ГРИН ПАРК</h2>
+    <table>
+      <thead><tr>
+        <th class="th-slot">Slot</th>
+        <th class="th-daytype">Day type</th>
+        <th class="th-rec">Recommended</th>
+        <th class="th-total">Total days</th>
+        <th class="th-under">Days short</th>
+        <th class="th-pct">% short</th>
+        <th class="th-shortfall">Shortfall (avg / max)</th>
+      </tr></thead>
+      <tbody>
+        <tr data-store="ГРИН ПАРК" data-slot="9:30 AM" data-day="Weekday">
+          <td class="slot">9:30 AM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="ГРИН ПАРК" data-slot="9:30 AM" data-day="Weekend">
+          <td class="slot">9:30 AM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="ГРИН ПАРК" data-slot="2:00 PM" data-day="Weekday">
+          <td class="slot">2:00 PM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="ГРИН ПАРК" data-slot="2:00 PM" data-day="Weekend">
+          <td class="slot">2:00 PM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="ГРИН ПАРК" data-slot="6:00 PM" data-day="Weekday">
+          <td class="slot">6:00 PM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="ГРИН ПАРК" data-slot="6:00 PM" data-day="Weekend">
+          <td class="slot">6:00 PM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+  <div class="store-card wide">
+    <h2>КИОСК</h2>
+    <table>
+      <thead><tr>
+        <th class="th-slot">Slot</th>
+        <th class="th-daytype">Day type</th>
+        <th class="th-rec">Recommended</th>
+        <th class="th-total">Total days</th>
+        <th class="th-under">Days short</th>
+        <th class="th-pct">% short</th>
+        <th class="th-shortfall">Shortfall (avg / max)</th>
+      </tr></thead>
+      <tbody>
+        <tr data-store="КИОСК" data-slot="9:30 AM" data-day="Weekday">
+          <td class="slot">9:30 AM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="КИОСК" data-slot="9:30 AM" data-day="Weekend">
+          <td class="slot">9:30 AM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="КИОСК" data-slot="2:00 PM" data-day="Weekday">
+          <td class="slot">2:00 PM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="КИОСК" data-slot="2:00 PM" data-day="Weekend">
+          <td class="slot">2:00 PM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="КИОСК" data-slot="6:00 PM" data-day="Weekday">
+          <td class="slot">6:00 PM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="КИОСК" data-slot="6:00 PM" data-day="Weekend">
+          <td class="slot">6:00 PM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+  <div class="store-card wide">
+    <h2>КПК</h2>
+    <table>
+      <thead><tr>
+        <th class="th-slot">Slot</th>
+        <th class="th-daytype">Day type</th>
+        <th class="th-rec">Recommended</th>
+        <th class="th-total">Total days</th>
+        <th class="th-under">Days short</th>
+        <th class="th-pct">% short</th>
+        <th class="th-shortfall">Shortfall (avg / max)</th>
+      </tr></thead>
+      <tbody>
+        <tr data-store="КПК" data-slot="9:30 AM" data-day="Weekday">
+          <td class="slot">9:30 AM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="КПК" data-slot="9:30 AM" data-day="Weekend">
+          <td class="slot">9:30 AM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="КПК" data-slot="2:00 PM" data-day="Weekday">
+          <td class="slot">2:00 PM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="КПК" data-slot="2:00 PM" data-day="Weekend">
+          <td class="slot">2:00 PM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="КПК" data-slot="6:00 PM" data-day="Weekday">
+          <td class="slot">6:00 PM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="КПК" data-slot="6:00 PM" data-day="Weekend">
+          <td class="slot">6:00 PM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+  <div class="store-card wide">
+    <h2>НОВО КП</h2>
+    <table>
+      <thead><tr>
+        <th class="th-slot">Slot</th>
+        <th class="th-daytype">Day type</th>
+        <th class="th-rec">Recommended</th>
+        <th class="th-total">Total days</th>
+        <th class="th-under">Days short</th>
+        <th class="th-pct">% short</th>
+        <th class="th-shortfall">Shortfall (avg / max)</th>
+      </tr></thead>
+      <tbody>
+        <tr data-store="НОВО КП" data-slot="9:30 AM" data-day="Weekday">
+          <td class="slot">9:30 AM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="НОВО КП" data-slot="9:30 AM" data-day="Weekend">
+          <td class="slot">9:30 AM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="НОВО КП" data-slot="2:00 PM" data-day="Weekday">
+          <td class="slot">2:00 PM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="НОВО КП" data-slot="2:00 PM" data-day="Weekend">
+          <td class="slot">2:00 PM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="НОВО КП" data-slot="6:00 PM" data-day="Weekday">
+          <td class="slot">6:00 PM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="НОВО КП" data-slot="6:00 PM" data-day="Weekend">
+          <td class="slot">6:00 PM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+  <div class="store-card wide">
+    <h2>ОЗМОЛЛ</h2>
+    <table>
+      <thead><tr>
+        <th class="th-slot">Slot</th>
+        <th class="th-daytype">Day type</th>
+        <th class="th-rec">Recommended</th>
+        <th class="th-total">Total days</th>
+        <th class="th-under">Days short</th>
+        <th class="th-pct">% short</th>
+        <th class="th-shortfall">Shortfall (avg / max)</th>
+      </tr></thead>
+      <tbody>
+        <tr data-store="ОЗМОЛЛ" data-slot="9:30 AM" data-day="Weekday">
+          <td class="slot">9:30 AM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="ОЗМОЛЛ" data-slot="9:30 AM" data-day="Weekend">
+          <td class="slot">9:30 AM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="ОЗМОЛЛ" data-slot="2:00 PM" data-day="Weekday">
+          <td class="slot">2:00 PM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="ОЗМОЛЛ" data-slot="2:00 PM" data-day="Weekend">
+          <td class="slot">2:00 PM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="ОЗМОЛЛ" data-slot="6:00 PM" data-day="Weekday">
+          <td class="slot">6:00 PM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="ОЗМОЛЛ" data-slot="6:00 PM" data-day="Weekend">
+          <td class="slot">6:00 PM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+  <div class="store-card wide">
+    <h2>СОВЕТОВ</h2>
+    <table>
+      <thead><tr>
+        <th class="th-slot">Slot</th>
+        <th class="th-daytype">Day type</th>
+        <th class="th-rec">Recommended</th>
+        <th class="th-total">Total days</th>
+        <th class="th-under">Days short</th>
+        <th class="th-pct">% short</th>
+        <th class="th-shortfall">Shortfall (avg / max)</th>
+      </tr></thead>
+      <tbody>
+        <tr data-store="СОВЕТОВ" data-slot="9:30 AM" data-day="Weekday">
+          <td class="slot">9:30 AM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="СОВЕТОВ" data-slot="9:30 AM" data-day="Weekend">
+          <td class="slot">9:30 AM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="СОВЕТОВ" data-slot="2:00 PM" data-day="Weekday">
+          <td class="slot">2:00 PM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="СОВЕТОВ" data-slot="2:00 PM" data-day="Weekend">
+          <td class="slot">2:00 PM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="СОВЕТОВ" data-slot="6:00 PM" data-day="Weekday">
+          <td class="slot">6:00 PM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="СОВЕТОВ" data-slot="6:00 PM" data-day="Weekend">
+          <td class="slot">6:00 PM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr></tbody>
+    </table>
+  </div>
+
+  <div class="store-card wide">
+    <h2>ЧЕРНОМОРСКИЙ</h2>
+    <table>
+      <thead><tr>
+        <th class="th-slot">Slot</th>
+        <th class="th-daytype">Day type</th>
+        <th class="th-rec">Recommended</th>
+        <th class="th-total">Total days</th>
+        <th class="th-under">Days short</th>
+        <th class="th-pct">% short</th>
+        <th class="th-shortfall">Shortfall (avg / max)</th>
+      </tr></thead>
+      <tbody>
+        <tr data-store="ЧЕРНОМОРСКИЙ" data-slot="9:30 AM" data-day="Weekday">
+          <td class="slot">9:30 AM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="ЧЕРНОМОРСКИЙ" data-slot="9:30 AM" data-day="Weekend">
+          <td class="slot">9:30 AM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="ЧЕРНОМОРСКИЙ" data-slot="2:00 PM" data-day="Weekday">
+          <td class="slot">2:00 PM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="ЧЕРНОМОРСКИЙ" data-slot="2:00 PM" data-day="Weekend">
+          <td class="slot">2:00 PM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="ЧЕРНОМОРСКИЙ" data-slot="6:00 PM" data-day="Weekday">
+          <td class="slot">6:00 PM</td>
+          <td class="dt-cell" data-day="Weekday">Weekday</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr>
+        <tr data-store="ЧЕРНОМОРСКИЙ" data-slot="6:00 PM" data-day="Weekend">
+          <td class="slot">6:00 PM</td>
+          <td class="dt-cell" data-day="Weekend">Weekend</td>
+          <td class="num bt-rec">—</td>
+          <td class="num bt-total">—</td>
+          <td class="num bt-under bold">—</td>
+          <td class="num bt-pct">—</td>
+          <td class="num bt-shortfall">—</td>
+        </tr></tbody>
+    </table>
+  </div></div>
+
+<p class="updated">
+  <span class="lang-en">Last updated: 10 Feb 2026 – 11 May 2026</span>
+  <span class="lang-ru">Обновлено: 10 Feb 2026 – 11 May 2026</span>
+</p>
+
+<script>
+const PLAN  = {"АНАПА": {"9:30 AM": {"Weekday": {"avg": 0, "p75": 0, "p90": 0, "p95": 0, "max": 0}, "Weekend": {"avg": 1, "p75": 1, "p90": 1, "p95": 1, "max": 1}}, "2:00 PM": {"Weekday": {"avg": 0, "p75": 0, "p90": 0, "p95": 0, "max": 0}, "Weekend": {"avg": 7, "p75": 7, "p90": 7, "p95": 7, "max": 7}}, "6:00 PM": {"Weekday": {"avg": 0, "p75": 0, "p90": 0, "p95": 0, "max": 0}, "Weekend": {"avg": 11, "p75": 11, "p90": 11, "p95": 11, "max": 11}}}, "БОН ПАССАЖ": {"9:30 AM": {"Weekday": {"avg": 2, "p75": 2, "p90": 3, "p95": 4, "max": 4}, "Weekend": {"avg": 2, "p75": 2, "p90": 4, "p95": 5, "max": 5}}, "2:00 PM": {"Weekday": {"avg": 5, "p75": 6, "p90": 7, "p95": 7, "max": 11}, "Weekend": {"avg": 8, "p75": 9, "p90": 14, "p95": 17, "max": 18}}, "6:00 PM": {"Weekday": {"avg": 5, "p75": 6, "p90": 10, "p95": 11, "max": 13}, "Weekend": {"avg": 6, "p75": 7, "p90": 11, "p95": 11, "max": 15}}}, "ГАЛЕРЕЯ": {"9:30 AM": {"Weekday": {"avg": 2, "p75": 2, "p90": 3, "p95": 3, "max": 8}, "Weekend": {"avg": 2, "p75": 2, "p90": 4, "p95": 4, "max": 4}}, "2:00 PM": {"Weekday": {"avg": 4, "p75": 6, "p90": 6, "p95": 8, "max": 12}, "Weekend": {"avg": 8, "p75": 10, "p90": 12, "p95": 13, "max": 15}}, "6:00 PM": {"Weekday": {"avg": 5, "p75": 7, "p90": 8, "p95": 9, "max": 10}, "Weekend": {"avg": 9, "p75": 11, "p90": 12, "p95": 14, "max": 16}}}, "ГРИН ПАРК": {"9:30 AM": {"Weekday": {"avg": 3, "p75": 3, "p90": 5, "p95": 6, "max": 7}, "Weekend": {"avg": 3, "p75": 4, "p90": 4, "p95": 6, "max": 7}}, "2:00 PM": {"Weekday": {"avg": 6, "p75": 7, "p90": 9, "p95": 10, "max": 19}, "Weekend": {"avg": 11, "p75": 13, "p90": 16, "p95": 17, "max": 18}}, "6:00 PM": {"Weekday": {"avg": 6, "p75": 7, "p90": 9, "p95": 12, "max": 15}, "Weekend": {"avg": 10, "p75": 12, "p90": 13, "p95": 13, "max": 14}}}, "КИОСК": {"9:30 AM": {"Weekday": {"avg": 2, "p75": 3, "p90": 3, "p95": 3, "max": 3}, "Weekend": {"avg": 2, "p75": 1, "p90": 2, "p95": 2, "max": 2}}, "2:00 PM": {"Weekday": {"avg": 2, "p75": 2, "p90": 4, "p95": 5, "max": 5}, "Weekend": {"avg": 2, "p75": 2, "p90": 4, "p95": 5, "max": 5}}, "6:00 PM": {"Weekday": {"avg": 3, "p75": 2, "p90": 4, "p95": 6, "max": 10}, "Weekend": {"avg": 3, "p75": 4, "p90": 5, "p95": 7, "max": 8}}}, "КПК": {"9:30 AM": {"Weekday": {"avg": 2, "p75": 2, "p90": 3, "p95": 3, "max": 5}, "Weekend": {"avg": 2, "p75": 3, "p90": 4, "p95": 4, "max": 4}}, "2:00 PM": {"Weekday": {"avg": 3, "p75": 3, "p90": 4, "p95": 6, "max": 6}, "Weekend": {"avg": 5, "p75": 7, "p90": 8, "p95": 9, "max": 12}}, "6:00 PM": {"Weekday": {"avg": 4, "p75": 4, "p90": 6, "p95": 9, "max": 10}, "Weekend": {"avg": 6, "p75": 7, "p90": 8, "p95": 9, "max": 9}}}, "НОВО КП": {"9:30 AM": {"Weekday": {"avg": 3, "p75": 4, "p90": 5, "p95": 6, "max": 8}, "Weekend": {"avg": 5, "p75": 6, "p90": 7, "p95": 10, "max": 12}}, "2:00 PM": {"Weekday": {"avg": 8, "p75": 9, "p90": 12, "p95": 13, "max": 17}, "Weekend": {"avg": 12, "p75": 14, "p90": 17, "p95": 18, "max": 21}}, "6:00 PM": {"Weekday": {"avg": 8, "p75": 9, "p90": 11, "p95": 11, "max": 14}, "Weekend": {"avg": 11, "p75": 13, "p90": 17, "p95": 18, "max": 21}}}, "ОЗМОЛЛ": {"9:30 AM": {"Weekday": {"avg": 2, "p75": 2, "p90": 2, "p95": 2, "max": 4}, "Weekend": {"avg": 3, "p75": 3, "p90": 4, "p95": 4, "max": 4}}, "2:00 PM": {"Weekday": {"avg": 3, "p75": 3, "p90": 4, "p95": 6, "max": 7}, "Weekend": {"avg": 4, "p75": 4, "p90": 7, "p95": 7, "max": 8}}, "6:00 PM": {"Weekday": {"avg": 3, "p75": 4, "p90": 6, "p95": 6, "max": 8}, "Weekend": {"avg": 6, "p75": 7, "p90": 9, "p95": 11, "max": 13}}}, "СОВЕТОВ": {"9:30 AM": {"Weekday": {"avg": 2, "p75": 3, "p90": 3, "p95": 4, "max": 5}, "Weekend": {"avg": 2, "p75": 2, "p90": 4, "p95": 5, "max": 6}}, "2:00 PM": {"Weekday": {"avg": 4, "p75": 5, "p90": 6, "p95": 7, "max": 13}, "Weekend": {"avg": 5, "p75": 5, "p90": 9, "p95": 9, "max": 9}}, "6:00 PM": {"Weekday": {"avg": 5, "p75": 5, "p90": 7, "p95": 9, "max": 13}, "Weekend": {"avg": 5, "p75": 7, "p90": 7, "p95": 9, "max": 11}}}, "ЧЕРНОМОРСКИЙ": {"9:30 AM": {"Weekday": {"avg": 2, "p75": 1, "p90": 2, "p95": 3, "max": 3}, "Weekend": {"avg": 2, "p75": 2, "p90": 4, "p95": 5, "max": 5}}, "2:00 PM": {"Weekday": {"avg": 3, "p75": 3, "p90": 5, "p95": 6, "max": 6}, "Weekend": {"avg": 7, "p75": 8, "p90": 12, "p95": 13, "max": 13}}, "6:00 PM": {"Weekday": {"avg": 4, "p75": 4, "p90": 6, "p95": 8, "max": 10}, "Weekend": {"avg": 6, "p75": 7, "p90": 11, "p95": 12, "max": 13}}}};
+const BT    = {"АНАПА": {"9:30 AM": {"Weekday": {"avg": {}, "p75": {}, "p90": {}, "p95": {}, "max": {}}, "Weekend": {"avg": {"recommended": 1, "total_days": 1, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "p75": {"recommended": 1, "total_days": 1, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "p90": {"recommended": 1, "total_days": 1, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "p95": {"recommended": 1, "total_days": 1, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "max": {"recommended": 1, "total_days": 1, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}, "2:00 PM": {"Weekday": {"avg": {}, "p75": {}, "p90": {}, "p95": {}, "max": {}}, "Weekend": {"avg": {"recommended": 7, "total_days": 1, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "p75": {"recommended": 7, "total_days": 1, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "p90": {"recommended": 7, "total_days": 1, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "p95": {"recommended": 7, "total_days": 1, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "max": {"recommended": 7, "total_days": 1, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}, "6:00 PM": {"Weekday": {"avg": {}, "p75": {}, "p90": {}, "p95": {}, "max": {}}, "Weekend": {"avg": {"recommended": 11, "total_days": 1, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "p75": {"recommended": 11, "total_days": 1, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "p90": {"recommended": 11, "total_days": 1, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "p95": {"recommended": 11, "total_days": 1, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "max": {"recommended": 11, "total_days": 1, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}}, "БОН ПАССАЖ": {"9:30 AM": {"Weekday": {"avg": {"recommended": 2, "total_days": 42, "days_under": 9, "pct_under": 21.4, "avg_shortfall": 2, "max_shortfall": 2}, "p75": {"recommended": 2, "total_days": 42, "days_under": 9, "pct_under": 21.4, "avg_shortfall": 2, "max_shortfall": 2}, "p90": {"recommended": 3, "total_days": 42, "days_under": 3, "pct_under": 7.1, "avg_shortfall": 1, "max_shortfall": 1}, "p95": {"recommended": 4, "total_days": 42, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "max": {"recommended": 4, "total_days": 42, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 2, "total_days": 18, "days_under": 3, "pct_under": 16.7, "avg_shortfall": 2, "max_shortfall": 3}, "p75": {"recommended": 2, "total_days": 18, "days_under": 3, "pct_under": 16.7, "avg_shortfall": 2, "max_shortfall": 3}, "p90": {"recommended": 4, "total_days": 18, "days_under": 1, "pct_under": 5.6, "avg_shortfall": 1, "max_shortfall": 1}, "p95": {"recommended": 5, "total_days": 18, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "max": {"recommended": 5, "total_days": 18, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}, "2:00 PM": {"Weekday": {"avg": {"recommended": 5, "total_days": 62, "days_under": 16, "pct_under": 25.8, "avg_shortfall": 3, "max_shortfall": 6}, "p75": {"recommended": 6, "total_days": 62, "days_under": 10, "pct_under": 16.1, "avg_shortfall": 2, "max_shortfall": 5}, "p90": {"recommended": 7, "total_days": 62, "days_under": 3, "pct_under": 4.8, "avg_shortfall": 3, "max_shortfall": 4}, "p95": {"recommended": 7, "total_days": 62, "days_under": 3, "pct_under": 4.8, "avg_shortfall": 3, "max_shortfall": 4}, "max": {"recommended": 11, "total_days": 62, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 8, "total_days": 26, "days_under": 8, "pct_under": 30.8, "avg_shortfall": 5, "max_shortfall": 10}, "p75": {"recommended": 9, "total_days": 26, "days_under": 6, "pct_under": 23.1, "avg_shortfall": 5, "max_shortfall": 9}, "p90": {"recommended": 14, "total_days": 26, "days_under": 3, "pct_under": 11.5, "avg_shortfall": 3, "max_shortfall": 4}, "p95": {"recommended": 17, "total_days": 26, "days_under": 1, "pct_under": 3.8, "avg_shortfall": 1, "max_shortfall": 1}, "max": {"recommended": 18, "total_days": 26, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}, "6:00 PM": {"Weekday": {"avg": {"recommended": 5, "total_days": 60, "days_under": 16, "pct_under": 26.7, "avg_shortfall": 4, "max_shortfall": 8}, "p75": {"recommended": 6, "total_days": 60, "days_under": 12, "pct_under": 20.0, "avg_shortfall": 4, "max_shortfall": 7}, "p90": {"recommended": 10, "total_days": 60, "days_under": 3, "pct_under": 5.0, "avg_shortfall": 2, "max_shortfall": 3}, "p95": {"recommended": 11, "total_days": 60, "days_under": 2, "pct_under": 3.3, "avg_shortfall": 2, "max_shortfall": 2}, "max": {"recommended": 13, "total_days": 60, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 6, "total_days": 25, "days_under": 9, "pct_under": 36.0, "avg_shortfall": 4, "max_shortfall": 9}, "p75": {"recommended": 7, "total_days": 25, "days_under": 5, "pct_under": 20.0, "avg_shortfall": 4, "max_shortfall": 8}, "p90": {"recommended": 11, "total_days": 25, "days_under": 1, "pct_under": 4.0, "avg_shortfall": 4, "max_shortfall": 4}, "p95": {"recommended": 11, "total_days": 25, "days_under": 1, "pct_under": 4.0, "avg_shortfall": 4, "max_shortfall": 4}, "max": {"recommended": 15, "total_days": 25, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}}, "ГАЛЕРЕЯ": {"9:30 AM": {"Weekday": {"avg": {"recommended": 2, "total_days": 28, "days_under": 5, "pct_under": 17.9, "avg_shortfall": 2, "max_shortfall": 6}, "p75": {"recommended": 2, "total_days": 28, "days_under": 5, "pct_under": 17.9, "avg_shortfall": 2, "max_shortfall": 6}, "p90": {"recommended": 3, "total_days": 28, "days_under": 1, "pct_under": 3.6, "avg_shortfall": 5, "max_shortfall": 5}, "p95": {"recommended": 3, "total_days": 28, "days_under": 1, "pct_under": 3.6, "avg_shortfall": 5, "max_shortfall": 5}, "max": {"recommended": 8, "total_days": 28, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 2, "total_days": 18, "days_under": 4, "pct_under": 22.2, "avg_shortfall": 2, "max_shortfall": 2}, "p75": {"recommended": 2, "total_days": 18, "days_under": 4, "pct_under": 22.2, "avg_shortfall": 2, "max_shortfall": 2}, "p90": {"recommended": 4, "total_days": 18, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "p95": {"recommended": 4, "total_days": 18, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "max": {"recommended": 4, "total_days": 18, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}, "2:00 PM": {"Weekday": {"avg": {"recommended": 4, "total_days": 62, "days_under": 22, "pct_under": 35.5, "avg_shortfall": 3, "max_shortfall": 8}, "p75": {"recommended": 6, "total_days": 62, "days_under": 6, "pct_under": 9.7, "avg_shortfall": 3, "max_shortfall": 6}, "p90": {"recommended": 6, "total_days": 62, "days_under": 6, "pct_under": 9.7, "avg_shortfall": 3, "max_shortfall": 6}, "p95": {"recommended": 8, "total_days": 62, "days_under": 3, "pct_under": 4.8, "avg_shortfall": 2, "max_shortfall": 4}, "max": {"recommended": 12, "total_days": 62, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 8, "total_days": 26, "days_under": 9, "pct_under": 34.6, "avg_shortfall": 4, "max_shortfall": 7}, "p75": {"recommended": 10, "total_days": 26, "days_under": 6, "pct_under": 23.1, "avg_shortfall": 3, "max_shortfall": 5}, "p90": {"recommended": 12, "total_days": 26, "days_under": 2, "pct_under": 7.7, "avg_shortfall": 2, "max_shortfall": 3}, "p95": {"recommended": 13, "total_days": 26, "days_under": 1, "pct_under": 3.8, "avg_shortfall": 2, "max_shortfall": 2}, "max": {"recommended": 15, "total_days": 26, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}, "6:00 PM": {"Weekday": {"avg": {"recommended": 5, "total_days": 63, "days_under": 26, "pct_under": 41.3, "avg_shortfall": 3, "max_shortfall": 5}, "p75": {"recommended": 7, "total_days": 63, "days_under": 9, "pct_under": 14.3, "avg_shortfall": 2, "max_shortfall": 3}, "p90": {"recommended": 8, "total_days": 63, "days_under": 6, "pct_under": 9.5, "avg_shortfall": 2, "max_shortfall": 2}, "p95": {"recommended": 9, "total_days": 63, "days_under": 2, "pct_under": 3.2, "avg_shortfall": 1, "max_shortfall": 1}, "max": {"recommended": 10, "total_days": 63, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 9, "total_days": 26, "days_under": 10, "pct_under": 38.5, "avg_shortfall": 3, "max_shortfall": 7}, "p75": {"recommended": 11, "total_days": 26, "days_under": 5, "pct_under": 19.2, "avg_shortfall": 3, "max_shortfall": 5}, "p90": {"recommended": 12, "total_days": 26, "days_under": 2, "pct_under": 7.7, "avg_shortfall": 3, "max_shortfall": 4}, "p95": {"recommended": 14, "total_days": 26, "days_under": 1, "pct_under": 3.8, "avg_shortfall": 2, "max_shortfall": 2}, "max": {"recommended": 16, "total_days": 26, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}}, "ГРИН ПАРК": {"9:30 AM": {"Weekday": {"avg": {"recommended": 3, "total_days": 30, "days_under": 4, "pct_under": 13.3, "avg_shortfall": 3, "max_shortfall": 4}, "p75": {"recommended": 3, "total_days": 30, "days_under": 4, "pct_under": 13.3, "avg_shortfall": 3, "max_shortfall": 4}, "p90": {"recommended": 5, "total_days": 30, "days_under": 2, "pct_under": 6.7, "avg_shortfall": 2, "max_shortfall": 2}, "p95": {"recommended": 6, "total_days": 30, "days_under": 1, "pct_under": 3.3, "avg_shortfall": 1, "max_shortfall": 1}, "max": {"recommended": 7, "total_days": 30, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 3, "total_days": 23, "days_under": 7, "pct_under": 30.4, "avg_shortfall": 2, "max_shortfall": 4}, "p75": {"recommended": 4, "total_days": 23, "days_under": 2, "pct_under": 8.7, "avg_shortfall": 3, "max_shortfall": 3}, "p90": {"recommended": 4, "total_days": 23, "days_under": 2, "pct_under": 8.7, "avg_shortfall": 3, "max_shortfall": 3}, "p95": {"recommended": 6, "total_days": 23, "days_under": 1, "pct_under": 4.3, "avg_shortfall": 1, "max_shortfall": 1}, "max": {"recommended": 7, "total_days": 23, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}, "2:00 PM": {"Weekday": {"avg": {"recommended": 6, "total_days": 61, "days_under": 18, "pct_under": 29.5, "avg_shortfall": 4, "max_shortfall": 13}, "p75": {"recommended": 7, "total_days": 61, "days_under": 14, "pct_under": 23.0, "avg_shortfall": 4, "max_shortfall": 12}, "p90": {"recommended": 9, "total_days": 61, "days_under": 6, "pct_under": 9.8, "avg_shortfall": 5, "max_shortfall": 10}, "p95": {"recommended": 10, "total_days": 61, "days_under": 3, "pct_under": 4.9, "avg_shortfall": 7, "max_shortfall": 9}, "max": {"recommended": 19, "total_days": 61, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 11, "total_days": 26, "days_under": 13, "pct_under": 50.0, "avg_shortfall": 4, "max_shortfall": 7}, "p75": {"recommended": 13, "total_days": 26, "days_under": 6, "pct_under": 23.1, "avg_shortfall": 3, "max_shortfall": 5}, "p90": {"recommended": 16, "total_days": 26, "days_under": 3, "pct_under": 11.5, "avg_shortfall": 2, "max_shortfall": 2}, "p95": {"recommended": 17, "total_days": 26, "days_under": 1, "pct_under": 3.8, "avg_shortfall": 1, "max_shortfall": 1}, "max": {"recommended": 18, "total_days": 26, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}, "6:00 PM": {"Weekday": {"avg": {"recommended": 6, "total_days": 64, "days_under": 24, "pct_under": 37.5, "avg_shortfall": 3, "max_shortfall": 9}, "p75": {"recommended": 7, "total_days": 64, "days_under": 14, "pct_under": 21.9, "avg_shortfall": 3, "max_shortfall": 8}, "p90": {"recommended": 9, "total_days": 64, "days_under": 5, "pct_under": 7.8, "avg_shortfall": 4, "max_shortfall": 6}, "p95": {"recommended": 12, "total_days": 64, "days_under": 1, "pct_under": 1.6, "avg_shortfall": 3, "max_shortfall": 3}, "max": {"recommended": 15, "total_days": 64, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 10, "total_days": 26, "days_under": 9, "pct_under": 34.6, "avg_shortfall": 3, "max_shortfall": 4}, "p75": {"recommended": 12, "total_days": 26, "days_under": 4, "pct_under": 15.4, "avg_shortfall": 2, "max_shortfall": 2}, "p90": {"recommended": 13, "total_days": 26, "days_under": 1, "pct_under": 3.8, "avg_shortfall": 1, "max_shortfall": 1}, "p95": {"recommended": 13, "total_days": 26, "days_under": 1, "pct_under": 3.8, "avg_shortfall": 1, "max_shortfall": 1}, "max": {"recommended": 14, "total_days": 26, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}}, "КИОСК": {"9:30 AM": {"Weekday": {"avg": {"recommended": 2, "total_days": 11, "days_under": 3, "pct_under": 27.3, "avg_shortfall": 1, "max_shortfall": 1}, "p75": {"recommended": 3, "total_days": 11, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "p90": {"recommended": 3, "total_days": 11, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "p95": {"recommended": 3, "total_days": 11, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "max": {"recommended": 3, "total_days": 11, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 2, "total_days": 5, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "p75": {"recommended": 1, "total_days": 5, "days_under": 1, "pct_under": 20.0, "avg_shortfall": 1, "max_shortfall": 1}, "p90": {"recommended": 2, "total_days": 5, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "p95": {"recommended": 2, "total_days": 5, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "max": {"recommended": 2, "total_days": 5, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}, "2:00 PM": {"Weekday": {"avg": {"recommended": 2, "total_days": 23, "days_under": 3, "pct_under": 13.0, "avg_shortfall": 3, "max_shortfall": 3}, "p75": {"recommended": 2, "total_days": 23, "days_under": 3, "pct_under": 13.0, "avg_shortfall": 3, "max_shortfall": 3}, "p90": {"recommended": 4, "total_days": 23, "days_under": 2, "pct_under": 8.7, "avg_shortfall": 1, "max_shortfall": 1}, "p95": {"recommended": 5, "total_days": 23, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "max": {"recommended": 5, "total_days": 23, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 2, "total_days": 17, "days_under": 4, "pct_under": 23.5, "avg_shortfall": 2, "max_shortfall": 3}, "p75": {"recommended": 2, "total_days": 17, "days_under": 4, "pct_under": 23.5, "avg_shortfall": 2, "max_shortfall": 3}, "p90": {"recommended": 4, "total_days": 17, "days_under": 2, "pct_under": 11.8, "avg_shortfall": 1, "max_shortfall": 1}, "p95": {"recommended": 5, "total_days": 17, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "max": {"recommended": 5, "total_days": 17, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}, "6:00 PM": {"Weekday": {"avg": {"recommended": 3, "total_days": 28, "days_under": 3, "pct_under": 10.7, "avg_shortfall": 4, "max_shortfall": 7}, "p75": {"recommended": 2, "total_days": 28, "days_under": 6, "pct_under": 21.4, "avg_shortfall": 3, "max_shortfall": 8}, "p90": {"recommended": 4, "total_days": 28, "days_under": 2, "pct_under": 7.1, "avg_shortfall": 4, "max_shortfall": 6}, "p95": {"recommended": 6, "total_days": 28, "days_under": 1, "pct_under": 3.6, "avg_shortfall": 4, "max_shortfall": 4}, "max": {"recommended": 10, "total_days": 28, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 3, "total_days": 14, "days_under": 4, "pct_under": 28.6, "avg_shortfall": 3, "max_shortfall": 5}, "p75": {"recommended": 4, "total_days": 14, "days_under": 2, "pct_under": 14.3, "avg_shortfall": 3, "max_shortfall": 4}, "p90": {"recommended": 5, "total_days": 14, "days_under": 1, "pct_under": 7.1, "avg_shortfall": 3, "max_shortfall": 3}, "p95": {"recommended": 7, "total_days": 14, "days_under": 1, "pct_under": 7.1, "avg_shortfall": 1, "max_shortfall": 1}, "max": {"recommended": 8, "total_days": 14, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}}, "КПК": {"9:30 AM": {"Weekday": {"avg": {"recommended": 2, "total_days": 21, "days_under": 3, "pct_under": 14.3, "avg_shortfall": 2, "max_shortfall": 3}, "p75": {"recommended": 2, "total_days": 21, "days_under": 3, "pct_under": 14.3, "avg_shortfall": 2, "max_shortfall": 3}, "p90": {"recommended": 3, "total_days": 21, "days_under": 1, "pct_under": 4.8, "avg_shortfall": 2, "max_shortfall": 2}, "p95": {"recommended": 3, "total_days": 21, "days_under": 1, "pct_under": 4.8, "avg_shortfall": 2, "max_shortfall": 2}, "max": {"recommended": 5, "total_days": 21, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 2, "total_days": 9, "days_under": 3, "pct_under": 33.3, "avg_shortfall": 2, "max_shortfall": 2}, "p75": {"recommended": 3, "total_days": 9, "days_under": 1, "pct_under": 11.1, "avg_shortfall": 1, "max_shortfall": 1}, "p90": {"recommended": 4, "total_days": 9, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "p95": {"recommended": 4, "total_days": 9, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "max": {"recommended": 4, "total_days": 9, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}, "2:00 PM": {"Weekday": {"avg": {"recommended": 3, "total_days": 33, "days_under": 8, "pct_under": 24.2, "avg_shortfall": 2, "max_shortfall": 3}, "p75": {"recommended": 3, "total_days": 33, "days_under": 8, "pct_under": 24.2, "avg_shortfall": 2, "max_shortfall": 3}, "p90": {"recommended": 4, "total_days": 33, "days_under": 3, "pct_under": 9.1, "avg_shortfall": 2, "max_shortfall": 2}, "p95": {"recommended": 6, "total_days": 33, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "max": {"recommended": 6, "total_days": 33, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 5, "total_days": 16, "days_under": 5, "pct_under": 31.2, "avg_shortfall": 3, "max_shortfall": 7}, "p75": {"recommended": 7, "total_days": 16, "days_under": 2, "pct_under": 12.5, "avg_shortfall": 3, "max_shortfall": 5}, "p90": {"recommended": 8, "total_days": 16, "days_under": 1, "pct_under": 6.2, "avg_shortfall": 4, "max_shortfall": 4}, "p95": {"recommended": 9, "total_days": 16, "days_under": 1, "pct_under": 6.2, "avg_shortfall": 3, "max_shortfall": 3}, "max": {"recommended": 12, "total_days": 16, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}, "6:00 PM": {"Weekday": {"avg": {"recommended": 4, "total_days": 36, "days_under": 6, "pct_under": 16.7, "avg_shortfall": 4, "max_shortfall": 6}, "p75": {"recommended": 4, "total_days": 36, "days_under": 6, "pct_under": 16.7, "avg_shortfall": 4, "max_shortfall": 6}, "p90": {"recommended": 6, "total_days": 36, "days_under": 3, "pct_under": 8.3, "avg_shortfall": 3, "max_shortfall": 4}, "p95": {"recommended": 9, "total_days": 36, "days_under": 1, "pct_under": 2.8, "avg_shortfall": 1, "max_shortfall": 1}, "max": {"recommended": 10, "total_days": 36, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 6, "total_days": 16, "days_under": 7, "pct_under": 43.8, "avg_shortfall": 2, "max_shortfall": 3}, "p75": {"recommended": 7, "total_days": 16, "days_under": 3, "pct_under": 18.8, "avg_shortfall": 2, "max_shortfall": 2}, "p90": {"recommended": 8, "total_days": 16, "days_under": 1, "pct_under": 6.2, "avg_shortfall": 1, "max_shortfall": 1}, "p95": {"recommended": 9, "total_days": 16, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "max": {"recommended": 9, "total_days": 16, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}}, "НОВО КП": {"9:30 AM": {"Weekday": {"avg": {"recommended": 3, "total_days": 54, "days_under": 17, "pct_under": 31.5, "avg_shortfall": 2, "max_shortfall": 5}, "p75": {"recommended": 4, "total_days": 54, "days_under": 9, "pct_under": 16.7, "avg_shortfall": 2, "max_shortfall": 4}, "p90": {"recommended": 5, "total_days": 54, "days_under": 4, "pct_under": 7.4, "avg_shortfall": 2, "max_shortfall": 3}, "p95": {"recommended": 6, "total_days": 54, "days_under": 2, "pct_under": 3.7, "avg_shortfall": 2, "max_shortfall": 2}, "max": {"recommended": 8, "total_days": 54, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 5, "total_days": 24, "days_under": 8, "pct_under": 33.3, "avg_shortfall": 3, "max_shortfall": 7}, "p75": {"recommended": 6, "total_days": 24, "days_under": 5, "pct_under": 20.8, "avg_shortfall": 3, "max_shortfall": 6}, "p90": {"recommended": 7, "total_days": 24, "days_under": 2, "pct_under": 8.3, "avg_shortfall": 4, "max_shortfall": 5}, "p95": {"recommended": 10, "total_days": 24, "days_under": 1, "pct_under": 4.2, "avg_shortfall": 2, "max_shortfall": 2}, "max": {"recommended": 12, "total_days": 24, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}, "2:00 PM": {"Weekday": {"avg": {"recommended": 8, "total_days": 64, "days_under": 19, "pct_under": 29.7, "avg_shortfall": 4, "max_shortfall": 9}, "p75": {"recommended": 9, "total_days": 64, "days_under": 15, "pct_under": 23.4, "avg_shortfall": 4, "max_shortfall": 8}, "p90": {"recommended": 12, "total_days": 64, "days_under": 5, "pct_under": 7.8, "avg_shortfall": 3, "max_shortfall": 5}, "p95": {"recommended": 13, "total_days": 64, "days_under": 3, "pct_under": 4.7, "avg_shortfall": 3, "max_shortfall": 4}, "max": {"recommended": 17, "total_days": 64, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 12, "total_days": 26, "days_under": 11, "pct_under": 42.3, "avg_shortfall": 4, "max_shortfall": 9}, "p75": {"recommended": 14, "total_days": 26, "days_under": 6, "pct_under": 23.1, "avg_shortfall": 4, "max_shortfall": 7}, "p90": {"recommended": 17, "total_days": 26, "days_under": 2, "pct_under": 7.7, "avg_shortfall": 3, "max_shortfall": 4}, "p95": {"recommended": 18, "total_days": 26, "days_under": 1, "pct_under": 3.8, "avg_shortfall": 3, "max_shortfall": 3}, "max": {"recommended": 21, "total_days": 26, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}, "6:00 PM": {"Weekday": {"avg": {"recommended": 8, "total_days": 62, "days_under": 21, "pct_under": 33.9, "avg_shortfall": 3, "max_shortfall": 6}, "p75": {"recommended": 9, "total_days": 62, "days_under": 13, "pct_under": 21.0, "avg_shortfall": 3, "max_shortfall": 5}, "p90": {"recommended": 11, "total_days": 62, "days_under": 3, "pct_under": 4.8, "avg_shortfall": 2, "max_shortfall": 3}, "p95": {"recommended": 11, "total_days": 62, "days_under": 3, "pct_under": 4.8, "avg_shortfall": 2, "max_shortfall": 3}, "max": {"recommended": 14, "total_days": 62, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 11, "total_days": 26, "days_under": 10, "pct_under": 38.5, "avg_shortfall": 4, "max_shortfall": 10}, "p75": {"recommended": 13, "total_days": 26, "days_under": 6, "pct_under": 23.1, "avg_shortfall": 4, "max_shortfall": 8}, "p90": {"recommended": 17, "total_days": 26, "days_under": 2, "pct_under": 7.7, "avg_shortfall": 3, "max_shortfall": 4}, "p95": {"recommended": 18, "total_days": 26, "days_under": 1, "pct_under": 3.8, "avg_shortfall": 3, "max_shortfall": 3}, "max": {"recommended": 21, "total_days": 26, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}}, "ОЗМОЛЛ": {"9:30 AM": {"Weekday": {"avg": {"recommended": 2, "total_days": 24, "days_under": 1, "pct_under": 4.2, "avg_shortfall": 2, "max_shortfall": 2}, "p75": {"recommended": 2, "total_days": 24, "days_under": 1, "pct_under": 4.2, "avg_shortfall": 2, "max_shortfall": 2}, "p90": {"recommended": 2, "total_days": 24, "days_under": 1, "pct_under": 4.2, "avg_shortfall": 2, "max_shortfall": 2}, "p95": {"recommended": 2, "total_days": 24, "days_under": 1, "pct_under": 4.2, "avg_shortfall": 2, "max_shortfall": 2}, "max": {"recommended": 4, "total_days": 24, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 3, "total_days": 13, "days_under": 2, "pct_under": 15.4, "avg_shortfall": 1, "max_shortfall": 1}, "p75": {"recommended": 3, "total_days": 13, "days_under": 2, "pct_under": 15.4, "avg_shortfall": 1, "max_shortfall": 1}, "p90": {"recommended": 4, "total_days": 13, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "p95": {"recommended": 4, "total_days": 13, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "max": {"recommended": 4, "total_days": 13, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}, "2:00 PM": {"Weekday": {"avg": {"recommended": 3, "total_days": 54, "days_under": 13, "pct_under": 24.1, "avg_shortfall": 2, "max_shortfall": 4}, "p75": {"recommended": 3, "total_days": 54, "days_under": 13, "pct_under": 24.1, "avg_shortfall": 2, "max_shortfall": 4}, "p90": {"recommended": 4, "total_days": 54, "days_under": 5, "pct_under": 9.3, "avg_shortfall": 2, "max_shortfall": 3}, "p95": {"recommended": 6, "total_days": 54, "days_under": 1, "pct_under": 1.9, "avg_shortfall": 1, "max_shortfall": 1}, "max": {"recommended": 7, "total_days": 54, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 4, "total_days": 26, "days_under": 6, "pct_under": 23.1, "avg_shortfall": 3, "max_shortfall": 4}, "p75": {"recommended": 4, "total_days": 26, "days_under": 6, "pct_under": 23.1, "avg_shortfall": 3, "max_shortfall": 4}, "p90": {"recommended": 7, "total_days": 26, "days_under": 1, "pct_under": 3.8, "avg_shortfall": 1, "max_shortfall": 1}, "p95": {"recommended": 7, "total_days": 26, "days_under": 1, "pct_under": 3.8, "avg_shortfall": 1, "max_shortfall": 1}, "max": {"recommended": 8, "total_days": 26, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}, "6:00 PM": {"Weekday": {"avg": {"recommended": 3, "total_days": 51, "days_under": 15, "pct_under": 29.4, "avg_shortfall": 3, "max_shortfall": 5}, "p75": {"recommended": 4, "total_days": 51, "days_under": 9, "pct_under": 17.6, "avg_shortfall": 3, "max_shortfall": 4}, "p90": {"recommended": 6, "total_days": 51, "days_under": 2, "pct_under": 3.9, "avg_shortfall": 2, "max_shortfall": 2}, "p95": {"recommended": 6, "total_days": 51, "days_under": 2, "pct_under": 3.9, "avg_shortfall": 2, "max_shortfall": 2}, "max": {"recommended": 8, "total_days": 51, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 6, "total_days": 24, "days_under": 6, "pct_under": 25.0, "avg_shortfall": 4, "max_shortfall": 7}, "p75": {"recommended": 7, "total_days": 24, "days_under": 5, "pct_under": 20.8, "avg_shortfall": 4, "max_shortfall": 6}, "p90": {"recommended": 9, "total_days": 24, "days_under": 2, "pct_under": 8.3, "avg_shortfall": 3, "max_shortfall": 4}, "p95": {"recommended": 11, "total_days": 24, "days_under": 1, "pct_under": 4.2, "avg_shortfall": 2, "max_shortfall": 2}, "max": {"recommended": 13, "total_days": 24, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}}, "СОВЕТОВ": {"9:30 AM": {"Weekday": {"avg": {"recommended": 2, "total_days": 31, "days_under": 8, "pct_under": 25.8, "avg_shortfall": 2, "max_shortfall": 3}, "p75": {"recommended": 3, "total_days": 31, "days_under": 2, "pct_under": 6.5, "avg_shortfall": 2, "max_shortfall": 2}, "p90": {"recommended": 3, "total_days": 31, "days_under": 2, "pct_under": 6.5, "avg_shortfall": 2, "max_shortfall": 2}, "p95": {"recommended": 4, "total_days": 31, "days_under": 1, "pct_under": 3.2, "avg_shortfall": 1, "max_shortfall": 1}, "max": {"recommended": 5, "total_days": 31, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 2, "total_days": 15, "days_under": 3, "pct_under": 20.0, "avg_shortfall": 3, "max_shortfall": 4}, "p75": {"recommended": 2, "total_days": 15, "days_under": 3, "pct_under": 20.0, "avg_shortfall": 3, "max_shortfall": 4}, "p90": {"recommended": 4, "total_days": 15, "days_under": 1, "pct_under": 6.7, "avg_shortfall": 2, "max_shortfall": 2}, "p95": {"recommended": 5, "total_days": 15, "days_under": 1, "pct_under": 6.7, "avg_shortfall": 1, "max_shortfall": 1}, "max": {"recommended": 6, "total_days": 15, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}, "2:00 PM": {"Weekday": {"avg": {"recommended": 4, "total_days": 53, "days_under": 15, "pct_under": 28.3, "avg_shortfall": 3, "max_shortfall": 9}, "p75": {"recommended": 5, "total_days": 53, "days_under": 8, "pct_under": 15.1, "avg_shortfall": 3, "max_shortfall": 8}, "p90": {"recommended": 6, "total_days": 53, "days_under": 3, "pct_under": 5.7, "avg_shortfall": 4, "max_shortfall": 7}, "p95": {"recommended": 7, "total_days": 53, "days_under": 2, "pct_under": 3.8, "avg_shortfall": 5, "max_shortfall": 6}, "max": {"recommended": 13, "total_days": 53, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 5, "total_days": 23, "days_under": 4, "pct_under": 17.4, "avg_shortfall": 4, "max_shortfall": 4}, "p75": {"recommended": 5, "total_days": 23, "days_under": 4, "pct_under": 17.4, "avg_shortfall": 4, "max_shortfall": 4}, "p90": {"recommended": 9, "total_days": 23, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "p95": {"recommended": 9, "total_days": 23, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "max": {"recommended": 9, "total_days": 23, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}, "6:00 PM": {"Weekday": {"avg": {"recommended": 5, "total_days": 52, "days_under": 10, "pct_under": 19.2, "avg_shortfall": 4, "max_shortfall": 8}, "p75": {"recommended": 5, "total_days": 52, "days_under": 10, "pct_under": 19.2, "avg_shortfall": 4, "max_shortfall": 8}, "p90": {"recommended": 7, "total_days": 52, "days_under": 5, "pct_under": 9.6, "avg_shortfall": 3, "max_shortfall": 6}, "p95": {"recommended": 9, "total_days": 52, "days_under": 2, "pct_under": 3.8, "avg_shortfall": 3, "max_shortfall": 4}, "max": {"recommended": 13, "total_days": 52, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 5, "total_days": 25, "days_under": 9, "pct_under": 36.0, "avg_shortfall": 3, "max_shortfall": 6}, "p75": {"recommended": 7, "total_days": 25, "days_under": 2, "pct_under": 8.0, "avg_shortfall": 3, "max_shortfall": 4}, "p90": {"recommended": 7, "total_days": 25, "days_under": 2, "pct_under": 8.0, "avg_shortfall": 3, "max_shortfall": 4}, "p95": {"recommended": 9, "total_days": 25, "days_under": 1, "pct_under": 4.0, "avg_shortfall": 2, "max_shortfall": 2}, "max": {"recommended": 11, "total_days": 25, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}}, "ЧЕРНОМОРСКИЙ": {"9:30 AM": {"Weekday": {"avg": {"recommended": 2, "total_days": 8, "days_under": 1, "pct_under": 12.5, "avg_shortfall": 1, "max_shortfall": 1}, "p75": {"recommended": 1, "total_days": 8, "days_under": 1, "pct_under": 12.5, "avg_shortfall": 2, "max_shortfall": 2}, "p90": {"recommended": 2, "total_days": 8, "days_under": 1, "pct_under": 12.5, "avg_shortfall": 1, "max_shortfall": 1}, "p95": {"recommended": 3, "total_days": 8, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "max": {"recommended": 3, "total_days": 8, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 2, "total_days": 10, "days_under": 2, "pct_under": 20.0, "avg_shortfall": 2, "max_shortfall": 3}, "p75": {"recommended": 2, "total_days": 10, "days_under": 2, "pct_under": 20.0, "avg_shortfall": 2, "max_shortfall": 3}, "p90": {"recommended": 4, "total_days": 10, "days_under": 1, "pct_under": 10.0, "avg_shortfall": 1, "max_shortfall": 1}, "p95": {"recommended": 5, "total_days": 10, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "max": {"recommended": 5, "total_days": 10, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}, "2:00 PM": {"Weekday": {"avg": {"recommended": 3, "total_days": 26, "days_under": 4, "pct_under": 15.4, "avg_shortfall": 3, "max_shortfall": 3}, "p75": {"recommended": 3, "total_days": 26, "days_under": 4, "pct_under": 15.4, "avg_shortfall": 3, "max_shortfall": 3}, "p90": {"recommended": 5, "total_days": 26, "days_under": 2, "pct_under": 7.7, "avg_shortfall": 1, "max_shortfall": 1}, "p95": {"recommended": 6, "total_days": 26, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "max": {"recommended": 6, "total_days": 26, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 7, "total_days": 14, "days_under": 6, "pct_under": 42.9, "avg_shortfall": 3, "max_shortfall": 6}, "p75": {"recommended": 8, "total_days": 14, "days_under": 3, "pct_under": 21.4, "avg_shortfall": 4, "max_shortfall": 5}, "p90": {"recommended": 12, "total_days": 14, "days_under": 1, "pct_under": 7.1, "avg_shortfall": 1, "max_shortfall": 1}, "p95": {"recommended": 13, "total_days": 14, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}, "max": {"recommended": 13, "total_days": 14, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}, "6:00 PM": {"Weekday": {"avg": {"recommended": 4, "total_days": 32, "days_under": 6, "pct_under": 18.8, "avg_shortfall": 3, "max_shortfall": 6}, "p75": {"recommended": 4, "total_days": 32, "days_under": 6, "pct_under": 18.8, "avg_shortfall": 3, "max_shortfall": 6}, "p90": {"recommended": 6, "total_days": 32, "days_under": 3, "pct_under": 9.4, "avg_shortfall": 3, "max_shortfall": 4}, "p95": {"recommended": 8, "total_days": 32, "days_under": 2, "pct_under": 6.2, "avg_shortfall": 2, "max_shortfall": 2}, "max": {"recommended": 10, "total_days": 32, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}, "Weekend": {"avg": {"recommended": 6, "total_days": 16, "days_under": 4, "pct_under": 25.0, "avg_shortfall": 5, "max_shortfall": 7}, "p75": {"recommended": 7, "total_days": 16, "days_under": 4, "pct_under": 25.0, "avg_shortfall": 4, "max_shortfall": 6}, "p90": {"recommended": 11, "total_days": 16, "days_under": 1, "pct_under": 6.2, "avg_shortfall": 2, "max_shortfall": 2}, "p95": {"recommended": 12, "total_days": 16, "days_under": 1, "pct_under": 6.2, "avg_shortfall": 1, "max_shortfall": 1}, "max": {"recommended": 13, "total_days": 16, "days_under": 0, "pct_under": 0.0, "avg_shortfall": 0, "max_shortfall": 0}}}}};
+const SLOTS = ["9:30 AM", "2:00 PM", "6:00 PM"];
+let currentMode = 'p90', gramsPerPortion = 50;
+
+function setLang(lang) {
+  document.querySelectorAll('.lang-en, .lang-ru').forEach(el => {
+    const show = el.classList.contains('lang-' + lang);
+    el.style.display = show ? (el.tagName === 'SPAN' ? 'inline' : 'block') : 'none';
+  });
+  document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+  document.getElementById('lang-ru').classList.toggle('active', lang === 'ru');
+  const TH = {
+    en: { 'th-slot':'Slot','th-weekday-p':'Weekday<br><small>portions</small>','th-weekday-g':'Weekday<br><small>grams</small>','th-weekend-p':'Weekend<br><small>portions</small>','th-weekend-g':'Weekend<br><small>grams</small>','th-daytype':'Day type','th-rec':'Recommended','th-total':'Total days','th-under':'Days short','th-pct':'% short','th-shortfall':'Shortfall (avg / max)' },
+    ru: { 'th-slot':'Слот','th-weekday-p':'Будни<br><small>порции</small>','th-weekday-g':'Будни<br><small>граммы</small>','th-weekend-p':'Выходные<br><small>порции</small>','th-weekend-g':'Выходные<br><small>граммы</small>','th-daytype':'День','th-rec':'Рекомендовано','th-total':'Всего дней','th-under':'Дней с нехваткой','th-pct':'% нехватки','th-shortfall':'Нехватка (ср / макс)' },
+  };
+  Object.entries(TH[lang]).forEach(([cls, text]) =>
+    document.querySelectorAll('.' + cls).forEach(el => el.innerHTML = text));
+  document.querySelectorAll('td.dt-cell').forEach(td => {
+    td.textContent = td.dataset.day === 'Weekday'
+      ? (lang === 'en' ? 'Weekday' : 'Будни')
+      : (lang === 'en' ? 'Weekend' : 'Выходные');
+  });
+}
+
+function toggleGuide() {
+  const body = document.getElementById('guide-body');
+  const chev = document.getElementById('guide-chevron');
+  const open = body.classList.toggle('open');
+  chev.classList.toggle('open', open);
+  chev.closest('.guide-header').classList.toggle('open', open);
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.seg button').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + mode).classList.add('active');
+  render();
+}
+
+function sevClass(p) { return p >= 30 ? 'high' : p >= 15 ? 'med' : p > 0 ? 'low' : ''; }
+
+function render() {
+  const g = gramsPerPortion, m = currentMode;
+  document.querySelectorAll('td.pval').forEach(td => {
+    const val = PLAN[td.dataset.store]?.[td.dataset.slot]?.[td.dataset.day]?.[m] ?? 0;
+    td.textContent = val; td.dataset.portions = val;
+  });
+  document.querySelectorAll('td.grams').forEach(td => {
+    const p = parseFloat(td.previousElementSibling?.dataset?.portions) || 0;
+    td.textContent = p > 0 ? Math.round(p * g) + ' g' : '—';
+  });
+  document.querySelectorAll('tr[data-store]').forEach(tr => {
+    const d = BT[tr.dataset.store]?.[tr.dataset.slot]?.[tr.dataset.day]?.[m];
+    if (!d?.total_days) return;
+    const sev = sevClass(d.pct_under);
+    tr.className = sev ? 'sev-' + sev : '';
+    tr.querySelector('.bt-rec').textContent   = d.recommended;
+    tr.querySelector('.bt-total').textContent = d.total_days;
+    tr.querySelector('.bt-under').textContent = d.days_under;
+    const pctTd = tr.querySelector('.bt-pct');
+    pctTd.textContent = d.pct_under + '%';
+    pctTd.className   = 'num bt-pct' + (sev ? ' pct-' + sev : '');
+    tr.querySelector('.bt-shortfall').textContent = d.days_under > 0
+      ? d.avg_shortfall + ' avg / ' + d.max_shortfall + ' max' : '—';
+  });
+}
+
+document.getElementById('gpWeight').addEventListener('input', e => {
+  gramsPerPortion = parseFloat(e.target.value) || 0; render();
+});
+
+toggleGuide(); setLang('en'); render();
+</script>
 </body>
 </html>
