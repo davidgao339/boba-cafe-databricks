@@ -1,7 +1,4 @@
 # Databricks notebook source
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC # Tapioca Cooking Plan — Daily Report Job
 # MAGIC Reads last 90 days from `transactions` Delta table, generates HTML, pushes to GitHub Pages.
@@ -38,7 +35,7 @@ PERCENTILES  = {"avg": None, "p75": 75, "p90": 90, "p95": 95, "max": 100}
 
 # COMMAND ----------
 
-end_date   = datetime.now(timezone.utc)
+end_date   = datetime.now(timezone.utc) - timedelta(days=1)
 start_date = end_date - timedelta(days=ROLLING_DAYS)
 
 sdf = (
