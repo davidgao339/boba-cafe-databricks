@@ -5,3 +5,5 @@ __pycache__/
 .ipynb_checkpoints/
 weekly-analysis/analysis/
 *.csv
+ad_hoc/
+pipeline/secrets.py
