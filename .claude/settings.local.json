@@ -20,7 +20,14 @@
       "Bash(Sort-Object FullName)",
       "Bash(Format-Table -AutoSize)",
       "Bash(grep -E '\\\\.\\(txt|md|yml|yaml\\)$')",
-      "Bash(python -X utf8 -)"
+      "Bash(python -X utf8 -)",
+      "Bash(python fetch_july_2025.py)",
+      "Bash(Get-Content \"C:\\\\Users\\\\david\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Github-boba-cafe-databricks\\\\b298a74a-d3e6-4706-9018-7008fa2982af\\\\tasks\\\\bmoq2o6zf.output\" -Wait)",
+      "Bash(Select-String \".\")",
+      "Bash(python lookup_rnm.py)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }
