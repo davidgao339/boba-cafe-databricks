@@ -7,3 +7,4 @@ weekly-analysis/analysis/
 *.csv
 ad_hoc/
 pipeline/secrets.py
+POS/tapioca_report_job.py
