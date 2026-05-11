@@ -1,7 +1,12 @@
 # Databricks notebook source
-# Tapioca Cooking Plan — Daily Report Job
-# Reads last 90 days from transactions Delta table, generates HTML, pushes to GitHub Pages.
-# Schedule: daily. Secrets required: github/pat
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # Tapioca Cooking Plan — Daily Report Job
+# MAGIC Reads last 90 days from `transactions` Delta table, generates HTML, pushes to GitHub Pages.
+# MAGIC
+# MAGIC **Schedule:** daily. **Token:** paste your GitHub PAT into `GITHUB_TOKEN` below.
 
 # COMMAND ----------
 
@@ -11,12 +16,16 @@ from datetime import datetime, timedelta, timezone
 from pyspark.sql import functions as F
 
 # COMMAND ----------
-# MAGIC %md ## Config
+
+# MAGIC %md
+# MAGIC ## Config
+
+# COMMAND ----------
 
 GITHUB_REPO   = "davidgao339/boba-cafe-databricks"
 GITHUB_FILE   = "docs/internal/boba/index.html"
 GITHUB_BRANCH = "main"
-GITHUB_TOKEN  = dbutils.secrets.get(scope="github", key="pat")
+GITHUB_TOKEN  = "ghp_your_token_here"   # paste PAT here — do not commit
 
 ROLLING_DAYS = 90
 SLOT_ORDER   = ["9:30 AM", "2:00 PM", "6:00 PM"]
@@ -24,7 +33,11 @@ PERCENTILES  = {"avg": None, "p75": 75, "p90": 90, "p95": 95, "max": 100}
 TZ           = "Europe/Moscow"
 
 # COMMAND ----------
-# MAGIC %md ## Load data
+
+# MAGIC %md
+# MAGIC ## Load data
+
+# COMMAND ----------
 
 end_date   = datetime.now(timezone.utc)
 start_date = end_date - timedelta(days=ROLLING_DAYS)
@@ -40,13 +53,17 @@ date_range_str = f"{start_date.strftime('%d %b %Y')} – {end_date.strftime('%d 
 print(f"Loaded {len(df):,} rows  |  {date_range_str}")
 
 # COMMAND ----------
-# MAGIC %md ## Transform
+
+# MAGIC %md
+# MAGIC ## Transform
+
+# COMMAND ----------
 
 df["local_dt"]   = pd.to_datetime(df["datetime"], utc=True).dt.tz_convert(TZ)
 df["local_hour"] = df["local_dt"].dt.hour + df["local_dt"].dt.minute / 60
 df["date"]       = df["local_dt"].dt.date
 
-sign         = df["is_return"].apply(lambda x: -1 if x else 1)
+sign          = df["is_return"].apply(lambda x: -1 if x else 1)
 df["net_qty"] = df["qty"].abs() * sign
 
 def assign_slot(h):
@@ -63,7 +80,11 @@ daily = (
 )
 
 # COMMAND ----------
-# MAGIC %md ## Compute recommendations & backtest
+
+# MAGIC %md
+# MAGIC ## Recommendations & backtest
+
+# COMMAND ----------
 
 def compute_rec(daily, pct):
     if pct is None:
@@ -99,7 +120,11 @@ backtests = {k: compute_backtest(daily, recs[k]) for k in PERCENTILES}
 stores    = sorted(daily["store_name"].unique())
 
 # COMMAND ----------
-# MAGIC %md ## Build JSON for JS
+
+# MAGIC %md
+# MAGIC ## Build JSON for JS
+
+# COMMAND ----------
 
 plan_data = {}
 bt_data   = {}
@@ -147,7 +172,11 @@ slots_json  = json.dumps(SLOT_ORDER)
 n_stores    = len(stores)
 
 # COMMAND ----------
-# MAGIC %md ## Generate HTML
+
+# MAGIC %md
+# MAGIC ## Generate HTML
+
+# COMMAND ----------
 
 def plan_card(store):
     rows = "".join(f"""
@@ -528,7 +557,11 @@ toggleGuide(); setLang('en'); render();
 </html>"""
 
 # COMMAND ----------
-# MAGIC %md ## Push to GitHub Pages
+
+# MAGIC %md
+# MAGIC ## Push to GitHub Pages
+
+# COMMAND ----------
 
 def push_to_github(html_content, token, repo, path, branch, message):
     url     = f"https://api.github.com/repos/{repo}/contents/{path}"
@@ -536,14 +569,14 @@ def push_to_github(html_content, token, repo, path, branch, message):
         "Authorization": f"token {token}",
         "Accept": "application/vnd.github.v3+json",
     }
-    r   = requests.get(url, headers=headers, params={{"ref": branch}})
+    r   = requests.get(url, headers=headers, params={"ref": branch})
     sha = r.json().get("sha") if r.status_code == 200 else None
 
-    payload = {{
+    payload = {
         "message": message,
         "content": base64.b64encode(html_content.encode("utf-8")).decode("ascii"),
         "branch":  branch,
-    }}
+    }
     if sha:
         payload["sha"] = sha
 
