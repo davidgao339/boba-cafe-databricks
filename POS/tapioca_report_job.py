@@ -48,6 +48,8 @@ sdf = (
     .filter(F.col("transaction_type") != "Non-Fiscal")
 )
 df = sdf.toPandas()
+EXCLUDE_STORES = {"АНАПА", "КПК"}
+df = df[~df["store_name"].isin(EXCLUDE_STORES)]
 date_range_str = f"{start_date.strftime('%d %b %Y')} – {end_date.strftime('%d %b %Y')}"
 print(f"Loaded {len(df):,} rows  |  {date_range_str}")
 
@@ -238,244 +240,279 @@ html = f"""<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tapioca Cooking Plan</title>
+<title>План варки тапиоки</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-  body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-          background: #f5f5f5; color: #222; padding: 32px 24px; }}
-  h1  {{ font-size: 1.6rem; margin-bottom: 4px; }}
-  h3  {{ font-size: 1.05rem; font-weight: 700; margin: 36px 0 14px; color: #333; }}
-  .subtitle {{ color: #666; font-size: 0.9rem; margin-bottom: 20px; }}
-  .lang-bar {{ display: flex; align-items: center; gap: 8px; margin-bottom: 22px; }}
-  .lang-bar span {{ font-size: 0.8rem; color: #999; }}
-  .lang-seg {{ display: flex; border: 1px solid #ccc; border-radius: 6px; overflow: hidden; }}
-  .lang-seg button {{ padding: 4px 12px; border: none; background: #fff; cursor: pointer;
-                      font-size: 0.82rem; font-weight: 600; color: #555;
-                      border-right: 1px solid #ccc; transition: background .15s; }}
-  .lang-seg button:last-child {{ border-right: none; }}
-  .lang-seg button.active {{ background: #3b5bdb; color: #fff; }}
-  .lang-ru {{ display: none; }}
-  .guide {{ background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.08);
-            margin-bottom: 28px; overflow: hidden; }}
-  .guide-header {{ display: flex; justify-content: space-between; align-items: center;
-                   padding: 14px 20px; cursor: pointer; user-select: none;
-                   border-bottom: 1px solid transparent; transition: border-color .2s; }}
-  .guide-header:hover {{ background: #fafafa; }}
-  .guide-header.open {{ border-bottom-color: #eee; }}
-  .guide-title {{ font-weight: 700; font-size: 0.95rem; color: #333; }}
-  .guide-chevron {{ font-size: 0.75rem; color: #999; transition: transform .2s; }}
-  .guide-chevron.open {{ transform: rotate(180deg); }}
-  .guide-body {{ display: none; padding: 20px; }}
-  .guide-body.open {{ display: block; }}
-  .guide-body p  {{ font-size: 0.88rem; line-height: 1.65; color: #444; margin-bottom: 14px; }}
-  .guide-body p:last-child {{ margin-bottom: 0; }}
-  .guide-body strong {{ color: #222; }}
-  .guide-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px; }}
-  @media (max-width: 640px) {{ .guide-grid {{ grid-template-columns: 1fr; }} }}
-  .guide-box {{ background: #f7f7f7; border-radius: 8px; padding: 12px 14px; }}
-  .guide-box h4 {{ font-size: 0.82rem; font-weight: 700; color: #555;
-                   text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }}
-  .guide-box ul {{ padding-left: 16px; font-size: 0.85rem; line-height: 1.7; color: #444; }}
-  .slot-chip {{ display: inline-block; background: #e8f5e9; color: #2d6a4f;
-                border-radius: 4px; padding: 1px 7px; font-weight: 700;
-                font-size: 0.8rem; margin-right: 4px; }}
-  .badge {{ display: inline-block; border-radius: 4px; padding: 1px 7px;
-             font-size: 0.78rem; font-weight: 700; }}
-  .badge-red    {{ background: #fff5f5; color: #c0392b; }}
-  .badge-yellow {{ background: #fffdf0; color: #d68910; }}
-  .badge-teal   {{ background: #f5fffe; color: #1a7a6e; }}
-  .toolbar {{ display: flex; flex-wrap: wrap; gap: 20px; align-items: center;
-              background: #fff; border-radius: 10px; padding: 16px 22px;
-              box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 28px; }}
-  .toolbar label {{ font-weight: 600; white-space: nowrap; font-size: 0.9rem; }}
-  .toolbar input  {{ width: 80px; padding: 5px 9px; border: 1px solid #ccc;
-                     border-radius: 6px; font-size: 0.95rem; }}
-  .seg {{ display: flex; border: 1px solid #ccc; border-radius: 7px; overflow: hidden; }}
-  .seg button {{ padding: 6px 14px; border: none; background: #fff; cursor: pointer;
-                 font-size: 0.88rem; font-weight: 600; color: #555;
-                 border-right: 1px solid #ccc; transition: background .15s; }}
-  .seg button:last-child {{ border-right: none; }}
-  .seg button.active {{ background: #2d6a4f; color: #fff; }}
-  .seg button:hover:not(.active) {{ background: #f0f0f0; }}
-  .grid      {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(500px, 1fr)); gap: 18px; }}
-  .grid.wide {{ grid-template-columns: repeat(auto-fill, minmax(680px, 1fr)); }}
-  .store-card {{ background: #fff; border-radius: 10px; padding: 18px 22px;
-                 box-shadow: 0 1px 4px rgba(0,0,0,.08); }}
-  .store-card h2 {{ font-size: 0.95rem; font-weight: 700; margin-bottom: 10px;
-                    color: #444; letter-spacing: .04em; }}
-  table  {{ width: 100%; border-collapse: collapse; font-size: 0.84rem; }}
-  thead tr {{ background: #f0f0f0; }}
-  th {{ padding: 7px 11px; text-align: center; font-weight: 600;
-        border-bottom: 2px solid #ddd; line-height: 1.3; }}
-  th:first-child {{ text-align: left; }}
-  td {{ padding: 7px 11px; border-bottom: 1px solid #eee; }}
-  td.slot  {{ font-weight: 600; color: #555; white-space: nowrap; }}
-  td.num   {{ text-align: center; }}
-  td.grams {{ color: #c84b31; font-weight: 600; }}
-  td.bold  {{ font-weight: 700; }}
-  tr:last-child td {{ border-bottom: none; }}
-  tr:hover td {{ background: #fafafa; }}
-  .legend {{ display: flex; gap: 18px; margin-bottom: 14px; font-size: 0.81rem; color: #555; }}
-  .legend span {{ display: flex; align-items: center; gap: 5px; }}
-  .dot {{ width: 9px; height: 9px; border-radius: 50%; }}
-  .dot-high {{ background: #f8d7da; border: 1px solid #f5c2c7; }}
-  .dot-med  {{ background: #fff3cd; border: 1px solid #ffecb5; }}
-  .dot-low  {{ background: #d1ecf1; border: 1px solid #bee5eb; }}
-  .sev-high {{ background: #fff5f5; }}
-  .sev-med  {{ background: #fffdf0; }}
-  .sev-low  {{ background: #f5fffe; }}
-  .pct-high {{ color: #c0392b; font-weight: 700; }}
-  .pct-med  {{ color: #d68910; font-weight: 700; }}
-  .pct-low  {{ color: #1a7a6e; font-weight: 600; }}
-  .updated  {{ font-size: 0.78rem; color: #aaa; margin-top: 40px; text-align: right; }}
+:root {{
+  --bg:        #f8f9fa;
+  --surface:   #ffffff;
+  --border:    #dadce0;
+  --text-1:    #202124;
+  --text-2:    #5f6368;
+  --text-3:    #80868b;
+  --accent:    #8d6e63;
+  --accent-bg: #f4ede9;
+  --shadow-sm: 0 1px 2px rgba(60,64,67,.3), 0 1px 3px rgba(60,64,67,.15);
+  --shadow-md: 0 1px 3px rgba(60,64,67,.3), 0 4px 8px rgba(60,64,67,.15);
+}}
+* {{ box-sizing: border-box; margin: 0; padding: 0; }}
+body {{ font-family: 'Roboto', Arial, sans-serif; background: var(--bg); color: var(--text-1); font-size: 16px; line-height: 1.5; }}
+nav {{
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  height: 64px; padding: 0 24px; display: flex; align-items: center;
+  justify-content: space-between; position: sticky; top: 0; z-index: 100;
+}}
+.nav-brand {{ display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; color: var(--text-1); letter-spacing: -0.01em; }}
+.nav-right {{ display: flex; align-items: center; gap: 12px; }}
+.nav-tag {{ font-size: 12px; font-weight: 500; color: var(--text-3); border: 1px solid var(--border); border-radius: 4px; padding: 3px 8px; }}
+.nav-back {{ font-size: 13px; color: var(--accent); text-decoration: none; font-weight: 500; }}
+.nav-back:hover {{ text-decoration: underline; }}
+.page {{ max-width: 1200px; margin: 0 auto; padding: 40px 24px 80px; }}
+.page-header {{ margin-bottom: 32px; }}
+.page-title {{ font-size: 28px; font-weight: 700; color: var(--text-1); letter-spacing: -0.02em; margin-bottom: 6px; }}
+.page-sub {{ font-size: 15px; color: var(--text-2); margin-bottom: 16px; }}
+.lang-bar {{ display: flex; align-items: center; gap: 8px; }}
+.lang-bar-label {{ font-size: 13px; color: var(--text-3); }}
+.lang-seg {{ display: flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }}
+.lang-seg button {{ padding: 4px 14px; border: none; background: var(--surface); cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-2); border-right: 1px solid var(--border); transition: background .15s; font-family: 'Roboto', Arial, sans-serif; }}
+.lang-seg button:last-child {{ border-right: none; }}
+.lang-seg button.active {{ background: var(--accent); color: #fff; }}
+.lang-ru {{ display: none; }}
+.section-label {{ font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); margin-bottom: 14px; }}
+.card {{ background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; }}
+.guide-header {{ display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }}
+.guide-header:hover .guide-title {{ color: var(--accent); }}
+.guide-title {{ font-weight: 700; font-size: 14px; color: var(--text-1); transition: color .15s; }}
+.guide-chevron {{ font-size: 12px; color: var(--text-3); transition: transform .2s; }}
+.guide-chevron.open {{ transform: rotate(180deg); }}
+.guide-body {{ display: none; padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border); }}
+.guide-body.open {{ display: block; }}
+.guide-body p {{ font-size: 14px; line-height: 1.65; color: var(--text-2); margin-bottom: 14px; }}
+.guide-body p:last-child {{ margin-bottom: 0; }}
+.guide-body strong {{ color: var(--text-1); }}
+.guide-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }}
+.guide-box {{ background: var(--bg); border-radius: 8px; padding: 12px 14px; border: 1px solid var(--border); }}
+.guide-box h4 {{ font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }}
+.guide-box ul {{ padding-left: 16px; font-size: 13px; line-height: 1.7; color: var(--text-2); }}
+.slot-chip {{ display: inline-block; background: var(--accent-bg); color: var(--accent); border-radius: 4px; padding: 1px 7px; font-weight: 700; font-size: 12px; margin-right: 4px; }}
+.badge {{ display: inline-block; border-radius: 4px; padding: 1px 7px; font-size: 12px; font-weight: 700; }}
+.badge-red    {{ background: #fce8e6; color: #c5221f; }}
+.badge-yellow {{ background: #fef7e0; color: #b06000; }}
+.badge-teal   {{ background: #e6f4ea; color: #137333; }}
+.toolbar {{ display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-end; }}
+.toolbar-group label {{ font-size: 13px; font-weight: 500; color: var(--text-2); display: block; margin-bottom: 8px; }}
+.toolbar-group input {{ width: 80px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; font-family: 'Roboto', Arial, sans-serif; color: var(--text-1); outline: none; }}
+.toolbar-group input:focus {{ border-color: var(--accent); }}
+.seg {{ display: flex; border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }}
+.seg button {{ padding: 6px 14px; border: none; background: var(--surface); cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-2); border-right: 1px solid var(--border); transition: background .15s; font-family: 'Roboto', Arial, sans-serif; }}
+.seg button:last-child {{ border-right: none; }}
+.seg button.active {{ background: var(--accent); color: #fff; }}
+.seg button:hover:not(.active) {{ background: var(--bg); }}
+.grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); gap: 16px; margin-bottom: 40px; }}
+.grid.wide {{ grid-template-columns: repeat(auto-fill, minmax(620px, 1fr)); }}
+.store-card {{ background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; transition: box-shadow .2s; }}
+.store-card:hover {{ box-shadow: var(--shadow-sm); }}
+.store-card h2 {{ font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); margin-bottom: 12px; }}
+table {{ width: 100%; border-collapse: collapse; font-size: 13px; }}
+thead tr {{ background: var(--bg); }}
+th {{ padding: 7px 10px; text-align: center; font-weight: 600; border-bottom: 2px solid var(--border); line-height: 1.3; color: var(--text-2); font-size: 12px; }}
+th:first-child {{ text-align: left; }}
+td {{ padding: 7px 10px; border-bottom: 1px solid var(--border); }}
+td.slot {{ font-weight: 600; color: var(--text-2); white-space: nowrap; }}
+td.num {{ text-align: center; }}
+td.grams {{ color: var(--accent); font-weight: 600; }}
+td.bold {{ font-weight: 700; }}
+tr:last-child td {{ border-bottom: none; }}
+tr:hover td {{ background: var(--bg); }}
+.legend {{ display: flex; gap: 16px; margin-bottom: 12px; font-size: 13px; color: var(--text-2); }}
+.legend span {{ display: flex; align-items: center; gap: 6px; }}
+.dot {{ width: 8px; height: 8px; border-radius: 50%; }}
+.dot-high {{ background: #fce8e6; border: 1px solid #f5c2c7; }}
+.dot-med  {{ background: #fef7e0; border: 1px solid #ffecb5; }}
+.dot-low  {{ background: #e6f4ea; border: 1px solid #b7dfbc; }}
+.sev-high {{ background: #fef9f8; }}
+.sev-med  {{ background: #fefdf5; }}
+.sev-low  {{ background: #f3faf5; }}
+.pct-high {{ color: #c5221f; font-weight: 700; }}
+.pct-med  {{ color: #b06000; font-weight: 700; }}
+.pct-low  {{ color: #137333; font-weight: 600; }}
+.updated {{ font-size: 12px; color: var(--text-3); margin-top: 8px; text-align: right; }}
+footer {{ padding: 20px 24px; font-size: 13px; color: var(--text-3); border-top: 1px solid var(--border); text-align: center; }}
+footer a {{ color: var(--accent); text-decoration: none; }}
+footer a:hover {{ text-decoration: underline; }}
+@media (max-width: 640px) {{
+  .page {{ padding: 24px 16px 60px; }}
+  .page-title {{ font-size: 22px; }}
+  .grid, .grid.wide {{ grid-template-columns: 1fr; }}
+  .guide-grid {{ grid-template-columns: 1fr; }}
+  nav {{ padding: 0 16px; }}
+}}
 </style>
 </head>
 <body>
 
-<h1>
-  <span class="lang-en">Tapioca Cooking Plan</span>
-  <span class="lang-ru">План варки тапиоки</span>
-</h1>
-<p class="subtitle">
-  <span class="lang-en">Rolling 90 days: {date_range_str} &nbsp;·&nbsp; {n_stores} stores &nbsp;·&nbsp; Weekday vs Weekend</span>
-  <span class="lang-ru">Скользящие 90 дней: {date_range_str} &nbsp;·&nbsp; {n_stores} магазинов &nbsp;·&nbsp; Будни vs Выходные</span>
-</p>
-
-<div class="lang-bar">
-  <span>🌐</span>
-  <div class="lang-seg">
-    <button id="lang-en" class="active" onclick="setLang('en')">EN</button>
-    <button id="lang-ru" onclick="setLang('ru')">RU</button>
+<nav>
+  <div class="nav-brand">🐰 Боба Кролик</div>
+  <div class="nav-right">
+    <a href="https://bobacafe.net/internal/" class="nav-back">← Портал</a>
+    <span class="nav-tag">Внутренний</span>
   </div>
-</div>
+</nav>
 
-<div class="guide">
-  <div class="guide-header" onclick="toggleGuide()">
-    <span class="guide-title">
-      <span class="lang-en">📖 How to use this report</span>
-      <span class="lang-ru">📖 Как пользоваться отчётом</span>
-    </span>
-    <span class="guide-chevron" id="guide-chevron">▼</span>
+<div class="page">
+  <div class="page-header">
+    <h1 class="page-title">
+      <span class="lang-en">Tapioca Cooking Plan</span>
+      <span class="lang-ru">План варки тапиоки</span>
+    </h1>
+    <p class="page-sub">
+      <span class="lang-en">Rolling 90 days: {date_range_str} &nbsp;·&nbsp; {n_stores} stores &nbsp;·&nbsp; Weekday vs Weekend</span>
+      <span class="lang-ru">Скользящие 90 дней: {date_range_str} &nbsp;·&nbsp; {n_stores} магазинов &nbsp;·&nbsp; Будни vs Выходные</span>
+    </p>
+    <div class="lang-bar">
+      <span class="lang-bar-label">🌐</span>
+      <div class="lang-seg">
+        <button id="lang-en" class="active" onclick="setLang('en')">EN</button>
+        <button id="lang-ru" onclick="setLang('ru')">RU</button>
+      </div>
+    </div>
   </div>
-  <div class="guide-body" id="guide-body">
-    <div class="lang-en">
-      <p>This report shows <strong>how many portions of tapioca to cook</strong> for each time slot per store, based on the last 90 days of sales. It updates automatically every day.</p>
-      <div class="guide-grid">
-        <div class="guide-box">
-          <h4>Cooking slots</h4>
-          <ul>
-            <li><span class="slot-chip">9:30 AM</span> Covers sales until <strong>4:00 PM</strong></li>
-            <li><span class="slot-chip">2:00 PM</span> Ready at 4 PM, covers until <strong>8:00 PM</strong></li>
-            <li><span class="slot-chip">6:00 PM</span> Ready at 8 PM, covers until <strong>close</strong></li>
-          </ul>
+
+  <div class="card">
+    <div class="guide-header" onclick="toggleGuide()">
+      <span class="guide-title">
+        <span class="lang-en">📖 How to use this report</span>
+        <span class="lang-ru">📖 Как пользоваться отчётом</span>
+      </span>
+      <span class="guide-chevron" id="guide-chevron">▼</span>
+    </div>
+    <div class="guide-body" id="guide-body">
+      <div class="lang-en">
+        <p>This report shows <strong>how many portions of tapioca to cook</strong> for each time slot per store, based on the last 90 days of sales. It updates automatically every day.</p>
+        <div class="guide-grid">
+          <div class="guide-box">
+            <h4>Cooking slots</h4>
+            <ul>
+              <li><span class="slot-chip">9:30 AM</span> Covers sales until <strong>4:00 PM</strong></li>
+              <li><span class="slot-chip">2:00 PM</span> Ready at 4 PM, covers until <strong>8:00 PM</strong></li>
+              <li><span class="slot-chip">6:00 PM</span> Ready at 8 PM, covers until <strong>close</strong></li>
+            </ul>
+          </div>
+          <div class="guide-box">
+            <h4>Percentile toggle</h4>
+            <ul>
+              <li><strong>Avg</strong> — runs short ~50% of days</li>
+              <li><strong>p75</strong> — short 1 in 4 days</li>
+              <li><strong>p90</strong> — short ~2–3 days/month <em>(recommended)</em></li>
+              <li><strong>p95</strong> — short ~1–2 days/month</li>
+              <li><strong>Max</strong> — never short, but wastes the most</li>
+            </ul>
+          </div>
+          <div class="guide-box">
+            <h4>Grams per portion</h4>
+            <ul>
+              <li>Set this to the weight of <strong>dry tapioca pearls</strong> per drink.</li>
+              <li>The grams column updates automatically.</li>
+              <li>Default is 50 g — adjust to your recipe.</li>
+            </ul>
+          </div>
+          <div class="guide-box">
+            <h4>Backtest colour codes</h4>
+            <ul>
+              <li><span class="badge badge-red">≥ 30%</span> Short more than 1 in 3 days</li>
+              <li><span class="badge badge-yellow">15–29%</span> Borderline</li>
+              <li><span class="badge badge-teal">&lt; 15%</span> Acceptable</li>
+            </ul>
+          </div>
         </div>
-        <div class="guide-box">
-          <h4>Percentile toggle</h4>
-          <ul>
-            <li><strong>Avg</strong> — runs short ~50% of days</li>
-            <li><strong>p75</strong> — short 1 in 4 days</li>
-            <li><strong>p90</strong> — short ~2–3 days/month <em>(recommended)</em></li>
-            <li><strong>p95</strong> — short ~1–2 days/month</li>
-            <li><strong>Max</strong> — never short, but wastes the most</li>
-          </ul>
+        <p><strong>Shortfall</strong> shows average and maximum extra portions needed on days the recommendation fell short.</p>
+      </div>
+      <div class="lang-ru">
+        <p>Этот отчёт показывает <strong>сколько порций тапиоки варить</strong> для каждого временного слота в каждом магазине, на основе продаж за последние 90 дней. Обновляется автоматически каждый день.</p>
+        <div class="guide-grid">
+          <div class="guide-box">
+            <h4>Временные слоты</h4>
+            <ul>
+              <li><span class="slot-chip">9:30</span> Покрывает продажи до <strong>16:00</strong></li>
+              <li><span class="slot-chip">14:00</span> Готова в 16:00, покрывает до <strong>20:00</strong></li>
+              <li><span class="slot-chip">18:00</span> Готова в 20:00, покрывает до <strong>закрытия</strong></li>
+            </ul>
+          </div>
+          <div class="guide-box">
+            <h4>Переключатель перцентиля</h4>
+            <ul>
+              <li><strong>Avg</strong> — не хватает ~в 50% дней</li>
+              <li><strong>p75</strong> — не хватает 1 день из 4</li>
+              <li><strong>p90</strong> — не хватает ~2–3 дня/мес <em>(рекомендуется)</em></li>
+              <li><strong>p95</strong> — не хватает ~1–2 дня/мес</li>
+              <li><strong>Max</strong> — никогда не заканчивается, но больше отходов</li>
+            </ul>
+          </div>
+          <div class="guide-box">
+            <h4>Граммов на порцию</h4>
+            <ul>
+              <li>Укажите вес <strong>сухих шариков тапиоки</strong> на один напиток.</li>
+              <li>Столбец граммов пересчитается автоматически.</li>
+              <li>По умолчанию 50 г — измените под ваш рецепт.</li>
+            </ul>
+          </div>
+          <div class="guide-box">
+            <h4>Цвета в бэктесте</h4>
+            <ul>
+              <li><span class="badge badge-red">≥ 30%</span> Не хватает чаще 1 раза из 3</li>
+              <li><span class="badge badge-yellow">15–29%</span> Погранично</li>
+              <li><span class="badge badge-teal">&lt; 15%</span> Приемлемо</li>
+            </ul>
+          </div>
         </div>
-        <div class="guide-box">
-          <h4>Grams per portion</h4>
-          <ul>
-            <li>Set this to the weight of <strong>dry tapioca pearls</strong> per drink.</li>
-            <li>The grams column updates automatically.</li>
-            <li>Default is 50 g — adjust to your recipe.</li>
-          </ul>
-        </div>
-        <div class="guide-box">
-          <h4>Backtest colour codes</h4>
-          <ul>
-            <li><span class="badge badge-red">≥ 30%</span> Short more than 1 in 3 days</li>
-            <li><span class="badge badge-yellow">15–29%</span> Borderline</li>
-            <li><span class="badge badge-teal">&lt; 15%</span> Acceptable</li>
-          </ul>
+        <p><strong>Нехватка</strong> — среднее и максимальное количество лишних порций, которых не хватило бы в плохие дни.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <label><span class="lang-en">Percentile standard</span><span class="lang-ru">Уровень перцентиля</span></label>
+        <div class="seg">
+          <button onclick="setMode('avg')" id="btn-avg">Avg</button>
+          <button onclick="setMode('p75')" id="btn-p75">p75</button>
+          <button onclick="setMode('p90')" id="btn-p90" class="active">p90</button>
+          <button onclick="setMode('p95')" id="btn-p95">p95</button>
+          <button onclick="setMode('max')" id="btn-max">Max</button>
         </div>
       </div>
-      <p><strong>Shortfall</strong> shows average and maximum extra portions needed on days the recommendation fell short.</p>
-    </div>
-    <div class="lang-ru">
-      <p>Этот отчёт показывает <strong>сколько порций тапиоки варить</strong> для каждого временного слота в каждом магазине, на основе продаж за последние 90 дней. Обновляется автоматически каждый день.</p>
-      <div class="guide-grid">
-        <div class="guide-box">
-          <h4>Временные слоты</h4>
-          <ul>
-            <li><span class="slot-chip">9:30</span> Покрывает продажи до <strong>16:00</strong></li>
-            <li><span class="slot-chip">14:00</span> Готова в 16:00, покрывает до <strong>20:00</strong></li>
-            <li><span class="slot-chip">18:00</span> Готова в 20:00, покрывает до <strong>закрытия</strong></li>
-          </ul>
-        </div>
-        <div class="guide-box">
-          <h4>Переключатель перцентиля</h4>
-          <ul>
-            <li><strong>Avg</strong> — не хватает ~в 50% дней</li>
-            <li><strong>p75</strong> — не хватает 1 день из 4</li>
-            <li><strong>p90</strong> — не хватает ~2–3 дня/мес <em>(рекомендуется)</em></li>
-            <li><strong>p95</strong> — не хватает ~1–2 дня/мес</li>
-            <li><strong>Max</strong> — никогда не заканчивается, но больше отходов</li>
-          </ul>
-        </div>
-        <div class="guide-box">
-          <h4>Граммов на порцию</h4>
-          <ul>
-            <li>Укажите вес <strong>сухих шариков тапиоки</strong> на один напиток.</li>
-            <li>Столбец граммов пересчитается автоматически.</li>
-            <li>По умолчанию 50 г — измените под ваш рецепт.</li>
-          </ul>
-        </div>
-        <div class="guide-box">
-          <h4>Цвета в бэктесте</h4>
-          <ul>
-            <li><span class="badge badge-red">≥ 30%</span> Не хватает чаще 1 раза из 3</li>
-            <li><span class="badge badge-yellow">15–29%</span> Погранично</li>
-            <li><span class="badge badge-teal">&lt; 15%</span> Приемлемо</li>
-          </ul>
-        </div>
+      <div class="toolbar-group">
+        <label for="gpWeight"><span class="lang-en">Grams per portion</span><span class="lang-ru">Граммов на порцию</span></label>
+        <input type="number" id="gpWeight" value="50" min="1" step="1">
       </div>
-      <p><strong>Нехватка</strong> — среднее и максимальное количество лишних порций, которых не хватило бы в плохие дни.</p>
     </div>
   </div>
-</div>
 
-<div class="toolbar">
-  <div>
-    <label><span class="lang-en">Percentile standard:</span><span class="lang-ru">Уровень перцентиля:</span></label><br>
-    <div class="seg" style="margin-top:6px">
-      <button onclick="setMode('avg')" id="btn-avg">Avg</button>
-      <button onclick="setMode('p75')" id="btn-p75">p75</button>
-      <button onclick="setMode('p90')" id="btn-p90" class="active">p90</button>
-      <button onclick="setMode('p95')" id="btn-p95">p95</button>
-      <button onclick="setMode('max')" id="btn-max">Max</button>
-    </div>
+  <div class="section-label"><span class="lang-en">Cooking Plan</span><span class="lang-ru">План варки</span></div>
+  <div class="grid">{plan_cards}</div>
+
+  <div class="section-label">
+    <span class="lang-en">Backtest — Days the recommendation falls short</span>
+    <span class="lang-ru">Бэктест — дни, когда рекомендации не хватает</span>
   </div>
-  <div>
-    <label for="gpWeight"><span class="lang-en">Grams per portion:</span><span class="lang-ru">Граммов на порцию:</span></label><br>
-    <input type="number" id="gpWeight" value="50" min="1" step="1" style="margin-top:6px">
+  <div class="legend">
+    <span><span class="dot dot-high"></span><span class="lang-en">&ge;30% of days short</span><span class="lang-ru">&ge;30% дней с нехваткой</span></span>
+    <span><span class="dot dot-med"></span>15–29%</span>
+    <span><span class="dot dot-low"></span>&lt;15%</span>
   </div>
+  <div class="grid wide">{bt_cards}</div>
+
+  <p class="updated">
+    <span class="lang-en">Last updated: {date_range_str}</span>
+    <span class="lang-ru">Обновлено: {date_range_str}</span>
+  </p>
 </div>
 
-<h3><span class="lang-en">Cooking Plan</span><span class="lang-ru">План варки</span></h3>
-<div class="grid">{plan_cards}</div>
-
-<h3>
-  <span class="lang-en">Backtest — Days the recommendation falls short</span>
-  <span class="lang-ru">Бэктест — дни, когда рекомендации не хватает</span>
-</h3>
-<div class="legend">
-  <span><span class="dot dot-high"></span><span class="lang-en">&ge;30% of days short</span><span class="lang-ru">&ge;30% дней с нехваткой</span></span>
-  <span><span class="dot dot-med"></span>15–29%</span>
-  <span><span class="dot dot-low"></span>&lt;15%</span>
-</div>
-<div class="grid wide">{bt_cards}</div>
-
-<p class="updated">
-  <span class="lang-en">Last updated: {date_range_str}</span>
-  <span class="lang-ru">Обновлено: {date_range_str}</span>
-</p>
+<footer>
+  <a href="https://bobacafe.net/internal/">← Внутренний портал</a> &nbsp;·&nbsp; Боба Кролик &copy; 2024 — Только для сотрудников
+</footer>
 
 <script>
 const PLAN  = {plan_json};
