@@ -30,7 +30,6 @@ GITHUB_TOKEN  = "ghp_your_token_here"   # paste PAT here — do not commit
 ROLLING_DAYS = 90
 SLOT_ORDER   = ["9:30 AM", "2:00 PM", "6:00 PM"]
 PERCENTILES  = {"avg": None, "p75": 75, "p90": 90, "p95": 95, "max": 100}
-TZ           = "Europe/Moscow"
 
 # COMMAND ----------
 
@@ -59,7 +58,7 @@ print(f"Loaded {len(df):,} rows  |  {date_range_str}")
 
 # COMMAND ----------
 
-df["local_dt"]   = pd.to_datetime(df["datetime"], utc=True).dt.tz_convert(TZ)
+df["local_dt"]   = pd.to_datetime(df["datetime"])
 df["local_hour"] = df["local_dt"].dt.hour + df["local_dt"].dt.minute / 60
 df["date"]       = df["local_dt"].dt.date
 
