@@ -3,10 +3,10 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC # Coffee Orders with No Toppings — Per-Store, 6-Month Rolling
+# MAGIC # Coffee Orders with No Toppings — Per-Store, Last 6 Months
 # MAGIC
-# MAGIC For each store and month: what % of orders include a coffee drink but zero toppings?
-# MAGIC Rolling 6-month window so each month's number smooths over short-term noise.
+# MAGIC Per store: what % of orders include a coffee drink but zero toppings,
+# MAGIC calculated over the last 6 full calendar months of data?
 
 # COMMAND ----------
 
@@ -15,10 +15,10 @@ import pandas as pd
 from datetime import datetime, timedelta, timezone
 from pyspark.sql import functions as F
 
-HIERARCHY_PATH  = "/Workspace/Users/davidgao734@gmail.com/boba-cafe/weekly-analysis/data/products_mapped.csv"
-EXCLUDE_STORES  = {"АНАПА", "КПК"}
-ROLLING_MONTHS  = 6
-LOAD_MONTHS     = 8   # extra buffer so the first rolling window is fully populated
+HIERARCHY_PATH = "/Workspace/Users/davidgao734@gmail.com/boba-cafe/weekly-analysis/data/products_mapped.csv"
+EXCLUDE_STORES = {"АНАПА", "КПК"}
+
+display = globals().get("display", lambda df: print(df.to_string(index=False)))
 
 _VARIANT_SUFFIXES = re.compile(
     r"\s*\(шарики не включены\)"
@@ -30,24 +30,31 @@ _VARIANT_SUFFIXES = re.compile(
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Load transactions
+# MAGIC ## Load transactions — last 6 months
 
 # COMMAND ----------
 
-start_date = (datetime.now(timezone.utc) - timedelta(days=30 * LOAD_MONTHS)).strftime("%Y-%m-%d")
+# Anchor to the start of 6 full calendar months ago
+today      = datetime.now(timezone.utc).date()
+# e.g. if today is 2026-05-15, start = 2025-11-01
+start_date = (today.replace(day=1) - timedelta(days=1)).replace(day=1)  # start of prior month
+for _ in range(5):
+    start_date = (start_date - timedelta(days=1)).replace(day=1)
 
 sdf = (
     spark.table("workspace.default.transactions")
-    .filter(F.col("date") >= start_date)
-    .filter(F.col("is_return")         == False)
-    .filter(F.col("online")            == False)
-    .filter(F.col("transaction_type")  != "Non-Fiscal")
+    .filter(F.col("date") >= start_date.strftime("%Y-%m-%d"))
+    .filter(F.col("is_return")        == False)
+    .filter(F.col("online")           == False)
+    .filter(F.col("transaction_type") != "Non-Fiscal")
 )
 df = sdf.toPandas()
 df = df[~df["store_name"].isin(EXCLUDE_STORES)].copy()
 df["date"] = pd.to_datetime(df["date"])
 
-print(f"Loaded {len(df):,} rows from {df['date'].min().date()} to {df['date'].max().date()}")
+print(f"Window : {start_date} → {today}")
+print(f"Rows   : {len(df):,}")
+print(f"Stores : {sorted(df['store_name'].unique())}")
 
 # COMMAND ----------
 
@@ -61,7 +68,7 @@ if "status" in hier.columns:
     hier = hier[hier["status"] == "mapped"]
 hier = hier[["product_ru", "subcategory"]].rename(columns={"product_ru": "product_key"})
 
-# Strip "(no balls)" variants before joining — they're still coffee drinks
+# Strip "(no balls)" suffix — those drinks are still coffee
 df["product_key"] = df["product"].apply(
     lambda n: _VARIANT_SUFFIXES.sub("", n).strip() if isinstance(n, str) else n
 )
@@ -71,31 +78,66 @@ df["is_coffee"] = df["subcategory"] == "Coffee"
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Aggregate per order
+# MAGIC ## Aggregate per order, then per store
 
 # COMMAND ----------
 
-# is_topping already exists as a column in the transactions table
+# One row per order: does it contain coffee? does it contain any topping?
+# is_topping comes directly from the transactions table
 order_flags = (
-    df.groupby(["store_name", "order_number", "date"])
+    df.groupby(["store_name", "order_number"])
     .agg(
-        has_coffee  = ("is_coffee",   "any"),
-        has_topping = ("is_topping",  "any"),
+        has_coffee  = ("is_coffee",  "any"),
+        has_topping = ("is_topping", "any"),
     )
     .reset_index()
 )
 order_flags["coffee_no_topping"] = order_flags["has_coffee"] & ~order_flags["has_topping"]
-order_flags["month"] = order_flags["date"].dt.to_period("M")
+
+# Aggregate across all 6 months per store
+result = (
+    order_flags
+    .groupby("store_name")
+    .agg(
+        total_orders      = ("order_number",      "count"),
+        coffee_orders     = ("has_coffee",         "sum"),
+        coffee_no_topping = ("coffee_no_topping",  "sum"),
+    )
+    .reset_index()
+)
+result["pct_coffee_no_topping"] = (
+    result["coffee_no_topping"] / result["total_orders"] * 100
+).round(1)
+result["pct_of_coffee_orders"] = (
+    result["coffee_no_topping"] / result["coffee_orders"] * 100
+).round(1)
+
+result = result.sort_values("pct_coffee_no_topping", ascending=False).reset_index(drop=True)
+
+display(result[[
+    "store_name",
+    "total_orders",
+    "coffee_orders",
+    "coffee_no_topping",
+    "pct_coffee_no_topping",   # % of ALL orders that are coffee with no topping
+    "pct_of_coffee_orders",    # % of coffee orders specifically that have no topping
+]])
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Monthly counts → 6-month rolling %
+# MAGIC ## Month-by-month breakdown (trend view)
 
 # COMMAND ----------
 
+order_flags_monthly = df.groupby(["store_name", "order_number", df["date"].dt.to_period("M").rename("month")]).agg(
+    has_coffee  = ("is_coffee",  "any"),
+    has_topping = ("is_topping", "any"),
+).reset_index()
+order_flags_monthly["coffee_no_topping"] = order_flags_monthly["has_coffee"] & ~order_flags_monthly["has_topping"]
+
 monthly = (
-    order_flags
+    order_flags_monthly
     .groupby(["store_name", "month"])
     .agg(
         total_orders      = ("order_number",      "count"),
@@ -104,45 +146,9 @@ monthly = (
     .reset_index()
     .sort_values(["store_name", "month"])
 )
+monthly["pct_coffee_no_topping"] = (
+    monthly["coffee_no_topping"] / monthly["total_orders"] * 100
+).round(1)
+monthly["month"] = monthly["month"].astype(str)
 
-def add_rolling(grp):
-    grp = grp.sort_values("month").copy()
-    grp["rolling_orders"]      = grp["total_orders"].rolling(ROLLING_MONTHS, min_periods=1).sum()
-    grp["rolling_cof_no_top"]  = grp["coffee_no_topping"].rolling(ROLLING_MONTHS, min_periods=1).sum()
-    grp["pct_coffee_no_topping"] = (
-        grp["rolling_cof_no_top"] / grp["rolling_orders"] * 100
-    ).round(1)
-    return grp
-
-result = (
-    monthly
-    .groupby("store_name", group_keys=False)
-    .apply(add_rolling)
-    .reset_index(drop=True)
-)
-
-# Keep only the last ROLLING_MONTHS months for display (window is fully populated)
-latest_months = sorted(result["month"].unique())[-ROLLING_MONTHS:]
-display_df = result[result["month"].isin(latest_months)].copy()
-display_df["month"] = display_df["month"].astype(str)
-
-display(display_df[[
-    "store_name", "month",
-    "rolling_orders", "rolling_cof_no_top", "pct_coffee_no_topping"
-]].sort_values(["store_name", "month"]))
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ## Latest rolling snapshot per store (most recent 6-month window)
-
-# COMMAND ----------
-
-snapshot = (
-    result[result["month"] == result["month"].max()]
-    [["store_name", "month", "rolling_orders", "rolling_cof_no_top", "pct_coffee_no_topping"]]
-    .sort_values("pct_coffee_no_topping", ascending=False)
-    .reset_index(drop=True)
-)
-snapshot["month"] = snapshot["month"].astype(str)
-display(snapshot)
+display(monthly[["store_name", "month", "total_orders", "coffee_no_topping", "pct_coffee_no_topping"]])
