@@ -27,7 +27,15 @@
       "Bash(python lookup_rnm.py)",
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(python ad_hoc/tapioca_cooking_plan.py)",
+      "Bash(start \"d:\\\\Github\\\\boba-cafe-databricks\\\\ad_hoc\\\\tapioca_cooking_plan.html\")",
+      "Bash(git pull *)",
+      "Bash(git stash *)",
+      "Bash(git rm *)",
+      "Bash(Get-ChildItem -Path \"d:\\\\Github\\\\boba-cafe-web\" -Recurse -Directory -Exclude node_modules, .git)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Sort-Object)"
     ]
   }
 }
