@@ -36,7 +36,10 @@
       "Bash(Get-ChildItem -Path \"d:\\\\Github\\\\boba-cafe-web\" -Recurse -Directory -Exclude node_modules, .git)",
       "Bash(Select-Object -ExpandProperty FullName)",
       "Bash(Sort-Object)",
-      "Bash(git status *)"
+      "Bash(git status *)",
+      "Bash(pip show *)",
+      "Bash(pip install *)",
+      "Bash(python ad_hoc/food_only_analysis.py)"
     ]
   }
 }
