@@ -13,7 +13,7 @@ from pipeline.secrets import APP_CLIENT_ID, LOGIN, PASSWORD
 
 # --- POS Terminal → Store Name Mapping ---
 POS_TO_STORE = {
-    "0008929167049570": "АНАПА",
+    "0008929167049570": "ЧЕРНОМОРСКИЙ",
     "0007051168060479": "ЧЕРНОМОРСКИЙ",
     "0009764481004270": "БОН ПАССАЖ",
     "0007371451035037": "БОН ПАССАЖ",
