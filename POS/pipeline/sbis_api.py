@@ -131,6 +131,8 @@ def fetch_orders(sid, points, start_dt, end_dt):
                         txn_type = "Non-Fiscal"
                 elif is_online:
                     txn_type = "Online"
+                else:
+                    txn_type = "Non-Fiscal"
 
                 items = o.get("SaleNomenclatures") or []
                 if not items:
