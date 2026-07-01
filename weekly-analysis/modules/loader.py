@@ -27,7 +27,6 @@ def load_daily_sales(spark, table, date_from, date_to):
 
 
 def load_product_hierarchy(path):
-    import os
     try:
         h = pd.read_csv(path, encoding="utf-8")
     except Exception:

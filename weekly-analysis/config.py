@@ -41,6 +41,8 @@ TAPIOCA_KEYWORD        = "тапиок"
 MIN_TRADING_REVENUE    = 500    # ignore days with < 500 revenue (closed/near-closed)
 
 # ── Output ────────────────────────────────────────────────────────
-ANALYSIS_DIR      = os.path.join(HERE, "analysis")
-ANALYSIS_HTML_DIR = os.path.join(HERE, "analysis-html")
+_HERE = os.path.dirname(os.path.abspath(__file__)) if "__file__" in dir() else \
+        "/Workspace/Users/davidgao734@gmail.com/boba-cafe/weekly-analysis"
+ANALYSIS_DIR      = os.path.join(_HERE, "analysis")
+ANALYSIS_HTML_DIR = os.path.join(_HERE, "analysis-html")
 
