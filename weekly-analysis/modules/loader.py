@@ -27,22 +27,16 @@ def load_daily_sales(spark, table, date_from, date_to):
 
 
 def load_product_hierarchy(path):
-    """
-    Load products_mapped.csv.
-    Columns: product_ru, status, category, subcategory, product (EN name), variant
-    Returns a DataFrame with a clean join key 'product_ru' → transactions 'product'.
-    """
     import os
-    if not os.path.exists(path):
+    try:
+        h = pd.read_csv(path, encoding="utf-8")
+    except Exception:
         return pd.DataFrame()
-
-    h = pd.read_csv(path, encoding="utf-8")
 
     required = {"product_ru", "category", "subcategory", "product"}
     if not required.issubset(h.columns):
         return pd.DataFrame()
 
-    # Only keep mapped rows
     if "status" in h.columns:
         h = h[h["status"] == "mapped"]
 
