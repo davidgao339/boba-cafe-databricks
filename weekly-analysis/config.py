@@ -30,7 +30,7 @@ TRANSACTIONS_TABLE  = "workspace.default.transactions"
 DAILY_SALES_TABLE   = "workspace.default.daily_sales_v2"
 
 # ── Product Hierarchy ────────────────────────────────────────────
-HIERARCHY_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS4Ot_b26DzF-VNSVhMTH9WeCXz5zFR9cavGA9U6S8X1VlGkYPbbIkT4QydxIENgRb79ISHEvRlZR8E/pubhtml"
+HIERARCHY_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS4Ot_b26DzF-VNSVhMTH9WeCXz5zFR9cavGA9U6S8X1VlGkYPbbIkT4QydxIENgRb79ISHEvRlZR8E/pub?output=csv"
 
 # ── Anomaly Thresholds ───────────────────────────────────────────
 LOW_SALES_PCT          = 0.50   # flag if daily revenue < 50% of 4-week rolling avg
