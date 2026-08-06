@@ -33,6 +33,11 @@ DATABRICKS_REPO = "/Workspace/Users/davidgao734@gmail.com/boba-cafe/POS"
 TRANSACTIONS_TABLE      = "workspace.default.transactions"
 DAILY_SALES_TABLE       = "workspace.default.daily_sales_v2"
 EMPLOYEE_SCHEDULE_TABLE = "workspace.default.employee_schedule_snapshot"
+EMPLOYEE_SCHEDULE_SHEET_URL = (
+    "https://docs.google.com/spreadsheets/d/e/"
+    "2PACX-1vQEUW3vd8VtYtI7vy_wpMeATDMZDuW5-y4u7jmyw0qlEaBSZ8fBdNnFKMl1yTwJmQ8mRVC2jvE812b9"
+    "/pub?gid=1943990106&single=true&output=csv"
+)
 
 # ── Product Hierarchy ────────────────────────────────────────────
 HIERARCHY_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS4Ot_b26DzF-VNSVhMTH9WeCXz5zFR9cavGA9U6S8X1VlGkYPbbIkT4QydxIENgRb79ISHEvRlZR8E/pub?output=csv"

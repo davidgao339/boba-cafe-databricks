@@ -10,6 +10,25 @@ import numpy as np
 from modules.utils import fmt_rub, fmt_pct, md_table, section
 
 
+STORE_ALIASES = {
+    "КИОСК": ["КОСА", "КИОСК"],
+    "КОСА": ["КИОСК", "КОСА"],
+    "НОВО КП": ["КРАСНАЯ ПЛОЩАДЬ", "КП", "НОВО КП", "НОВОРОССИЙСК КРАСНАЯ ПЛОЩАДЬ"],
+    "КРАСНАЯ ПЛОЩАДЬ": ["НОВО КП", "КРАСНАЯ ПЛОЩАДЬ", "КП"],
+    "ОЗ МОЛЛ": ["КРАСНОДАР ОЗ МОЛЛ", "ОЗ МОЛЛ", "ОЗМОЛЛ"],
+    "КРАСНОДАР ОЗ МОЛЛ": ["ОЗ МОЛЛ", "КРАСНОДАР ОЗ МОЛЛ"],
+    "ГАЛЕРЕЯ": ["КРАСНОДАР ГАЛЕРЕЯ", "ГАЛЕРЕЯ"],
+    "КРАСНОДАР ГАЛЕРЕЯ": ["ГАЛЕРЕЯ", "КРАСНОДАР ГАЛЕРЕЯ"],
+    "БОН ПАССАЖ": ["БОН ПАССАЖ", "БОНПАССАЖ", "БОН"],
+    "СОВЕТОВ": ["СОВЕТОВ"],
+    "ГРИН ПАРК": ["ГРИН ПАРК", "ГРИНПАРК", "ГРИН"],
+    "ЧЕРНОМОРСКИЙ": ["ЧЕРНОМОРСКИЙ"],
+    "НЕПТУН": ["НЕПТУН"],
+    "ЦЕМДОЛИНА": ["ЦЕМДОЛИНА"],
+    "ШИРОКАЯ БАЛКА": ["ШИРОКАЯ БАЛКА", "ШИРОКАЯ"],
+}
+
+
 def _get_scheduled_staff(schedule_df, date_str, store_name):
     """
     Look up scheduled employees for a given date and store from the employee schedule table.
@@ -20,17 +39,22 @@ def _get_scheduled_staff(schedule_df, date_str, store_name):
     sched = schedule_df.copy()
     if "date" in sched.columns:
         sched["date_str"] = pd.to_datetime(sched["date"]).dt.strftime("%Y-%m-%d")
-    else:
+    elif "date_str" not in sched.columns:
         return "—"
 
     store_col = "store" if "store" in sched.columns else "store_name"
     sched["store_clean"] = sched[store_col].astype(str).str.strip().str.upper()
     store_clean = str(store_name).strip().upper()
 
-    matched = sched[(sched["date_str"] == str(date_str)) & (sched["store_clean"] == store_clean)]
+    candidates = STORE_ALIASES.get(store_clean, [store_clean])
+
+    matched = sched[(sched["date_str"] == str(date_str)) & (sched["store_clean"].isin(candidates))]
     if matched.empty:
-        # Fallback: check if store name is substring
-        matched = sched[(sched["date_str"] == str(date_str)) & (sched["store_clean"].str.contains(store_clean, regex=False))]
+        # Fallback: check substring matching both ways
+        matched = sched[
+            (sched["date_str"] == str(date_str)) &
+            (sched["store_clean"].apply(lambda x: any(c in x or x in c for c in candidates)))
+        ]
 
     if matched.empty:
         return "Unscheduled"

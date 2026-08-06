@@ -43,13 +43,25 @@ def run_weekly_report(week_start=None, spark=None, push_remote=True, token=None)
         cur_sales = load_daily_sales(spark, config.DAILY_SALES_TABLE, week_start, week_end)
         pri_sales = load_daily_sales(spark, config.DAILY_SALES_TABLE, prior_start, prior_end)
         rolling_sales = load_daily_sales(spark, config.DAILY_SALES_TABLE, rolling_start, rolling_end)
-        schedule_df = load_employee_schedule(spark, config.EMPLOYEE_SCHEDULE_TABLE, week_start, week_end)
+        schedule_df = load_employee_schedule(
+            spark,
+            config.EMPLOYEE_SCHEDULE_TABLE,
+            week_start,
+            week_end,
+            sheet_url=getattr(config, "EMPLOYEE_SCHEDULE_SHEET_URL", None),
+        )
     else:
         # Standalone mock / local fallback
         print("Note: Running in standalone mode without active Spark session.")
         cur_txn, pri_txn = pd.DataFrame(), pd.DataFrame()
         cur_sales, pri_sales, rolling_sales = pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
-        schedule_df = pd.DataFrame()
+        schedule_df = load_employee_schedule(
+            None,
+            None,
+            week_start,
+            week_end,
+            sheet_url=getattr(config, "EMPLOYEE_SCHEDULE_SHEET_URL", None),
+        )
 
     anomaly_cfg = {
         "LOW_SALES_PCT": config.LOW_SALES_PCT,
