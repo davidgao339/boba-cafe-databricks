@@ -357,9 +357,79 @@ def push_to_github(
             print(f"[Publisher] GITHUB_TOKEN unauthorized (401). Please verify GITHUB_TOKEN in pipeline/secrets.py has 'repo' / 'contents:write' permission.")
         else:
             print(f"[Publisher] Failed to push {path} to GitHub: {he}")
+RU_MONTHS_GEN = {
+    "01": "января", "02": "февраля", "03": "марта",    "04": "апреля",
+    "05": "мая",    "06": "июня",    "07": "июля",     "08": "августа",
+    "09": "сентября", "10": "октября", "11": "ноября", "12": "декабря"
+}
+
+
+def format_ru_date(date_str):
+    parts = (date_str or "").split("-")
+    if len(parts) == 3:
+        y, m, d = parts[0], parts[1], str(int(parts[2]))
+        return f"{d} {RU_MONTHS_GEN.get(m, m)} {y}"
+    return date_str
+
+
+def update_bobacafe_web_index(token, week_start, repo="davidgao339/bobacafe-web", branch="main"):
+    """
+    Updates the reports index.html in bobacafe-web so new reports appear at the top.
+    """
+    token = (token or get_github_token() or "").strip()
+    if not token:
         return False
+
+    url = f"https://api.github.com/repos/{repo}/contents/site/internal/reports/index.html"
+    auth_header = f"Bearer {token}" if not token.startswith(("Bearer ", "token ")) else token
+    headers = {
+        "Authorization": auth_header,
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "BobaCafe-WeeklyReportPublisher",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    try:
+        r = requests.get(url, headers=headers, params={"ref": branch}, timeout=10)
+        if r.status_code != 200:
+            return False
+
+        file_data = r.json()
+        sha = file_data.get("sha")
+        content_b64 = file_data.get("content", "")
+        content = base64.b64decode(content_b64).decode("utf-8")
+
+        report_filename = f"{week_start}_weekly_report.html"
+        if report_filename in content:
+            print(f"[Publisher] {report_filename} already listed in {repo} index.html")
+            return True
+
+        date_label = format_ru_date(week_start)
+        content = content.replace('<span class="new-badge">Новый</span>', '')
+
+        new_entry = f'''        <a href="{report_filename}" class="report-item">
+            <div class="report-icon">📈</div>
+            <div class="report-info">
+                <div class="report-name">Еженедельный отчёт <span class="new-badge">Новый</span></div>
+                <div class="report-date">{date_label}</div>
+            </div>
+            <span class="report-arrow">→</span>
+        </a>\n'''
+
+        if '<div class="report-list">' in content:
+            content = content.replace('<div class="report-list">\n', f'<div class="report-list">\n{new_entry}', 1)
+
+        payload = {
+            "message": f"auto: index weekly report {week_start} [skip ci]",
+            "content": base64.b64encode(content.encode("utf-8")).decode("ascii"),
+            "sha": sha,
+            "branch": branch,
+        }
+        put_r = requests.put(url, headers=headers, json=payload, timeout=15)
+        put_r.raise_for_status()
+        print(f"[Publisher] Successfully updated {repo} site/internal/reports/index.html")
+        return True
     except Exception as e:
-        print(f"[Publisher] Failed to push {path} to GitHub: {e}")
+        print(f"[Publisher] Note: Could not update {repo} index: {e}")
         return False
 
 
@@ -371,13 +441,14 @@ def publish_report(
     push_remote=True,
     token=None,
     repo="davidgao339/boba-cafe-databricks",
+    web_repo="davidgao339/bobacafe-web",
     branch="main",
 ):
     """
     Complete publishing lifecycle:
     1. Compiles branded HTML.
-    2. Writes locally to docs/internal/weekly/index.html and docs/internal/weekly/archive/{week_start}.html.
-    3. Pushes to GitHub via REST API for instant deployment to bobacafe.net/internal/weekly/.
+    2. Writes locally to docs/internal/weekly/ & docs/internal/reports/.
+    3. Pushes to GitHub via REST API for instant deployment to bobacafe.net/internal/reports/.
     """
     html_content = render_portal_html(
         markdown_content=report_md,
@@ -388,7 +459,6 @@ def publish_report(
 
     # 1. Local filesystem deployment
     if docs_root is None:
-        # Resolve docs/internal relative to repository root
         base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         docs_root = os.path.join(base_dir, "docs", "internal", "weekly")
 
@@ -411,14 +481,30 @@ def publish_report(
     if push_remote:
         resolved_token = token or get_github_token()
         if resolved_token:
-            msg_latest = f"auto: weekly report {week_start} [skip ci]"
+            # A. Push to bobacafe-web (serves bobacafe.net/internal/reports/)
+            push_to_github(
+                html_content=html_content,
+                path=f"site/internal/reports/{week_start}_weekly_report.html",
+                token=resolved_token,
+                repo=web_repo,
+                branch=branch,
+                message=f"auto: weekly report {week_start} [skip ci]",
+            )
+            update_bobacafe_web_index(
+                token=resolved_token,
+                week_start=week_start,
+                repo=web_repo,
+                branch=branch,
+            )
+
+            # B. Push to boba-cafe-databricks (internal mirror / backup)
             push_to_github(
                 html_content=html_content,
                 path="docs/internal/weekly/index.html",
                 token=resolved_token,
                 repo=repo,
                 branch=branch,
-                message=msg_latest,
+                message=f"auto: weekly report {week_start} [skip ci]",
             )
             push_to_github(
                 html_content=html_content,
