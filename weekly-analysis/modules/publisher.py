@@ -284,9 +284,12 @@ def get_github_token():
 
     # 2. pipeline.secrets (used across Databricks repo)
     try:
-        from pipeline.secrets import GITHUB_TOKEN
-        if GITHUB_TOKEN:
-            return GITHUB_TOKEN
+        import importlib
+        from pipeline import secrets
+        importlib.reload(secrets)
+        token = getattr(secrets, "GITHUB_TOKEN", None)
+        if token:
+            return str(token).strip()
     except Exception:
         pass
 
