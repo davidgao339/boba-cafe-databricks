@@ -313,7 +313,7 @@ def push_to_github(
     """
     Pushes HTML content directly to GitHub repo via Contents API to trigger GitHub Pages build.
     """
-    token = token or get_github_token()
+    token = (token or get_github_token() or "").strip()
     if not token:
         print(f"[Publisher] GITHUB_TOKEN not found. Skipping remote push for {path}.")
         return False
@@ -322,9 +322,12 @@ def push_to_github(
         message = f"auto: publish weekly report to {path} [skip ci]"
 
     url = f"https://api.github.com/repos/{repo}/contents/{path}"
+    auth_header = f"Bearer {token}" if not token.startswith(("Bearer ", "token ")) else token
     headers = {
-        "Authorization": f"token {token}",
-        "Accept": "application/vnd.github.v3+json",
+        "Authorization": auth_header,
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "BobaCafe-WeeklyReportPublisher",
+        "X-GitHub-Api-Version": "2022-11-28",
     }
 
     try:
@@ -345,6 +348,13 @@ def push_to_github(
         commit_sha = put_res.json().get("commit", {}).get("sha", "")[:8]
         print(f"[Publisher] Successfully pushed {path} to GitHub ({branch} @ {commit_sha})")
         return True
+    except requests.exceptions.HTTPError as he:
+        status_code = he.response.status_code if he.response is not None else 0
+        if status_code == 401:
+            print(f"[Publisher] GITHUB_TOKEN unauthorized (401). Please verify GITHUB_TOKEN in pipeline/secrets.py has 'repo' / 'contents:write' permission.")
+        else:
+            print(f"[Publisher] Failed to push {path} to GitHub: {he}")
+        return False
     except Exception as e:
         print(f"[Publisher] Failed to push {path} to GitHub: {e}")
         return False

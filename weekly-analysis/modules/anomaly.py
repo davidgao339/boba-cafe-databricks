@@ -106,14 +106,14 @@ def build(
     # ── 4.1 Low Sales Days ────────────────────────────────────────
     parts.append(section("Low Daily Sales", 3))
 
-    cur_valid = cur_txn[~cur_txn["is_return"]] if "is_return" in cur_txn.columns else cur_txn
+    cur_valid = (cur_txn[~cur_txn["is_return"]] if "is_return" in cur_txn.columns else cur_txn).copy()
     cur_daily = (
         cur_valid.groupby(["store_clean", "date"])["revenue"].sum()
         .reset_index()
     )
 
     if not baseline_df.empty:
-        base_valid = baseline_df[~baseline_df["is_return"]] if "is_return" in baseline_df.columns else baseline_df
+        base_valid = (baseline_df[~baseline_df["is_return"]] if "is_return" in baseline_df.columns else baseline_df).copy()
         rolling_avg = (
             base_valid.groupby(["store_clean", "date"])["revenue"].sum()
             .reset_index()
@@ -154,7 +154,7 @@ def build(
 
     # Determine baseline cash ratio per store
     if not baseline_df.empty:
-        base_valid = baseline_df[~baseline_df["is_return"]] if "is_return" in baseline_df.columns else baseline_df
+        base_valid = (baseline_df[~baseline_df["is_return"]] if "is_return" in baseline_df.columns else baseline_df).copy()
         base_txn_type = "transaction_type" if "transaction_type" in base_valid.columns else "payment_type"
         base_cash_mask = base_valid[base_txn_type].astype(str).str.lower().str.contains("cash|нал", regex=True)
         base_valid["is_cash"] = base_cash_mask
