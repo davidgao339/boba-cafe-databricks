@@ -3,172 +3,368 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Внутренний портал | Боба Кролик</title>
+<title>Внутренний портал управления | Боба Кролик</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:        #f8f9fa;
-  --surface:   #ffffff;
-  --border:    #dadce0;
-  --text-1:    #202124;
-  --text-2:    #5f6368;
-  --text-3:    #80868b;
-  --accent:    #8d6e63;
-  --accent-bg: #f4ede9;
-  --shadow-sm: 0 1px 3px rgba(60,64,67,.15), 0 1px 2px rgba(60,64,67,.08);
-  --shadow-md: 0 4px 12px rgba(60,64,67,.15), 0 2px 4px rgba(60,64,67,.08);
+  --bg:            #F5F5F7;
+  --surface:       #FFFFFF;
+  --border-light:  #E5E5EA;
+  --border-strong: #D1D1D6;
+  --text-1:        #111111;
+  --text-2:        #48484A;
+  --text-3:        #8E8E93;
+  --brand:         #784D38;
+  --brand-light:   #F7F2EF;
+  --brand-dark:    #4E3123;
+  --accent-green:  #197A3B;
+  --accent-green-bg:#EBF6ED;
+  --shadow-sm:     0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+  --shadow-md:     0 12px 32px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.03);
+  --shadow-lg:     0 20px 48px rgba(0,0,0,0.09), 0 4px 12px rgba(0,0,0,0.04);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
   background: var(--bg);
   color: var(--text-1);
-  font-size: 16px;
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
 }
+
+/* Header & Navigation */
 nav {
   background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-light);
   height: 64px;
-  padding: 0 24px;
+  padding: 0 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: var(--shadow-sm);
 }
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 18px;
+  gap: 12px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 19px;
   font-weight: 700;
   color: var(--text-1);
   text-decoration: none;
+  letter-spacing: -0.01em;
 }
 .nav-tag {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-3);
-  border: 1px solid var(--border);
-  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--brand);
+  background: var(--brand-light);
+  border: 1px solid rgba(120,77,56,0.18);
+  border-radius: 6px;
   padding: 3px 8px;
 }
-.hero {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 48px 24px 32px;
-  text-align: center;
-}
-.hero h1 {
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--text-1);
-  margin-bottom: 8px;
-  letter-spacing: -0.02em;
-}
-.hero p {
-  font-size: 16px;
-  color: var(--text-2);
-}
-.grid {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 24px 80px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 24px;
-}
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 32px 28px;
-  box-shadow: var(--shadow-sm);
-  transition: all .2s ease;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  text-decoration: none;
-  color: inherit;
-}
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--accent);
-}
-.card-icon {
-  font-size: 36px;
-  margin-bottom: 16px;
-}
-.card-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-1);
-  margin-bottom: 8px;
-}
-.card-desc {
-  font-size: 14px;
-  color: var(--text-2);
-  line-height: 1.5;
-  margin-bottom: 24px;
-}
-.card-btn {
+.nav-status {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
-  color: #fff;
-  background: var(--accent);
-  border-radius: 8px;
-  padding: 10px 18px;
-  transition: background .15s;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent-green);
+  background: var(--accent-green-bg);
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(25,122,59,0.15);
 }
-.card:hover .card-btn {
-  background: #795548;
+.nav-status-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--accent-green);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(25,122,59,0.2);
 }
-footer {
+
+/* Layout Container */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+/* Hero Section */
+.hero {
   text-align: center;
-  padding: 32px 24px;
+  margin-bottom: 48px;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: 999px;
+  padding: 5px 14px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow-sm);
+}
+.hero h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 38px;
+  font-weight: 700;
+  color: var(--text-1);
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 12px;
+}
+.hero p {
+  font-size: 17px;
+  color: var(--text-2);
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* Main Dashboard Card */
+.main-card {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: var(--shadow-md);
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+.main-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--brand);
+}
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.card-title-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.card-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: var(--brand-light);
+  border: 1px solid rgba(120,77,56,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+}
+.card-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-1);
+  letter-spacing: -0.02em;
+}
+.card-subtitle {
+  font-size: 14px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+.badge-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border-light);
+  color: var(--text-2);
+}
+
+.card-desc {
+  font-size: 15px;
+  color: var(--text-2);
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+/* Feature Highlights Grid */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 36px;
+}
+.feature-item {
+  background: var(--bg);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  padding: 16px;
+}
+.feature-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-1);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.feature-text {
   font-size: 13px;
   color: var(--text-3);
-  border-top: 1px solid var(--border);
+  line-height: 1.4;
+}
+
+/* CTA Button */
+.cta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-light);
+}
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--brand);
+  color: #ffffff;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 13px 26px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 4px 14px rgba(120,77,56,0.25);
+}
+.cta-button:hover {
+  background: var(--brand-dark);
+  transform: translateY(-1px);
+}
+.cta-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 40px 24px;
+  font-size: 13px;
+  color: var(--text-3);
+  border-top: 1px solid var(--border-light);
+  margin-top: 40px;
+}
+footer a {
+  color: var(--brand);
+  text-decoration: none;
+  font-weight: 600;
+}
+footer a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .hero h1 { font-size: 28px; }
+  .main-card { padding: 24px 20px; }
+  nav { padding: 0 16px; }
+  .cta-row { flex-direction: column; align-items: stretch; }
+  .cta-button { justify-content: center; }
 }
 </style>
 </head>
 <body>
 
 <nav>
-  <div style="display:flex; align-items:center; gap:12px;">
+  <div style="display:flex; align-items:center; gap:16px;">
     <a href="https://bobacafe.net/internal/" class="nav-brand">🧋 Боба Кролик</a>
-    <span class="nav-tag">Служебный доступ</span>
+    <span class="nav-tag">Executive Portal</span>
+  </div>
+  <div class="nav-status">
+    <div class="nav-status-dot"></div>
+    <span>Система активна</span>
   </div>
 </nav>
 
-<div class="hero">
-  <h1>Внутренний портал управления</h1>
-  <p>Оперативная аналитика, еженедельные бизнес-отчеты и мониторинг сети Боба Кролик</p>
-</div>
+<div class="container">
 
-<div class="grid" style="max-width: 680px;">
-  <a href="https://bobacafe.net/internal/weekly/" class="card">
-    <div>
-      <div class="card-icon">📊</div>
-      <h2 class="card-title">Еженедельный бизнес-отчет</h2>
-      <p class="card-desc">
-        Комплексный анализ показателей сети: выручка (4-недельный базис + WoW), декомпозиция среднего чека и трафика, динамика будни/выходные, Attach Rate десертов и топингов, сигналы оптимизации меню и аудит аномалий кассы по сменам сотрудников.
-      </p>
+  <div class="hero">
+    <div class="hero-badge">🔐 Служебный доступ сети кафе</div>
+    <h1>Внутренний портал управления</h1>
+    <p>Оперативная бизнес-аналитика, мониторинг выручки и еженедельный аудит сети Боба Кролик</p>
+  </div>
+
+  <div class="main-card">
+    <div class="card-header">
+      <div class="card-title-group">
+        <div class="card-icon-box">📊</div>
+        <div>
+          <h2 class="card-title">Еженедельный бизнес-отчет</h2>
+          <div class="card-subtitle">Weekly Executive Intelligence & Operational Loss Prevention</div>
+        </div>
+      </div>
+      <div class="badge-pill">Обновляется по понедельникам</div>
     </div>
-    <div class="card-btn">Открыть актуальный отчет →</div>
-  </a>
+
+    <p class="card-desc">
+      Сквозной управленческий отчет с 4-недельным базисом сравнения, декомпозицией среднего чека и покупательского трафика, матрицей допродаж десертов и топингов, сигналами оптимизации товарной матрицы и аудитом кассовой дисциплины с привязкой к сменам сотрудников.
+    </p>
+
+    <div class="feature-grid">
+      <div class="feature-item">
+        <div class="feature-label">📈 Выручка & Базис</div>
+        <div class="feature-text">4-недельный скользящий средний базис + WoW декомпозиция чека и трафика.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-label">🧋 Attach Rate</div>
+        <div class="feature-text">Конверсия десертов, топингов и расчет недополученной выручки (Gap Analysis).</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-label">✂️ Решения по меню</div>
+        <div class="feature-text">Сигналы продвижения лидеров и вывода аутсайдеров по скорости продаж.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-label">🚨 Касса и смены</div>
+        <div class="feature-text">Детекция просадок налички и разрывов продаж с фамилиями бариста на смене.</div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <a href="https://bobacafe.net/internal/weekly/" class="cta-button">
+        <span>Открыть актуальный отчет</span>
+        <span>→</span>
+      </a>
+      <div class="cta-meta">
+        Автоматическая публикация из Databricks Pipeline
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <footer>
-  Боба Кролик &copy; 2026 &nbsp;·&nbsp; Только для внутреннего использования сотрудниками сети
+  Боба Кролик &copy; 2026 &nbsp;·&nbsp; Конфиденциально для руководства и управляющих сети
 </footer>
 
 </body>
