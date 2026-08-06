@@ -1,10 +1,11 @@
 """
-Section 2: Basket Size — avg revenue per order by store, WoW, and add-on rate.
+Section 2: Basket & Attach Intelligence — Average check size, multi-tier attach rates
+           (Food/Dessert attach, Topping attach, Multi-Drink %), and Upsell Opportunity Gap.
 """
 import re
+import numpy as np
 import pandas as pd
-from modules.utils import fmt_rub, fmt_pct, wow_arrow, md_table, section
-
+from modules.utils import fmt_rub, fmt_pct, fmt_diff_rub, pct_arrow, md_table, section
 
 EXCLUDED_PAYMENT_TYPES = {"Non-Fiscal"}
 
@@ -14,136 +15,271 @@ _VARIANT_SUFFIXES = re.compile(
     r"|\s*\(no balls\)",
     flags=re.IGNORECASE,
 )
+_EXCLUDE_PREFIXES = ("списание", "у меня нет тапиоки")
+_ZERO_REV_MODIFIERS = {
+    "без соуса", "без топпинга", "без шариков", "кетчуп 30гр",
+    "менее сладкий", "со льдом", "соус кетчуп", "соус сырный",
+    "соус сырный 30гр", "стандартный", "теплый", "холодный меньше льда",
+}
 
 
-def _filter(txn):
-    """Exclude Non-Fiscal and online orders. Returns are kept so their negative
-    revenue nets against the original sale (fully-returned orders drop to zero)."""
-    return txn[
-        ~txn["online"]
-        & ~txn["transaction_type"].isin(EXCLUDED_PAYMENT_TYPES)
-    ]
+def _clean_product_name(name):
+    if not isinstance(name, str):
+        return name
+    cleaned = re.sub(r"\s+", " ", name)
+    return _VARIANT_SUFFIXES.sub("", cleaned).strip()
+
+
+def _should_exclude(name):
+    if not isinstance(name, str):
+        return False
+    low = re.sub(r"\s+", " ", name).lower().strip()
+    if any(low.startswith(p) or p in low for p in _EXCLUDE_PREFIXES):
+        return True
+    if low in _ZERO_REV_MODIFIERS:
+        return True
+    return False
+
+
+def _heuristic_category(name):
+    low = str(name).lower()
+    if any(k in low for k in ["тапиок", "джус болл", "топпинг", "пенк", "желе", "сироп", "молоко", "кусочк"]):
+        return "Toppings & Modifiers"
+    if any(k in low for k in ["чай", "ти", "лимонад", "коктейль", "кофе", "латте", "раф", "капучино", "бамбл", "фраппучино", "мокка", "американо"]):
+        return "Drink"
+    if any(k in low for k in ["блинчик", "корн дог", "корн-дог", "сосис", "сыр"]):
+        return "Food"
+    if any(k in low for k in ["моти", "печень", "чизкейк", "торт"]):
+        return "Dessert"
+    return "Other"
+
+
+def _filter_valid_orders(txn):
+    """Exclude non-fiscal and online orders."""
+    if txn is None or txn.empty:
+        return pd.DataFrame()
+    df = txn.copy()
+    if "online" in df.columns:
+        df = df[~df["online"]]
+    if "transaction_type" in df.columns:
+        df = df[~df["transaction_type"].isin(EXCLUDED_PAYMENT_TYPES)]
+    return df
 
 
 def _basket_stats(txn):
-    """Compute net avg basket per store.
+    """Compute net avg basket per store."""
+    filtered = _filter_valid_orders(txn)
+    if filtered.empty or "order_number" not in filtered.columns:
+        return pd.DataFrame()
 
-    Returns are separate orders with their own order numbers, so netting by
-    order_number is not possible. Instead: net_revenue / sale_order_count gives
-    the true average — returns reduce the numerator without inflating the denominator.
-    """
-    filtered = _filter(txn)
-    # Sum revenue per order (returns already carry negative revenue)
-    order_revenue = (
-        filtered.groupby(["store_name", "order_number", "is_return"])["revenue"]
-        .sum()
-        .reset_index()
-    )
-    by_store = order_revenue.groupby("store_name").apply(
-        lambda g: pd.Series({
-            "avg_basket": g["revenue"].sum() / (g["is_return"] == False).sum()
-            if (g["is_return"] == False).sum() > 0 else 0,
-            "orders": (g["is_return"] == False).sum(),
-        })
-    ).reset_index().rename(columns={"store_name": "store"})
-    return by_store
+    store_col = "store_name" if "store_name" in filtered.columns else "store"
+    
+    non_returns = filtered[filtered["is_return"] == False]
+    orders_per_store = non_returns.groupby(store_col)["order_number"].nunique().rename("orders")
+    rev_per_store = filtered.groupby(store_col)["revenue"].sum().rename("revenue")
+    
+    stats = pd.concat([orders_per_store, rev_per_store], axis=1).fillna(0).reset_index().rename(columns={store_col: "store"})
+    stats["avg_basket"] = stats.apply(lambda r: r["revenue"] / r["orders"] if r["orders"] > 0 else 0, axis=1)
+    return stats
 
 
 def _overall_avg(txn):
     """Net avg basket across all stores."""
-    filtered = _filter(txn)
-    order_revenue = filtered.groupby(["order_number", "is_return"])["revenue"].sum().reset_index()
-    total_revenue = order_revenue["revenue"].sum()
-    sale_count = (order_revenue["is_return"] == False).sum()
-    return total_revenue / sale_count if sale_count > 0 else 0
+    filtered = _filter_valid_orders(txn)
+    if filtered.empty or "order_number" not in filtered.columns:
+        return 0
+    non_returns = filtered[filtered["is_return"] == False]
+    orders = non_returns["order_number"].nunique()
+    rev = filtered["revenue"].sum()
+    return rev / orders if orders > 0 else 0
 
 
-def _compute_addon_rate(txn, hierarchy):
-    """Per-store share of orders that include a drink AND a food/dessert item."""
-    df = txn[
-        ~txn["is_return"]
-        & ~txn["online"]
-        & ~txn["transaction_type"].isin(EXCLUDED_PAYMENT_TYPES)
-    ].copy()
+def _compute_attach_matrix(txn, hierarchy):
+    """Computes Food/Dessert attach, Topping attach, and multi-drink rates per store."""
+    df = _filter_valid_orders(txn)
+    if df.empty or "order_number" not in df.columns:
+        return pd.DataFrame(), 0, 0
 
-    if not hierarchy.empty:
-        df["product_lookup"] = df["product"].apply(
-            lambda n: _VARIANT_SUFFIXES.sub("", n).strip() if isinstance(n, str) else n
-        )
+    df = df[~df["is_return"]].copy()
+    df = df[~df["product"].apply(_should_exclude)]
+    df["product_clean"] = df["product"].apply(_clean_product_name)
+
+    if hierarchy is not None and not hierarchy.empty:
+        hier_clean = hierarchy.copy()
+        hier_clean["product_clean"] = hier_clean["product"].apply(_clean_product_name)
         df = df.merge(
-            hierarchy[["product", "category"]],
-            left_on="product_lookup", right_on="product",
-            how="left", suffixes=("", "_hier")
+            hier_clean[["product_clean", "category"]],
+            on="product_clean", how="left"
         )
-        df["category"] = df["category"].fillna("Uncategorised")
+        df["category"] = df.apply(
+            lambda r: r["category"] if pd.notna(r["category"]) and r["category"] != "Uncategorised"
+            else _heuristic_category(r["product_clean"]),
+            axis=1
+        )
     else:
-        df["category"] = "Uncategorised"
+        df["category"] = df["product_clean"].apply(_heuristic_category)
 
-    order_cats = (
-        df.groupby(["store_name", "order_number"])["category"]
-        .agg(set)
-        .reset_index()
-        .rename(columns={"category": "categories"})
+    store_col = "store_name" if "store_name" in df.columns else "store"
+
+    df["is_drink"] = df["category"] == "Drink"
+    df["is_food_dessert"] = df["category"].isin(["Food", "Dessert"])
+    df["is_topping"] = df["category"] == "Toppings & Modifiers"
+    df["item_qty"] = df["qty"] if "qty" in df.columns else 1
+    df["drink_qty"] = np.where(df["is_drink"], df["item_qty"], 0)
+    df["food_rev"] = np.where(df["is_food_dessert"], df["revenue"], 0)
+    df["food_qty"] = np.where(df["is_food_dessert"], df["item_qty"], 0)
+
+    # Per-order category profile
+    order_profile = df.groupby([store_col, "order_number"]).agg(
+        has_drink=("is_drink", "max"),
+        drink_qty=("drink_qty", "sum"),
+        has_food_dessert=("is_food_dessert", "max"),
+        has_topping=("is_topping", "max"),
+        food_rev=("food_rev", "sum"),
+        food_qty=("food_qty", "sum"),
+    ).reset_index()
+
+    # Calculate average food item price across network for opportunity gap calculation
+    tot_food_rev = order_profile["food_rev"].sum()
+    tot_food_qty = order_profile["food_qty"].sum()
+    avg_food_price = tot_food_rev / tot_food_qty if tot_food_qty > 0 else 180.0
+
+    drink_orders = order_profile[order_profile["has_drink"] == True].copy()
+    if drink_orders.empty:
+        return pd.DataFrame(), 0, avg_food_price
+
+    drink_orders["has_food_attach"] = drink_orders["has_drink"] & drink_orders["has_food_dessert"]
+    drink_orders["has_topping_attach"] = drink_orders["has_drink"] & drink_orders["has_topping"]
+    drink_orders["is_multi_drink"] = drink_orders["drink_qty"] >= 2
+
+    # Store attach aggregation
+    store_attach = drink_orders.groupby(store_col).agg(
+        drink_orders=("order_number", "count"),
+        food_attach_orders=("has_food_attach", "sum"),
+        topping_attach_orders=("has_topping_attach", "sum"),
+        multi_drink_orders=("is_multi_drink", "sum"),
+    ).reset_index().rename(columns={store_col: "store"})
+
+    store_attach["food_attach_pct"] = store_attach.apply(
+        lambda r: r["food_attach_orders"] / r["drink_orders"] * 100 if r["drink_orders"] > 0 else 0, axis=1
     )
-    order_cats["is_addon"] = order_cats["categories"].apply(
-        lambda s: ("Drink" in s) and bool(s & {"Food", "Dessert"})
+    store_attach["topping_attach_pct"] = store_attach.apply(
+        lambda r: r["topping_attach_orders"] / r["drink_orders"] * 100 if r["drink_orders"] > 0 else 0, axis=1
     )
-    return (
-        order_cats.groupby("store_name")
-        .agg(orders=("order_number", "count"), addon_orders=("is_addon", "sum"))
-        .reset_index()
-        .assign(addon_rate=lambda d: d["addon_orders"] / d["orders"] * 100)
-        .rename(columns={"store_name": "store"})
+    store_attach["multi_drink_pct"] = store_attach.apply(
+        lambda r: r["multi_drink_orders"] / r["drink_orders"] * 100 if r["drink_orders"] > 0 else 0, axis=1
     )
+
+    # Calculate Top-Quartile Food Attach Benchmark (75th percentile of active stores)
+    active_stores = store_attach[store_attach["drink_orders"] >= 30]
+    benchmark_food_attach = active_stores["food_attach_pct"].quantile(0.75) if len(active_stores) >= 2 else (
+        store_attach["food_attach_pct"].max() if not store_attach.empty else 25.0
+    )
+
+    store_attach["food_benchmark"] = benchmark_food_attach
+    store_attach["upsell_gap_rub"] = store_attach.apply(
+        lambda r: max(0, (benchmark_food_attach - r["food_attach_pct"]) / 100.0 * r["drink_orders"] * avg_food_price),
+        axis=1
+    )
+
+    return store_attach, benchmark_food_attach, avg_food_price
 
 
 def build(current_txn, prior_txn, hierarchy=None):
-    parts = [section("2. Basket Size", 2)]
-    parts.append("_Excludes Non-Fiscal and online orders. Returns (separate orders with negative revenue) are netted into the total; only sale orders count toward the denominator._\n")
+    parts = [section("2. Basket Size & Attach Intelligence", 2)]
+    parts.append("_Excludes Non-Fiscal and online orders. Returns net into revenue numerator without inflating order count._\n")
 
+    # ── 2.1 Average Basket by Store ────────────────────────────────
     cur = _basket_stats(current_txn)
     pri = _basket_stats(prior_txn).rename(columns={"avg_basket": "prior_basket", "orders": "prior_orders"})
 
-    merged = cur.merge(pri[["store", "prior_basket"]], on="store", how="outer").fillna(0)
-    merged["wow"] = merged.apply(lambda r: wow_arrow(r["avg_basket"], r["prior_basket"]), axis=1)
+    merged = cur.merge(pri[["store", "prior_basket", "prior_orders"]], on="store", how="outer").fillna(0)
+    merged = merged[
+        ~(merged["store"].str.startswith("UNKNOWN_") & (merged["orders"] == 0) & (merged["prior_orders"] == 0))
+    ].copy()
+
+    merged["wow"] = merged.apply(lambda r: pct_arrow(r["avg_basket"], r["prior_basket"]), axis=1)
+    merged["net_diff"] = merged.apply(lambda r: fmt_diff_rub(r["avg_basket"], r["prior_basket"]), axis=1)
     merged = merged.sort_values("avg_basket", ascending=False)
 
     cur_overall = _overall_avg(current_txn)
     pri_overall = _overall_avg(prior_txn)
     parts.append(
-        f"**Avg basket (all stores):** {fmt_rub(cur_overall)}  "
-        f"**WoW:** {wow_arrow(cur_overall, pri_overall)}\n"
+        f"**Chain-Wide Avg Basket:** {fmt_rub(cur_overall)}  "
+        f"**WoW:** {pct_arrow(cur_overall, pri_overall)} ({fmt_diff_rub(cur_overall, pri_overall)})\n"
     )
 
     parts.append(md_table(
-        merged[["store", "avg_basket", "prior_basket", "orders", "wow"]],
+        merged[["store", "avg_basket", "prior_basket", "orders", "wow", "net_diff"]].rename(
+            columns={"net_diff": "net_change"}
+        ),
         formatters={
             "avg_basket":   fmt_rub,
             "prior_basket": fmt_rub,
+            "orders":       lambda x: f"{int(x):,}",
         }
     ))
 
-    # ── Add-on Rate ───────────────────────────────────────────────
-    if hierarchy is not None and not hierarchy.empty:
-        parts.append(section("Add-on Rate", 3))
-        parts.append("_Share of in-store orders that include both a drink and a food/dessert item._\n")
+    # ── 2.2 Multi-Tier Attach Intelligence ─────────────────────────
+    cur_att, bench_food, avg_price = _compute_attach_matrix(current_txn, hierarchy)
+    pri_att, _, _ = _compute_attach_matrix(prior_txn, hierarchy)
 
-        cur_ar = _compute_addon_rate(current_txn, hierarchy)
-        pri_ar = _compute_addon_rate(prior_txn, hierarchy).rename(
-            columns={"addon_rate": "prior_rate", "orders": "prior_orders", "addon_orders": "prior_addon"}
+    if not cur_att.empty:
+        parts.append(section("Attach Rates & Upsell Opportunity Gap", 3))
+        parts.append(
+            f"_Measures cross-sell effectiveness on drink orders. **Top-Quartile Food Attach Benchmark: {bench_food:.1f}%** "
+            f"(Avg food/dessert ticket: {fmt_rub(avg_price)})._\n"
         )
-        ar = cur_ar.merge(pri_ar[["store", "prior_rate", "prior_orders"]], on="store", how="outer").fillna(0)
-        ar = ar[(ar["orders"] > 0) | (ar["prior_orders"] > 0)]
-        ar["wow"] = ar.apply(lambda r: wow_arrow(r["addon_rate"], r["prior_rate"]), axis=1)
-        ar = ar.sort_values("addon_rate", ascending=False)
+
+        pri_cols = pri_att[["store", "food_attach_pct", "topping_attach_pct"]].rename(
+            columns={
+                "food_attach_pct": "pri_food_attach",
+                "topping_attach_pct": "pri_topping_attach",
+            }
+        )
+        att_m = cur_att.merge(pri_cols, on="store", how="left").fillna(0)
+        att_m = att_m[
+            ~(att_m["store"].str.startswith("UNKNOWN_") & (att_m["drink_orders"] == 0))
+        ].copy()
+
+        att_m["food_attach_wow"] = att_m.apply(
+            lambda r: pct_arrow(r["food_attach_pct"], r["pri_food_attach"]), axis=1
+        )
+        att_m["topping_attach_wow"] = att_m.apply(
+            lambda r: pct_arrow(r["topping_attach_pct"], r["pri_topping_attach"]), axis=1
+        )
+
+        def _format_opportunity(gap_rub):
+            if gap_rub <= 500:
+                return "✓ Top Tier"
+            return f"+{fmt_rub(gap_rub)} / wk"
+
+        att_m["opportunity"] = att_m["upsell_gap_rub"].apply(_format_opportunity)
+        att_m = att_m.sort_values("drink_orders", ascending=False)
 
         parts.append(md_table(
-            ar[["store", "orders", "addon_orders", "addon_rate", "wow"]],
+            att_m[[
+                "store", "drink_orders", "food_attach_pct", "food_attach_wow",
+                "topping_attach_pct", "topping_attach_wow", "multi_drink_pct", "opportunity"
+            ]].rename(columns={
+                "food_attach_pct": "food_attach",
+                "topping_attach_pct": "topping_attach",
+                "multi_drink_pct": "multi_drink_pct",
+                "opportunity": "upsell_opportunity_₽",
+            }),
             formatters={
-                "addon_rate":   fmt_pct,
-                "orders":       lambda x: f"{int(x):,}",
-                "addon_orders": lambda x: f"{int(x):,}",
+                "drink_orders":    lambda x: f"{int(x):,}",
+                "food_attach":     fmt_pct,
+                "topping_attach":  fmt_pct,
+                "multi_drink_pct": fmt_pct,
             }
         ))
 
+        total_upsell_opp = att_m["upsell_gap_rub"].sum()
+        if total_upsell_opp > 1000:
+            parts.append(
+                f"\n💡 **Network Upsell Opportunity:** **+{fmt_rub(total_upsell_opp)} / week** left on the table across under-attaching stores if brought to the 75th percentile benchmark.\n"
+            )
+
     return "\n".join(parts)
+

@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boba Cafe — Демонстрация Дизайн-Стилей Отчетов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   BASE RESET & LAYOUT
+   ========================================================= */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+}
+
+/* =========================================================
+   THEME SWITCHER BAR (Sticky at Top)
+   ========================================================= */
+.style-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  font-family: 'Inter', sans-serif;
+  color: #fff;
+}
+.style-bar-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.style-bar-title span {
+  background: linear-gradient(135deg, #f59e0b, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.theme-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.theme-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+.theme-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: translateY(-1px);
+}
+.theme-btn.active {
+  background: #fff;
+  color: #0f172a;
+  border-color: #fff;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.3);
+}
+.theme-desc-banner {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+/* =========================================================
+   THEME 1: WARM BOBA & OAT (Artisanal Cafe Executive)
+   ========================================================= */
+body.theme-warm {
+  --bg: #FAF6F0;
+  --bg-subtle: #F2EBE1;
+  --surface: #FFFFFF;
+  --border: #E8DEC8;
+  --border-light: #F0E8D9;
+  --text-main: #2A2118;
+  --text-muted: #736456;
+  --text-faint: #9E8E80;
+  --brand: #C26D53;
+  --brand-light: #F7EBE7;
+  --accent: #D9886C;
+  --success-bg: #E8F5E9;
+  --success-text: #2E7D32;
+  --danger-bg: #FFEBEE;
+  --danger-text: #C62828;
+  --warning-bg: #FFF8E1;
+  --warning-text: #F57F17;
+  --card-shadow: 0 4px 20px rgba(74, 55, 40, 0.06), 0 1px 3px rgba(74, 55, 40, 0.04);
+  --header-grad: linear-gradient(135deg, #2A2118 0%, #4A3728 100%);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--bg);
+  color: var(--text-main);
+}
+
+/* =========================================================
+   THEME 2: OBSIDIAN & EMERALD (Sleek Dark Terminal)
+   ========================================================= */
+body.theme-dark {
+  --bg: #090D16;
+  --bg-subtle: #0F172A;
+  --surface: #111827;
+  --border: #1F2937;
+  --border-light: #162032;
+  --text-main: #F9FAFB;
+  --text-muted: #9CA3AF;
+  --text-faint: #6B7280;
+  --brand: #10B981;
+  --brand-light: rgba(16, 185, 129, 0.15);
+  --accent: #34D399;
+  --success-bg: rgba(16, 185, 129, 0.15);
+  --success-text: #34D399;
+  --danger-bg: rgba(239, 68, 68, 0.18);
+  --danger-text: #F87171;
+  --warning-bg: rgba(245, 158, 11, 0.18);
+  --warning-text: #FBBF24;
+  --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.05);
+  --header-grad: linear-gradient(135deg, #10B981 0%, #06B6D4 100%);
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg);
+  color: var(--text-main);
+}
+
+/* =========================================================
+   THEME 3: NORDIC GLASS & INDIGO (Clean Modern SaaS)
+   ========================================================= */
+body.theme-glass {
+  --bg: #F0F4F8;
+  --bg-subtle: #E2E8F0;
+  --surface: rgba(255, 255, 255, 0.82);
+  --border: rgba(203, 213, 225, 0.8);
+  --border-light: #F1F5F9;
+  --text-main: #0F172A;
+  --text-muted: #475569;
+  --text-faint: #94A3B8;
+  --brand: #4F46E5;
+  --brand-light: #EEF2FF;
+  --accent: #6366F1;
+  --success-bg: #DCFCE7;
+  --success-text: #15803D;
+  --danger-bg: #FEE2E2;
+  --danger-text: #B91C1C;
+  --warning-bg: #FEF3C7;
+  --warning-text: #B45309;
+  --card-shadow: 0 10px 30px rgba(79, 70, 229, 0.08), 0 1px 3px rgba(0,0,0,0.05);
+  --header-grad: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg);
+  color: var(--text-main);
+  backdrop-filter: blur(8px);
+}
+
+/* =========================================================
+   THEME 4: TOKYO NEO-EDITORIAL (High Contrast Modern)
+   ========================================================= */
+body.theme-editorial {
+  --bg: #F5F5F7;
+  --bg-subtle: #EBEBEF;
+  --surface: #FFFFFF;
+  --border: #D1D1D6;
+  --border-light: #E5E5EA;
+  --text-main: #1C1C1E;
+  --text-muted: #636366;
+  --text-faint: #8E8E93;
+  --brand: #FF453A;
+  --brand-light: #FFF1F0;
+  --accent: #FF5A5F;
+  --success-bg: #E3F8E8;
+  --success-text: #197A3B;
+  --danger-bg: #FFEBEA;
+  --danger-text: #D70015;
+  --warning-bg: #FFF4E5;
+  --warning-text: #B35C00;
+  --card-shadow: 0 2px 10px rgba(0, 0, 0, 0.04), 0 0 0 1px #E5E5EA;
+  --header-grad: linear-gradient(135deg, #1C1C1E 0%, #3A3A3C 100%);
+  font-family: 'Space Grotesk', -apple-system, sans-serif;
+  background-color: var(--bg);
+  color: var(--text-main);
+}
+
+/* =========================================================
+   PAGE CONTAINER & REPORT ELEMENTS
+   ========================================================= */
+.portal-nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  height: 68px;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--card-shadow);
+  transition: all 0.3s;
+}
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.brand-logo {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-main);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.brand-tag {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--brand-light);
+  color: var(--brand);
+  border: 1px solid var(--brand);
+}
+.nav-links {
+  display: flex;
+  gap: 12px;
+}
+.nav-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.15s;
+}
+.nav-link:hover {
+  background: var(--bg-subtle);
+  color: var(--text-main);
+}
+.nav-link.active {
+  background: var(--brand-light);
+  color: var(--brand);
+  font-weight: 700;
+}
+
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+/* Header & KPI Summary Row */
+.report-header {
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.header-title-box h1 {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+.header-title-box p {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--success-bg);
+  color: var(--success-text);
+  border: 1px solid currentColor;
+}
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background: currentColor;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* KPI Summary Cards */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+  margin-bottom: 36px;
+}
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px 24px;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--brand);
+}
+.kpi-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  margin-bottom: 8px;
+}
+.kpi-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.kpi-meta {
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.kpi-tag-pos {
+  color: var(--success-text);
+  background: var(--success-bg);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+.kpi-tag-neg {
+  color: var(--danger-text);
+  background: var(--danger-bg);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+/* Section Card & Tables */
+.section-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+  padding: 32px 36px;
+  margin-bottom: 32px;
+  transition: all 0.3s;
+}
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-light);
+}
+.section-head h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-desc {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+
+/* Modern Data Table */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+th {
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+}
+tr:last-child td {
+  border-bottom: none;
+}
+tr:hover td {
+  background: var(--brand-light);
+}
+
+/* Badge Styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.badge-breakout { background: var(--success-bg); color: var(--success-text); }
+.badge-slump { background: var(--danger-bg); color: var(--danger-text); }
+.badge-alert { background: var(--danger-bg); color: var(--danger-text); font-weight: 800; border: 1px solid currentColor; }
+.badge-notice { background: var(--warning-bg); color: var(--warning-text); font-weight: 700; }
+.badge-stable { background: var(--bg-subtle); color: var(--text-muted); }
+
+/* Value Highlighting */
+.num-pos { color: var(--success-text); font-weight: 700; }
+.num-neg { color: var(--danger-text); font-weight: 700; }
+.staff-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  background: var(--bg-subtle);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+footer {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-faint);
+  font-size: 13px;
+  border-top: 1px solid var(--border);
+}
+</style>
+</head>
+<body class="theme-warm">
+
+<!-- INTERACTIVE STYLE SWITCHER BAR -->
+<div class="style-bar">
+  <div class="style-bar-title">
+    🎨 <span>Выберите Дизайн-Стиль Отчета:</span>
+  </div>
+  <div class="theme-buttons">
+    <button class="theme-btn active" onclick="setTheme('theme-warm')">
+      🧋 1. Warm Boba & Oat (Фирменный теплый)
+    </button>
+    <button class="theme-btn" onclick="setTheme('theme-dark')">
+      ⚡ 2. Obsidian & Emerald (Dark Pro Executive)
+    </button>
+    <button class="theme-btn" onclick="setTheme('theme-glass')">
+      💎 3. Nordic Glass & Indigo (Modern SaaS)
+    </button>
+    <button class="theme-btn" onclick="setTheme('theme-editorial')">
+      📰 4. Neo-Editorial (High Contrast Clean)
+    </button>
+  </div>
+  <div class="theme-desc-banner" id="theme-desc">
+    Теплые кофейные и молочные тона, мягкие тени, премиальный брендинг
+  </div>
+</div>
+
+<!-- TOP PORTAL NAVIGATION -->
+<nav class="portal-nav">
+  <div class="brand-group">
+    <a href="https://bobacafe.net/internal/" class="brand-logo">🧋 Боба Кролик</a>
+    <span class="brand-tag">Executive Portal</span>
+  </div>
+  <div class="nav-links">
+    <a href="https://bobacafe.net/internal/" class="nav-link">← Портал</a>
+    <a href="https://bobacafe.net/internal/weekly/" class="nav-link active">📊 Еженедельный отчет</a>
+  </div>
+</nav>
+
+<!-- MAIN CONTAINER -->
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="report-header">
+    <div class="header-title-box">
+      <h1>Еженедельный бизнес-отчет: 30 мар – 05 апр 2026</h1>
+      <p>Сравнение с 4-недельным базисом (4W Baseline) и предыдущей неделей (WoW)</p>
+    </div>
+    <div>
+      <span class="live-pill"><span class="live-dot"></span> Отчет сформирован: 06 апр 2026, 06:00</span>
+    </div>
+  </div>
+
+  <!-- EXECUTIVE SUMMARY CARDS -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Выручка сети (Неделя)</div>
+      <div class="kpi-value">₽1,842,500</div>
+      <div class="kpi-meta">
+        <span class="kpi-tag-pos">↑ 8.4% WoW</span>
+        <span>vs 4W: <strong class="num-pos">+6.2%</strong></span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Количество заказов (Трафик)</div>
+      <div class="kpi-value">4,120</div>
+      <div class="kpi-meta">
+        <span class="kpi-tag-pos">↑ 5.1% WoW</span>
+        <span>vs 4W: <strong class="num-pos">+3.8%</strong></span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Средний чек (Ticket Size)</div>
+      <div class="kpi-value">₽447</div>
+      <div class="kpi-meta">
+        <span class="kpi-tag-pos">↑ 3.2% WoW</span>
+        <span>4W Avg: ₽433</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Opportunity Gap (Left on Table)</div>
+      <div class="kpi-value">₽94,200</div>
+      <div class="kpi-meta">
+        <span class="kpi-tag-neg">⚠️ Потенциал апселла</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: NETWORK OVERVIEW -->
+  <div class="section-card">
+    <div class="section-head">
+      <h2>1. Сеть торговых точек — Dual Baseline Overview</h2>
+    </div>
+    <p class="section-desc">
+      Оценка выручки по двум базисам: <strong>4W Baseline</strong> (устойчивый тренд) и <strong>WoW</strong> (недельные колебания).
+    </p>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Точка (Store)</th>
+            <th>Выручка (Неделя)</th>
+            <th>Прошлая неделя</th>
+            <th>WoW %</th>
+            <th>4W Базис</th>
+            <th>vs 4W %</th>
+            <th>Статус</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>НОВО КП</strong></td>
+            <td>₽155,815</td>
+            <td>₽130,845</td>
+            <td><span class="num-pos">↑ 19.1%</span></td>
+            <td>₽142,000</td>
+            <td><span class="num-pos">↑ 9.7%</span></td>
+            <td><span class="badge badge-breakout">🟢 Breakout</span></td>
+          </tr>
+          <tr>
+            <td><strong>ГОРЬКОГО</strong></td>
+            <td>₽182,400</td>
+            <td>₽178,200</td>
+            <td><span class="num-pos">↑ 2.4%</span></td>
+            <td>₽180,000</td>
+            <td><span class="num-pos">↑ 1.3%</span></td>
+            <td><span class="badge badge-stable">⚪ Core</span></td>
+          </tr>
+          <tr>
+            <td><strong>СОВЕТОВ</strong></td>
+            <td>₽94,300</td>
+            <td>₽112,000</td>
+            <td><span class="num-neg">↓ 15.8%</span></td>
+            <td>₽108,500</td>
+            <td><span class="num-neg">↓ 13.1%</span></td>
+            <td><span class="badge badge-slump">🔴 Underperforming</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 2: CALENDAR DYNAMICS & ATTACH INTELLIGENCE -->
+  <div class="section-card">
+    <div class="section-head">
+      <h2>2. Динамика Будни / Выходные и Attach Rate Топингов</h2>
+    </div>
+    <p class="section-desc">
+      Нормализация календарного фактора и аудит кросс-продаж (Десерты, Топинги, Мульти-напитки) с бенчмарком верхнего квартиля.
+    </p>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Точка</th>
+            <th>Будни (Пн-Пт)</th>
+            <th>Выходные (Сб-Вс)</th>
+            <th>Паттерн недели</th>
+            <th>Attach Десертов</th>
+            <th>Attach Топингов</th>
+            <th>₽ На столе (Gap)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>НОВО КП</strong></td>
+            <td><span class="num-pos">↑ 14.2%</span></td>
+            <td><span class="num-pos">↑ 28.5%</span></td>
+            <td><span class="badge badge-breakout">🔥 Full Growth</span></td>
+            <td>18.4%</td>
+            <td>34.2%</td>
+            <td>₽8,400</td>
+          </tr>
+          <tr>
+            <td><strong>ГОРЬКОГО</strong></td>
+            <td><span class="num-pos">↑ 8.1%</span></td>
+            <td><span class="num-neg">↓ 6.4%</span></td>
+            <td><span class="badge badge-notice">🌤️ Weekend Drag</span></td>
+            <td>24.1%</td>
+            <td>41.5%</td>
+            <td>₽3,200</td>
+          </tr>
+          <tr>
+            <td><strong>СОВЕТОВ</strong></td>
+            <td><span class="num-neg">↓ 12.0%</span></td>
+            <td><span class="num-neg">↓ 18.2%</span></td>
+            <td><span class="badge badge-slump">❄️ Full Slump</span></td>
+            <td>9.8%</td>
+            <td>18.3%</td>
+            <td><strong class="num-neg">₽24,800</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 3: MENU DECISION SIGNALS -->
+  <div class="section-card">
+    <div class="section-head">
+      <h2>3. Матрица Решений по Меню (Menu Action Signals)</h2>
+    </div>
+    <p class="section-desc">
+      Автоматическая классификация позиций меню на основе объема продаж и траектории роста.
+    </p>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Позиция меню</th>
+            <th>Категория</th>
+            <th>Кол-во (шт)</th>
+            <th>Выручка</th>
+            <th>WoW %</th>
+            <th>Сигнал Решения</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Матча Латте Клубника</strong></td>
+            <td>Фирменные напитки</td>
+            <td>480</td>
+            <td>₽168,000</td>
+            <td><span class="num-pos">↑ 32.0%</span></td>
+            <td><span class="badge badge-breakout">🌟 Promote (Лидер роста)</span></td>
+          </tr>
+          <tr>
+            <td><strong>Классический Милк Ти</strong></td>
+            <td>Классика</td>
+            <td>820</td>
+            <td>₽246,000</td>
+            <td><span class="num-pos">↑ 1.2%</span></td>
+            <td><span class="badge badge-stable">⚪ Keep Core (Базовый)</span></td>
+          </tr>
+          <tr>
+            <td><strong>Лимонад Лаванда-Черника</strong></td>
+            <td>Лимонады</td>
+            <td>24</td>
+            <td>₽7,200</td>
+            <td><span class="num-neg">↓ 42.0%</span></td>
+            <td><span class="badge badge-slump">✂️ Cut / Replace (Под замену)</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 4: OPERATIONAL ANOMALY & LOSS PREVENTION -->
+  <div class="section-card">
+    <div class="section-head">
+      <h2>4. Операционные Аномалии и Loss Prevention (Смены Сотрудников)</h2>
+    </div>
+    <p class="section-desc">
+      Выявление резких просадок доли наличных (сигнал кассовой дисциплины) и дневных пауз в продажах с автоматической привязкой к смене.
+    </p>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Дата</th>
+            <th>Точка</th>
+            <th>Сотрудники на смене</th>
+            <th>Наличные</th>
+            <th>Всего</th>
+            <th>Доля нал.</th>
+            <th>Базис %</th>
+            <th>Отклонение</th>
+            <th>Статус</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2026-03-30</td>
+            <td><strong>НОВО КП</strong></td>
+            <td><span class="staff-chip">Анна Иванова (1 см), Максим Смирнов (2 см)</span></td>
+            <td>₽0</td>
+            <td>₽50,000</td>
+            <td><strong>0.0%</strong></td>
+            <td>30.0%</td>
+            <td><span class="num-neg">-30.0%</span></td>
+            <td><span class="badge badge-alert">🚨 High Alert</span></td>
+          </tr>
+          <tr>
+            <td>2026-03-30</td>
+            <td><strong>СОВЕТОВ</strong></td>
+            <td><span class="staff-chip">Сергей Васильев (весь день)</span></td>
+            <td colspan="5"><em>Пауза в пробитии чеков: 11:00 – 13:00 (120 мин)</em></td>
+            <td><span class="badge badge-notice">⚠️ Notice</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Боба Кролик &copy; 2026 &nbsp;·&nbsp; Внутренний портал бизнес-аналитики &nbsp;·&nbsp; Только для служебного пользования
+</footer>
+
+<script>
+const themes = {
+  'theme-warm': 'Теплые кофейные и молочные тона, мягкие тени, премиальный брендинг кафе',
+  'theme-dark': 'Глубокий обсидиан, изумрудные акценты, высококонтрастные данные, стиль Dark Pro Terminal',
+  'theme-glass': 'Матовое стекло (Glassmorphism), индиго-градиенты, минимализм скандинавского SaaS',
+  'theme-editorial': 'Швейцарская типографика, моноширинные колонки, строгая контрастная сетка'
+};
+
+function setTheme(themeName) {
+  document.body.className = themeName;
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('onclick').includes(themeName));
+  });
+  document.getElementById('theme-desc').textContent = themes[themeName] || '';
+}
+</script>
+
+</body>
+</html>

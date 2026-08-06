@@ -45,3 +45,18 @@ def load_product_hierarchy(path):
     h.columns = ["product", "category", "subcategory", "product_en", "variant", "featured"]
     h["featured"] = h["featured"].fillna(0).astype(int)
     return h.reset_index(drop=True)
+
+
+def load_employee_schedule(spark, table, date_from, date_to):
+    try:
+        sdf = (
+            spark.table(table)
+            .filter(F.col("date").between(date_from, date_to))
+        )
+        df = sdf.toPandas()
+        df["date"] = pd.to_datetime(df["date"])
+        return df
+    except Exception as e:
+        print(f"Note: Could not load employee schedule ({e}), continuing without schedule matching.")
+        return pd.DataFrame()
+
