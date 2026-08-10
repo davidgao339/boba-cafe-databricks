@@ -419,7 +419,7 @@ def update_bobacafe_web_index(token, week_start, repo="davidgao339/bobacafe-web"
             content = content.replace('<div class="report-list">\n', f'<div class="report-list">\n{new_entry}', 1)
 
         payload = {
-            "message": f"auto: index weekly report {week_start} [skip ci]",
+            "message": f"auto: index weekly report {week_start}",
             "content": base64.b64encode(content.encode("utf-8")).decode("ascii"),
             "sha": sha,
             "branch": branch,
@@ -488,7 +488,7 @@ def publish_report(
                 token=resolved_token,
                 repo=web_repo,
                 branch=branch,
-                message=f"auto: weekly report {week_start} [skip ci]",
+                message=f"auto: weekly report {week_start}",
             )
             update_bobacafe_web_index(
                 token=resolved_token,
@@ -504,7 +504,7 @@ def publish_report(
                 token=resolved_token,
                 repo=repo,
                 branch=branch,
-                message=f"auto: weekly report {week_start} [skip ci]",
+                message=f"auto: weekly report {week_start}",
             )
             push_to_github(
                 html_content=html_content,
@@ -512,7 +512,7 @@ def publish_report(
                 token=resolved_token,
                 repo=repo,
                 branch=branch,
-                message=f"auto: archive weekly report {week_start} [skip ci]",
+                message=f"auto: archive weekly report {week_start}",
             )
         else:
             print("[Publisher] Note: No GitHub token configured. Remote push skipped; local files updated.")
