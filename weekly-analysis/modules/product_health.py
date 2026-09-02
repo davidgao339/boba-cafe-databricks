@@ -79,6 +79,7 @@ def _enrich(txn, hierarchy):
         # Match normalized names in hierarchy as well
         hier_clean = hierarchy.copy()
         hier_clean["product_clean"] = hier_clean["product"].apply(_clean_product_name)
+        hier_clean = hier_clean.drop_duplicates(subset=["product_clean"])
 
         df = df.merge(
             hier_clean[["product_clean", "category", "subcategory", "product_en", "variant", "featured"]],
