@@ -70,26 +70,25 @@ def fetch_orders(sid, points, start_dt, end_dt):
     """
     from pipeline.config import POS_TO_STORE
     from datetime import timedelta
+    import concurrent.futures
 
     headers = {"X-SBISSessionID": sid, "Accept": "application/json"}
     all_items = []
-
-    for p in points:
+    
+    def process_point(p):
         point_id = p["id"]
         default_name = p["name"]
-        print(f"  Fetching point {point_id} ({default_name})...")
-
-        # SBIS API page parameter is broken (returns same 100 orders). 
-        # Workaround: slice the time interval recursively if >100 orders are found.
+        print(f"  [START] Fetching point {point_id} ({default_name})...")
+        
+        point_items = []
         intervals = [(start_dt, end_dt)]
         seen_order_keys = set()
-
+        
         while intervals:
             cur_start, cur_end = intervals.pop(0)
 
-            # Safety check to prevent infinite loop on <1 second intervals
             if (cur_end - cur_start).total_seconds() < 1:
-                print(f"    WARNING: Interval {cur_start} - {cur_end} too small, skipping to prevent infinite loop.")
+                print(f"    WARNING: Interval {cur_start} - {cur_end} too small on point {point_id}, skipping.")
                 continue
 
             params = {
@@ -105,7 +104,6 @@ def fetch_orders(sid, points, start_dt, end_dt):
             has_more = (payload.get("outcome") or {}).get("hasMore")
 
             if has_more and len(orders) >= 100:
-                # Interval too large, split in half
                 mid_point = cur_start + (cur_end - cur_start) / 2
                 intervals.insert(0, (mid_point, cur_end))
                 intervals.insert(0, (cur_start, mid_point))
@@ -128,17 +126,9 @@ def fetch_orders(sid, points, start_dt, end_dt):
                 is_online = "онлайн" in str(raw_cust_name or "").lower()
 
                 payments = o.get("Payments") or []
-                if payments:
-                    pos_rnm = payments[0].get("KKTNumber") or "Non-Fiscal"
-                else:
-                    pos_rnm = "Non-Fiscal"
+                pos_rnm = payments[0].get("KKTNumber") or "Non-Fiscal" if payments else "Non-Fiscal"
+                store_name = POS_TO_STORE.get(pos_rnm, f"UNKNOWN_{pos_rnm[-4:]}")
 
-                if pos_rnm in POS_TO_STORE:
-                    store_name = POS_TO_STORE[pos_rnm]
-                else:
-                    store_name = f"UNKNOWN_{pos_rnm[-4:]}"
-
-                # Determine transaction type
                 txn_type = "Unknown"
                 if payments:
                     p0 = payments[0]
@@ -160,9 +150,6 @@ def fetch_orders(sid, points, start_dt, end_dt):
                     txn_type = "Non-Fiscal"
 
                 items = o.get("SaleNomenclatures") or []
-                if not items:
-                    continue
-
                 for item in items:
                     qty = _nz(item.get("Quantity"))
                     price = _nz(item.get("CatalogPrice"))
@@ -185,16 +172,15 @@ def fetch_orders(sid, points, start_dt, end_dt):
                         "revenue_raw": net_revenue,
                         "discount_amount": discount,
                     }
-                    all_items.append(base)
+                    point_items.append(base)
 
-                    # Toppings (all modifiers, including free ones)
                     for pos in item.get("Positions") or []:
                         if pos.get("IsModifier"):
                             t_qty = _nz(pos.get("Quantity"))
                             t_disc = _nz(pos.get("CheckDiscount")) or _nz(pos.get("TotalDiscount"))
                             t_net = (_nz(pos.get("CatalogPrice")) * t_qty) - t_disc
 
-                            all_items.append({
+                            point_items.append({
                                 **base,
                                 "product": pos.get("Name"),
                                 "is_topping": True,
@@ -202,6 +188,15 @@ def fetch_orders(sid, points, start_dt, end_dt):
                                 "revenue_raw": t_net,
                                 "discount_amount": t_disc,
                             })
+                            
+        print(f"  [DONE] Point {point_id} ({default_name}) -> {len(point_items)} items")
+        return point_items
+
+    # Fetch points in parallel (10 workers to speed up the time slicing overhead)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        futures = [executor.submit(process_point, p) for p in points]
+        for future in concurrent.futures.as_completed(futures):
+            all_items.extend(future.result())
 
     print(f"  Fetched {len(all_items):,} line items total")
     return all_items
