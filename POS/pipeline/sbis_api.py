@@ -69,6 +69,7 @@ def fetch_orders(sid, points, start_dt, end_dt):
     Returns a list of dicts (one per line item / topping).
     """
     from pipeline.config import POS_TO_STORE
+    from datetime import timedelta
 
     headers = {"X-SBISSessionID": sid, "Accept": "application/json"}
     all_items = []
@@ -78,25 +79,49 @@ def fetch_orders(sid, points, start_dt, end_dt):
         default_name = p["name"]
         print(f"  Fetching point {point_id} ({default_name})...")
 
-        page = 0
-        while True:
+        # SBIS API page parameter is broken (returns same 100 orders). 
+        # Workaround: slice the time interval recursively if >100 orders are found.
+        intervals = [(start_dt, end_dt)]
+        seen_order_keys = set()
+
+        while intervals:
+            cur_start, cur_end = intervals.pop(0)
+
+            # Safety check to prevent infinite loop on <1 second intervals
+            if (cur_end - cur_start).total_seconds() < 1:
+                print(f"    WARNING: Interval {cur_start} - {cur_end} too small, skipping to prevent infinite loop.")
+                continue
+
             params = {
                 "pointId": point_id,
-                "fromDateTime": _fmt(start_dt),
-                "toDateTime": _fmt(end_dt),
+                "fromDateTime": _fmt(cur_start),
+                "toDateTime": _fmt(cur_end),
                 "withDetail": "true",
-                "page": page,
-                "pageSize": 200,
+                "pageSize": 100,
             }
 
             payload = _request_with_retry(ORDERS_URL, headers, params)
             orders = payload.get("orders") or []
+            has_more = (payload.get("outcome") or {}).get("hasMore")
+
+            if has_more and len(orders) >= 100:
+                # Interval too large, split in half
+                mid_point = cur_start + (cur_end - cur_start) / 2
+                intervals.insert(0, (mid_point, cur_end))
+                intervals.insert(0, (cur_start, mid_point))
+                continue
+
             if not orders:
-                break
+                continue
 
             for o in orders:
                 if o.get("Deleted"):
                     continue
+
+                order_key = o.get("Key")
+                if order_key in seen_order_keys:
+                    continue
+                seen_order_keys.add(order_key)
 
                 order_number = o.get("Number")
                 raw_cust_name = o.get("CustomerName")
@@ -177,10 +202,6 @@ def fetch_orders(sid, points, start_dt, end_dt):
                                 "revenue_raw": t_net,
                                 "discount_amount": t_disc,
                             })
-
-            if not (payload.get("outcome") or {}).get("hasMore"):
-                break
-            page += 1
 
     print(f"  Fetched {len(all_items):,} line items total")
     return all_items
