@@ -59,17 +59,17 @@ def build_transactions(raw_data):
 
     df = pd.DataFrame(raw_data)
 
-    df["datetime"] = pd.to_datetime(df["datetime"], infer_datetime_format=True)
+    df["datetime"] = pd.to_datetime(df["datetime"])
     df["date"] = df["datetime"].dt.date
 
     sign = df["is_return"].apply(lambda x: -1 if x else 1)
     df["qty"] = df["qty_raw"] * sign
     df["standard_revenue"] = df["revenue_raw"] * sign
 
-    # Online & E-Transfer orders: revenue = discount_amount (aggregator commission & 100% discount SBP model)
+    # Online & E-Transfer orders: revenue = discount_amount only when 100% discount was applied (discount > 0 and standard_revenue == 0)
     df["revenue"] = df.apply(
         lambda r: r["discount_amount"] * sign[r.name]
-        if (r["online"] or r["transaction_type"] == "E-Transfer")
+        if (r["online"] or r["transaction_type"] == "E-Transfer") and r["standard_revenue"] == 0 and r["discount_amount"] > 0
         else r["standard_revenue"],
         axis=1,
     )
@@ -147,7 +147,7 @@ def build_product_sales(transactions_df):
         .rename(columns={"store_name": "store"})
     )
     result["date"] = pd.to_datetime(result["date"]).dt.date
-    result["revenue"] = result["revenue"].astype(int)
+    result["revenue"] = result["revenue"].fillna(0).round().astype(int)
     return result.sort_values(["date", "store", "revenue"], ascending=[True, True, False]).reset_index(drop=True)
 
 
