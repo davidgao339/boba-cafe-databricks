@@ -110,29 +110,37 @@ def fetch_orders(sid, points, start_dt, end_dt):
 
                 order_number = o.get("Number")
                 raw_cust_name = o.get("CustomerName")
-                is_online = "онлайн" in str(raw_cust_name or "").lower()
+                cust_lower = str(raw_cust_name or "").lower()
+                is_online = "онлайн" in cust_lower
+                is_etransfer = any(k in cust_lower for k in ["спб", "сбп", "перевод", "etransfer", "e-transfer"])
 
                 payments = o.get("Payments") or []
-                pos_rnm = payments[0].get("KKTNumber") or "Non-Fiscal" if payments else "Non-Fiscal"
-                store_name = POS_TO_STORE.get(pos_rnm, f"UNKNOWN_{pos_rnm[-4:]}")
+                pos_rnm = next((p.get("KKTNumber") for p in payments if p.get("KKTNumber")), None) or "Non-Fiscal"
+                store_name = POS_TO_STORE.get(pos_rnm)
+                if not store_name:
+                    for s in POS_TO_STORE.values():
+                        if s in default_name:
+                            store_name = s
+                            break
+                    if not store_name:
+                        store_name = f"UNKNOWN_{pos_rnm[-4:]}"
 
                 txn_type = "Unknown"
-                if payments:
-                    p0 = payments[0]
-                    bank = _nz(p0.get("BankSum") or p0.get("PayBank"))
-                    cash = _nz(p0.get("CashSum") or p0.get("PayCash"))
-                    if is_online:
-                        txn_type = "Online"
-                    elif bank > 0 and cash > 0:
-                        txn_type = "Mixed"
-                    elif bank > 0:
-                        txn_type = "Card"
-                    elif cash > 0:
-                        txn_type = "Cash"
-                    elif p0.get("Nonfiscal"):
-                        txn_type = "Non-Fiscal"
-                elif is_online:
+                if is_online:
                     txn_type = "Online"
+                elif is_etransfer:
+                    txn_type = "E-Transfer"
+                elif payments:
+                    total_bank = sum(_nz(p.get("BankSum") or p.get("PayBank")) for p in payments)
+                    total_cash = sum(_nz(p.get("CashSum") or p.get("PayCash")) for p in payments)
+                    if total_bank > 0 and total_cash > 0:
+                        txn_type = "Mixed"
+                    elif total_bank > 0:
+                        txn_type = "Card"
+                    elif total_cash > 0:
+                        txn_type = "Cash"
+                    elif any(p.get("Nonfiscal") for p in payments):
+                        txn_type = "Non-Fiscal"
                 else:
                     txn_type = "Non-Fiscal"
 

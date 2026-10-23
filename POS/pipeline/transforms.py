@@ -66,9 +66,11 @@ def build_transactions(raw_data):
     df["qty"] = df["qty_raw"] * sign
     df["standard_revenue"] = df["revenue_raw"] * sign
 
-    # Online orders: revenue = discount_amount (aggregator commission model)
+    # Online & E-Transfer orders: revenue = discount_amount (aggregator commission & 100% discount SBP model)
     df["revenue"] = df.apply(
-        lambda r: r["discount_amount"] * sign[r.name] if r["online"] else r["standard_revenue"],
+        lambda r: r["discount_amount"] * sign[r.name]
+        if (r["online"] or r["transaction_type"] == "E-Transfer")
+        else r["standard_revenue"],
         axis=1,
     )
 

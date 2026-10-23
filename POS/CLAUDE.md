@@ -59,13 +59,13 @@ Notebooks 2 and 3 read from the `transactions` Delta table (via `transforms.load
 ## Key Domain Logic
 
 **Revenue calculation:**
-- Online orders: `revenue = discount_amount` (commission from aggregator, e.g. Yandex.Eda)
+- Online & E-Transfer orders: `revenue = discount_amount` (aggregator commission & 100% discount SBP/transfer model)
 - All other orders: `revenue = qty × price − discount_amount`
 - Returns: qty and revenue are negated
 
-**Transaction types:** `Cash`, `Card`, `Mixed`, `Online`, `Non-Fiscal`, `Unknown`
+**Transaction types:** `Cash`, `Card`, `Mixed`, `Online`, `E-Transfer`, `Non-Fiscal`, `Unknown`
 
-**Payment types (in `daily_sales_v2`):** `cash`, `card`, `online`, `other` (mixed/non-fiscal/unknown)
+**Payment types (in `daily_sales_v2`):** `cash`, `card`, `online`, `other` (e-transfer/mixed/non-fiscal/unknown)
 
 **Delta upsert pattern** (`save_delta`): deletes all rows in the target date range first, then appends — safe to re-run notebooks idempotently.
 
